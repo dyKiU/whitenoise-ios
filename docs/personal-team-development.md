@@ -42,4 +42,8 @@ canonical chat destinations through the actual rendering/copy policy. Production
 behavior is unchanged. All 99 tests in AppStateBootstrapTests,
 AppContainerConfigTests and MessageLinkCopyTests passed after correction. The
 actual result count, terminal log hash and two changed test-file hashes were
-independently verified. A complete corrected-profile suite remains pending.
+independently verified. The complete corrected-profile suite from signed `7622a09` then passed on M5:
+2,702 passed, zero failed, two skipped (2,704 total), in 204.82 seconds. Root
+independently verified the actual xcresult, terminal log hash, source commit and
+clean worktree. Compact proof is in the parent workspace
+`build/results/ios-personal-profile-full-pr-root-verification.json`.
