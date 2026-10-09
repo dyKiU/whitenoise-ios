@@ -32,3 +32,14 @@ Validation on 2026-10-09:
 The original runs and compact verification records live in the parent workspace
 `build/results/ios-personal-*`. Preserve the distinct development storage identity
 when replacing the app. Full experimental sync integration is a separate gate.
+
+The initial complete Personal Team M5 simulator run executed 2,704 tests:
+2,699 passed, three failed, two skipped. Two fixtures assumed available remote
+push; one supplied a flavor URL instead of the canonical generated chat URL.
+The fixtures now verify local authorization without remote registration in this
+profile, require absent Personal Team push configuration, and exercise rejected
+canonical chat destinations through the actual rendering/copy policy. Production
+behavior is unchanged. All 99 tests in AppStateBootstrapTests,
+AppContainerConfigTests and MessageLinkCopyTests passed after correction. The
+actual result count, terminal log hash and two changed test-file hashes were
+independently verified. A complete corrected-profile suite remains pending.

@@ -629,6 +629,7 @@ struct AppStateBootstrapTests {
 
     @Test func createIdentityDefaultsNotificationsOnWhenPermissionIsGranted() async throws {
         try await notificationDefaultsTestGate.withLock {
+            let nativePushAvailable = Bundle.main.bundleIdentifier != "dev.ipf.whitenoise.ios.staging.personal"
             var authorizationRequestCount = 0
             var remoteRegistrationRequestCount = 0
             let notifications = grantedNotifications(
@@ -637,7 +638,8 @@ struct AppStateBootstrapTests {
                 },
                 remoteNotificationRegistrar: {
                     remoteRegistrationRequestCount += 1
-                }
+                },
+                remoteNotificationsAvailable: nativePushAvailable
             )
             let appState = try testAppState(notifications: notifications)
             await appState.bootstrap()
@@ -648,9 +650,13 @@ struct AppStateBootstrapTests {
             let maybeSettings = await appState.notificationSettings(for: account.label)
             let settings = try #require(maybeSettings)
             #expect(settings.localNotificationsEnabled)
-            #expect(settings.nativePushEnabled)
+            #expect(settings.nativePushEnabled == nativePushAvailable)
             #expect(authorizationRequestCount == 1)
-            #expect(remoteRegistrationRequestCount >= 1)
+            if nativePushAvailable {
+                #expect(remoteRegistrationRequestCount >= 1)
+            } else {
+                #expect(remoteRegistrationRequestCount == 0)
+            }
 
             let marmot = try #require(appState.client?.marmot)
             _ = try? marmot.setLocalNotificationsEnabled(accountRef: account.label, enabled: false)
@@ -2354,7 +2360,8 @@ struct AppStateBootstrapTests {
 
     private func grantedNotifications(
         onAuthorizationRequest: @escaping () -> Void = {},
-        remoteNotificationRegistrar: @escaping () -> Void = {}
+        remoteNotificationRegistrar: @escaping () -> Void = {},
+        remoteNotificationsAvailable: Bool = true
     ) -> AppNotifications {
         AppNotifications(
             requestAuthorizationHandler: {
@@ -2362,7 +2369,8 @@ struct AppStateBootstrapTests {
                 return true
             },
             authorizationStatusProvider: { .authorized },
-            remoteNotificationRegistrar: remoteNotificationRegistrar
+            remoteNotificationRegistrar: remoteNotificationRegistrar,
+            remoteNotificationsAvailable: remoteNotificationsAvailable
         )
     }
 
@@ -3360,6 +3368,10 @@ struct AppContainerConfigTests {
     }
 
     @Test func pushServerConfigMatchesBuildFlavor() throws {
+        if Bundle.main.bundleIdentifier == "dev.ipf.whitenoise.ios.staging.personal" {
+            #expect(NativePushServerConfig.current() == nil)
+            return
+        }
         // The push server pubkey is flavor-specific (`WHITENOISE_PUSH_SERVER_PUBKEY_HEX`),
         // so assert against the value for the flavor this test bundle was built
         // with rather than hardcoding production; the test runs under Staging in CI.
