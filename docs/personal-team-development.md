@@ -47,3 +47,12 @@ independently verified. The complete corrected-profile suite from signed `7622a0
 independently verified the actual xcresult, terminal log hash, source commit and
 clean worktree. Compact proof is in the parent workspace
 `build/results/ios-personal-profile-full-pr-root-verification.json`.
+
+Local experimental artifact installation now verifies the requested feature list
+and exact source/builder commit before replacing the existing artifact. Both the
+compiled Swift provenance and `MARMOT_VERSION` record the actual features and
+source branch. Four isolated installer regressions failed against the previous
+script, then all four passed; one compiles and executes the emitted Swift
+provenance. Four existing published-binding coherence tests also pass. These
+checks use synthetic build outputs and do not establish a native experimental
+build, exported linking API or message synchronization.

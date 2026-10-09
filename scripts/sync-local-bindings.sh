@@ -2,7 +2,7 @@
 # Build a clean, pinned MDK checkout. Local artifacts are never committed.
 set -euo pipefail
 if [[ $# != 2 ]]; then
-  echo 'usage: scripts/sync-local-bindings.sh <mdk-checkout> <full-master-sha>' >&2
+  echo 'usage: scripts/sync-local-bindings.sh <mdk-checkout> <full-source-sha>' >&2
   exit 2
 fi
 local_mdk="$(cd "$1" && pwd)"
@@ -21,10 +21,25 @@ export OTLP_EXPORT=1 PRODUCT_ANALYTICS_EXPORT=1
 )
 python3 - "$local_mdk" "$ios_root" "$source_sha" <<'PY'
 from pathlib import Path
-import datetime,hashlib,json,shutil,subprocess,sys
+import datetime,hashlib,json,os,shutil,subprocess,sys
 mdk,root,sha=Path(sys.argv[1]),Path(sys.argv[2]),sys.argv[3]
 package=root/'Packages/MarmotKit'
 manifest=json.loads((root/f'build/local-marmotkit/marmotkit-ios-local-{sha}.manifest.json').read_text())
+features=manifest.get('features')
+expected_features=['otlp-export','product-analytics-export']
+experimental=os.environ.get('EXPERIMENTAL_DEVICE_SYNC','0')
+if experimental not in {'','0','false','1','true'}:
+    raise ValueError('EXPERIMENTAL_DEVICE_SYNC must be 0, false, 1 or true')
+if experimental in {'1','true'}:
+    expected_features.append('experimental-device-sync')
+if features != expected_features:
+    raise ValueError('built MarmotKit features do not match the requested local profile')
+if manifest.get('source_sha') != sha or manifest.get('builder_sha') != sha:
+    raise ValueError('built MarmotKit source identity does not match the pinned checkout')
+features_csv=','.join(features)
+branch=subprocess.check_output(['git','-C',str(mdk),'rev-parse','--abbrev-ref','HEAD'],text=True).strip()
+if branch == 'HEAD':
+    branch='detached'
 artifact=package/'Artifacts/MarmotKit.xcframework'
 if artifact.exists(): shutil.rmtree(artifact)
 shutil.copytree(mdk/'crates/marmot-uniffi/output/MarmotKit.xcframework',artifact)
@@ -47,7 +62,7 @@ manifest['installed_swift_sha256']=hashlib.sha256((package/'Sources/MarmotKit/Ma
 (package/'LOCAL_BUILD.json').write_text(json.dumps(manifest,indent=2)+'\n')
 built=datetime.datetime.now(datetime.timezone.utc).isoformat()
 uniffi=re.search(r'uniffi = \{ version = "([^"]+)"', (mdk/'crates/marmot-uniffi/Cargo.toml').read_text()).group(1)
-(package/'MARMOT_VERSION').write_text(f'mdk-sha: {sha}\nmdk-branch: master\nmdk-tag: local-{sha}\nbuilt-at: {built}\nfeatures: otlp-export,product-analytics-export\nSee LOCAL_BUILD.json for exact artifact checksums and toolchain.\n')
+(package/'MARMOT_VERSION').write_text(f'mdk-sha: {sha}\nmdk-branch: {branch}\nmdk-tag: local-{sha}\nbuilt-at: {built}\nuniffi-version: {uniffi}\nfeatures: {features_csv}\nSee LOCAL_BUILD.json for exact artifact checksums and toolchain.\n')
 (package/'Sources/MarmotKit/MarmotKitVersion.swift').write_text(f'''import Foundation
 
 /// Provenance for locally built, unpublished bindings.
@@ -56,7 +71,7 @@ public enum MarmotKitVersion {{
     public static let mdkTag = "local-{sha}"
     public static let builtAt = "{built}"
     public static let uniffiVersion = "{uniffi}"
-    public static let features = "otlp-export,product-analytics-export"
+    public static let features = "{features_csv}"
 }}
 ''')
 PY
