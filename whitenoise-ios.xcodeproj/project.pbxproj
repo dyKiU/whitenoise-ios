@@ -790,7 +790,7 @@
 			buildSettings = {
 				APS_ENVIRONMENT = development;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "whitenoise-ios/whitenoise-ios.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "whitenoise-ios/PersonalTeam.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
 				DEAD_CODE_STRIPPING = YES;
@@ -801,7 +801,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "White Noise";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(WN_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "White Noise uses Face ID to unlock the app.";
@@ -844,7 +844,7 @@
 			buildSettings = {
 				APS_ENVIRONMENT = production;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "whitenoise-ios/whitenoise-ios.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "whitenoise-ios/PersonalTeam.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
 				DEAD_CODE_STRIPPING = YES;

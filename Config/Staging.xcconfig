@@ -1,17 +1,17 @@
-// Staging flavor. Installs side-by-side as dev.ipf.whitenoise.ios.staging.
+// Staging flavor. Installs side-by-side as dev.ipf.whitenoise.ios.staging.personal.
 #include "Shared.xcconfig"
 
 WN_FLAVOR = staging
-WN_DISPLAY_NAME = WN Staging
-WN_URL_SCHEME = marmot-staging
-WN_LEGACY_URL_SCHEME = whitenoise-staging
+WN_DISPLAY_NAME = WN Personal Dev
+WN_URL_SCHEME = marmot-personal
+WN_LEGACY_URL_SCHEME = whitenoise-personal
 
-PRODUCT_BUNDLE_IDENTIFIER = dev.ipf.whitenoise.ios.staging
-NSE_BUNDLE_IDENTIFIER = dev.ipf.whitenoise.ios.staging.NotificationService
+PRODUCT_BUNDLE_IDENTIFIER = dev.ipf.whitenoise.ios.staging.personal
+NSE_BUNDLE_IDENTIFIER = dev.ipf.whitenoise.ios.staging.personal.NotificationService
 
 // NSE shares the app's App Group and keychain group (keyed to the app bundle id).
-APP_GROUP_IDENTIFIER = group.dev.ipf.whitenoise.ios.staging
-KEYCHAIN_ACCESS_GROUP = $(AppIdentifierPrefix)dev.ipf.whitenoise.ios.staging
+APP_GROUP_IDENTIFIER = group.dev.ipf.whitenoise.ios.staging.personal
+KEYCHAIN_ACCESS_GROUP = $(AppIdentifierPrefix)dev.ipf.whitenoise.ios.staging.personal
 
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-Staging
 WHITENOISE_TELEMETRY_ENVIRONMENT = staging
@@ -20,3 +20,7 @@ WHITENOISE_PUSH_SERVER_PUBKEY_HEX = 94186f72f66d09f94ca33599fda4b39cd8ac40376964
 WHITENOISE_PRODUCT_ANALYTICS_APP_KEY = $(STAGING_APTABASE_KEY_WHITENOISE_IOS)
 
 WHITENOISE_DONATION_SERVICE_URL = https:$(WN_SLASH)$(WN_SLASH)payments-staging.ipf.dev
+
+// Local Personal Team development profile: foreground testing only.
+WHITENOISE_PUSH_SERVER_PUBKEY_HEX =
+WHITENOISE_APPLE_PAY_MERCHANT_IDENTIFIER =

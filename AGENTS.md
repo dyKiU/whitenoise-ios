@@ -123,9 +123,13 @@ Install a formal release using its version:
 ./scripts/sync-bindings.sh 0.9.21
 ```
 
-The app now pins the formal MarmotKit 0.11.0 release. For local reproduction only,
-`scripts/sync-local-bindings.sh <clean-mdk-checkout> <full-master-sha>` builds
-matching artifacts with both exporters; restore the published pin before committing.
+The app pins the formal MarmotKit 0.12.0 release. For local reproduction only,
+`scripts/sync-local-bindings.sh <clean-mdk-checkout> <full-source-sha>` builds
+matching artifacts with both exporters. Set `EXPERIMENTAL_DEVICE_SYNC=1` explicitly
+for the private development profile. The installer validates source and features
+before replacing artifacts and records the actual source branch; compiled Swift
+provenance must match the packaged feature list. Restore the published pin before
+committing generated local artifacts.
 Keep the XCFramework ignored. `CancellablePresentedChatList.swift` is a handwritten
 adapter using the released UniFFI native future cancellation API; preserve it on
 binding refresh and run its native cancellation test. Do not patch generated binding files directly or commit an expanded XCFramework. Change Rust/UniFFI, publish an immutable release, install it with the script, then validate the iOS app. The generated Swift source, binary URL, and checksum must always move together.

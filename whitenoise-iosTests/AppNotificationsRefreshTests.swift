@@ -229,3 +229,31 @@ struct AppNotificationsRefreshTests {
         )
     }
 }
+
+@MainActor
+struct PersonalTeamNotificationTests {
+    @Test func localAuthorizationDoesNotRegisterUnavailableRemotePush() async throws {
+        var registrationCount = 0
+        let notifications = AppNotifications(
+            requestAuthorizationHandler: { true },
+            authorizationStatusProvider: { .authorized },
+            remoteNotificationRegistrar: { registrationCount += 1 },
+            remoteNotificationsAvailable: false
+        )
+        let localAuthorizationGranted = try await notifications.requestAuthorizationAndRegister()
+        #expect(localAuthorizationGranted)
+        #expect(registrationCount == 0)
+    }
+
+    @Test func unavailableRemotePushDoesNotReportRegistrationRequested() async {
+        var registrationCount = 0
+        let notifications = AppNotifications(
+            authorizationStatusProvider: { .authorized },
+            remoteNotificationRegistrar: { registrationCount += 1 },
+            remoteNotificationsAvailable: false
+        )
+        let requested = await notifications.registerForRemoteNotificationsIfAuthorized()
+        #expect(!requested)
+        #expect(registrationCount == 0)
+    }
+}
