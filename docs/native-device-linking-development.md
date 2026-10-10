@@ -164,3 +164,13 @@ The exact RED source is retained in named Git stash `e08e67e1`.
 See `native-device-linking-transport-verification.json` for compact evidence.
 These generated-protocol controls do not qualify fresh native pairing or actual
 chat delivery; full new-source qualification remains a separate gate.
+
+The signed transport slice `de7b13a6` subsequently passed full experimental
+Staging2,729 and published0.12 Staging2,702 tests, zero failures and the same two
+existing skips. Root independently verified all786 frozen source inputs and
+complete logs for both cohorts. Three published attempts compiled zero tests
+because of stale FFI precompiled modules; only the diagnosed owned files were
+retired after each target stopped. The preserved e6 overrides were restored and
+all786 experimental inputs verified byte for byte before further work.
+See `native-device-linking-transport-full-verification.json`. No physical
+installation or fresh native pairing/delivery is implied by these full regressions.

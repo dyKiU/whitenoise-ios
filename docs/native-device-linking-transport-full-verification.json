@@ -1,0 +1,124 @@
+{
+  "cohorts": [
+    {
+      "signed_source": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+      "verified_inputs": 786,
+      "sources": {
+        "signed_de7b13a": 782,
+        "preserved_M5_metadata": 2,
+        "preserved_experimental_SDK_override": 2
+      },
+      "result": {
+        "source_base": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+        "source_inputs": 786,
+        "input_manifest_sha256": "48bbea6846e5c96bc4973bcb7eacff02b2306eb7ee303e3fe89112f15d230a0e",
+        "profile": "local-e6/experimentalflag1/Staging",
+        "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+        "exit_code": 0,
+        "seconds": 187.24,
+        "log_sha256": "7ce1078d78c919e97475bdf2f240ac7fcc4a5cbed9ebf32233824e8d048d417a",
+        "physical_phone_changed": false,
+        "scope": "Full signed experimental iOS transport source qualification; native pairing and delivery acceptance remain separate",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 2731,
+          "passedTests": 2729,
+          "failedTests": 0,
+          "skippedTests": 2
+        },
+        "test_failures": []
+      },
+      "scope": "Root independent source and complete log verification. Full regression qualification only, not fresh pairing, actual delivery or physical installation."
+    },
+    {
+      "signed_source": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+      "verified_inputs": 786,
+      "sources": {
+        "signed_de7b13a": 786
+      },
+      "result": {
+        "source_base": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+        "source_inputs": 786,
+        "input_manifest_sha256": "be5fbe2c9068ab2677445a248ca3a425ac22d5ee33b949fed7cc9c6ca908ec3d",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 0,
+        "seconds": 274.6,
+        "log_sha256": "6b89ddef2d0832e08585525e5e21b29b11c78bf1f8147fa402a49bb6b5655c39",
+        "physical_phone_changed": false,
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 2704,
+          "passedTests": 2702,
+          "failedTests": 0,
+          "skippedTests": 2
+        },
+        "test_failures": []
+      },
+      "scope": "Root independent source and complete log verification. Full regression qualification only, not fresh pairing, actual delivery or physical installation."
+    }
+  ],
+  "restored_bindings": {
+    "source": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+    "verified_restored_inputs": 786,
+    "manifest_sha256": "48bbea6846e5c96bc4973bcb7eacff02b2306eb7ee303e3fe89112f15d230a0e",
+    "sdk_stash": "84188266304e5347ce935cc87ee6a458b8a6e44f",
+    "physical_phone_changed": false
+  },
+  "scope": "Full signed-source regression qualification; actual native verification, enrollment, selected chat admission and delivery remain separate.",
+  "zero_test_compile_failures": [
+    {
+      "source_base": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+      "source_inputs": 786,
+      "input_manifest_sha256": "be5fbe2c9068ab2677445a248ca3a425ac22d5ee33b949fed7cc9c6ca908ec3d",
+      "profile": "published-0.12.0/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 7.1,
+      "log_sha256": "a201a54d6308fdd51f9f44710492fcfdd34ded4562f0f6aefd56f500f3b314da",
+      "physical_phone_changed": false,
+      "diagnosed_pcm_retirement": [
+        {
+          "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+          "bytes": 529976,
+          "sha256": "585dd58a343d9c2ab8b482f512718be2285235481def85dad1250c646a681ea2",
+          "cause": "Exact diagnosed header/PCM mismatch; zero tests; owned Xcode target idle"
+        }
+      ]
+    },
+    {
+      "source_base": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+      "source_inputs": 786,
+      "input_manifest_sha256": "be5fbe2c9068ab2677445a248ca3a425ac22d5ee33b949fed7cc9c6ca908ec3d",
+      "profile": "published-0.12.0/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 8.68,
+      "log_sha256": "dc2ef7aa4350aa367116c50206c5e2b61f44face98aef5287f7b16641a84db23",
+      "physical_phone_changed": false,
+      "diagnosed_pcm_retirement": [
+        {
+          "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+          "bytes": 529928,
+          "sha256": "185b55f7a7866b8464afa18b7165c964e806148a62856f0ba99eed71c2cfbdcc",
+          "cause": "Exact diagnosed header/PCM mismatch; zero tests; owned Xcode target idle"
+        }
+      ]
+    },
+    {
+      "source_base": "de7b13a65797d8814126a1bc25f0fd869fdbe8e2",
+      "source_inputs": 786,
+      "input_manifest_sha256": "be5fbe2c9068ab2677445a248ca3a425ac22d5ee33b949fed7cc9c6ca908ec3d",
+      "profile": "published-0.12.0/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 13.75,
+      "log_sha256": "b00dcded991969762a735cf8ae4430a5f33818e62a971bb155339571cb81b787",
+      "physical_phone_changed": false,
+      "diagnosed_pcm_retirement": [
+        {
+          "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+          "bytes": 529928,
+          "sha256": "4c2cb0bbaea99c5cef483773e986224b7723c02c0f5b07fc20bd3b8416bf4428",
+          "cause": "Exact diagnosed header/PCM mismatch; zero tests; owned Xcode target idle"
+        }
+      ]
+    }
+  ]
+}
