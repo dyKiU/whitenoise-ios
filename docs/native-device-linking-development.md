@@ -368,3 +368,17 @@ lint/format/diff and Apple localization checks pass. Exact source stashes, logs,
 hosted simulator bundle hashes and limits are in native-enrollment-approval-pane-evidence.json.
 This is focused native action/lifetime qualification, not full PR or actual native
 A/B/C enrollment acceptance; final integrated SDK/application gates remain required.
+
+Selected-chat transfer is independent of protected-device enrollment. Thin
+MarmotClient factories and original request/consent scopes now forward exact
+revisions and opaque bytes, with lifetime checks before/after every await.
+Invalidation cannot restore authority; cancellation retains exact failed cleanup
+for retry. Reading a consent snapshot never approves the selected chat.
+
+Direct forwarding/factory RED0/4 precedes scope GREEN11/11 and affected74/74;
+strict scoped lint/format/diff checks pass. The first all-controls baseline was
+interrupted at two unreachable default-deny checkpoints and is retained as a
+harness limitation, not terminal qualification. Exact source/logs are recorded
+in native-selected-chat-scope-evidence.json. Account/runtime factory adoption,
+canonical default/full PR qualification and real selected-chat acceptance remain
+separate. No SDK/generated artifacts or native consent UI are committed here.

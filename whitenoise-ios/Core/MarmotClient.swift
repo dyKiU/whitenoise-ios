@@ -1,6 +1,6 @@
 import Foundation
-import OSLog
 @preconcurrency import MarmotKit
+import OSLog
 
 nonisolated struct TimelineReadMarkResult {
     let messageIdHex: String
@@ -50,6 +50,16 @@ nonisolated final class MarmotClient: Sendable {
     let telemetryConfig: TelemetryBuildConfig
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        func beginSelectedChatCopy(accountRef: String, groupIdHex: String, linkedRosterSelector: Data) async throws
+            -> SelectedChatCopy
+        {
+            try await marmot.beginSelectedChatCopy(
+                accountRef: accountRef, groupIdHex: groupIdHex, linkedRosterSelector: linkedRosterSelector)
+        }
+        func receiveSelectedChatCopyRequest(accountRef: String, packet: Data) async throws -> SelectedChatConsent {
+            try await marmot.receiveSelectedChatCopyRequest(accountRef: accountRef, packet: packet)
+        }
+
         func deviceLinkingCapabilities() -> DeviceLinkingCapabilitiesFfi {
             marmot.deviceLinkingCapabilities()
         }
@@ -111,7 +121,8 @@ nonisolated final class MarmotClient: Sendable {
         self.marmot = try Marmot.newWithConfiguration(
             rootPath: rootPath,
             relayUrls: relayUrls,
-            options: MarmotOptions(cursorPersistence: cursorPersistence, clientName: "whitenoise",
+            options: MarmotOptions(
+                cursorPersistence: cursorPersistence, clientName: "whitenoise",
                 attachmentAcquisitionMode: .hostManaged)
         )
         // A rejected audit destination must not block startup; recordings stay local.
@@ -130,7 +141,8 @@ nonisolated final class MarmotClient: Sendable {
         before: TimelineEditVersionFfi?
     ) async throws -> TimelineEditHistoryPageFfi {
         try await Task.detached { [marmot] in
-            try marmot.messageEditHistory(accountRef: accountRef, groupIdHex: groupID,
+            try marmot.messageEditHistory(
+                accountRef: accountRef, groupIdHex: groupID,
                 targetMessageIdHex: messageID, beforeEditedAt: before?.editedAt,
                 beforeMessageIdHex: before?.messageIdHex, limit: 100)
         }.value
@@ -189,17 +201,18 @@ nonisolated final class MarmotClient: Sendable {
         isFollowing: Bool
     ) async throws -> Bool {
         let normalizedAccountId = accountIdHex.lowercased()
-        let updated = if isFollowing {
-            try await marmot.followUser(
-                accountRef: accountRef,
-                userRef: normalizedAccountId
-            )
-        } else {
-            try await marmot.unfollowUser(
-                accountRef: accountRef,
-                userRef: normalizedAccountId
-            )
-        }
+        let updated =
+            if isFollowing {
+                try await marmot.followUser(
+                    accountRef: accountRef,
+                    userRef: normalizedAccountId
+                )
+            } else {
+                try await marmot.unfollowUser(
+                    accountRef: accountRef,
+                    userRef: normalizedAccountId
+                )
+            }
         return updated.contains { $0.caseInsensitiveCompare(normalizedAccountId) == .orderedSame }
     }
 
@@ -660,8 +673,11 @@ nonisolated final class MarmotClient: Sendable {
     /// forward directly — no `Task.detached` — exactly like `signOutAndWipe`.
     /// Routing them here keeps the raw handle out of feature code (the one
     /// seam).
-    func createGroup(accountRef: String, name: String, memberRefs: [String], description: String?) async throws -> String {
-        try await marmot.createGroup(accountRef: accountRef, name: name, memberRefs: memberRefs, description: description)
+    func createGroup(accountRef: String, name: String, memberRefs: [String], description: String?) async throws
+        -> String
+    {
+        try await marmot.createGroup(
+            accountRef: accountRef, name: name, memberRefs: memberRefs, description: description)
     }
 
     func createGroupWithInitialImage(
@@ -730,19 +746,28 @@ nonisolated final class MarmotClient: Sendable {
         try await marmot.notifyConnectivityRestored()
     }
 
-    func replyToMessage(accountRef: String, groupIdHex: String, targetMessageId: String, text: String) async throws -> SendSummaryFfi {
-        try await marmot.replyToMessage(accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: targetMessageId, text: text)
+    func replyToMessage(accountRef: String, groupIdHex: String, targetMessageId: String, text: String) async throws
+        -> SendSummaryFfi
+    {
+        try await marmot.replyToMessage(
+            accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: targetMessageId, text: text)
     }
 
-    func uploadMedia(accountRef: String, groupIdHex: String, request: MediaUploadRequestFfi) async throws -> MediaUploadResultFfi {
+    func uploadMedia(accountRef: String, groupIdHex: String, request: MediaUploadRequestFfi) async throws
+        -> MediaUploadResultFfi
+    {
         try await marmot.uploadMedia(accountRef: accountRef, groupIdHex: groupIdHex, request: request)
     }
 
-    func downloadMedia(accountRef: String, groupIdHex: String, reference: MediaAttachmentReferenceFfi) async throws -> MediaDownloadResultFfi {
+    func downloadMedia(accountRef: String, groupIdHex: String, reference: MediaAttachmentReferenceFfi) async throws
+        -> MediaDownloadResultFfi
+    {
         try await marmot.downloadMedia(accountRef: accountRef, groupIdHex: groupIdHex, reference: reference)
     }
 
-    func inviteMembersDetailed(accountRef: String, groupIdHex: String, memberRefs: [String]) async throws -> GroupMutationResultFfi {
+    func inviteMembersDetailed(accountRef: String, groupIdHex: String, memberRefs: [String]) async throws
+        -> GroupMutationResultFfi
+    {
         try await marmot.inviteMembersDetailed(accountRef: accountRef, groupIdHex: groupIdHex, memberRefs: memberRefs)
     }
 
@@ -754,15 +779,21 @@ nonisolated final class MarmotClient: Sendable {
         try await marmot.declineGroupInvite(accountRef: accountRef, groupIdHex: groupIdHex)
     }
 
-    func removeMembersDetailed(accountRef: String, groupIdHex: String, memberRefs: [String]) async throws -> GroupMutationResultFfi {
+    func removeMembersDetailed(accountRef: String, groupIdHex: String, memberRefs: [String]) async throws
+        -> GroupMutationResultFfi
+    {
         try await marmot.removeMembersDetailed(accountRef: accountRef, groupIdHex: groupIdHex, memberRefs: memberRefs)
     }
 
-    func promoteAdminDetailed(accountRef: String, groupIdHex: String, memberRef: String) async throws -> GroupMutationResultFfi {
+    func promoteAdminDetailed(accountRef: String, groupIdHex: String, memberRef: String) async throws
+        -> GroupMutationResultFfi
+    {
         try await marmot.promoteAdminDetailed(accountRef: accountRef, groupIdHex: groupIdHex, memberRef: memberRef)
     }
 
-    func demoteAdminDetailed(accountRef: String, groupIdHex: String, memberRef: String) async throws -> GroupMutationResultFfi {
+    func demoteAdminDetailed(accountRef: String, groupIdHex: String, memberRef: String) async throws
+        -> GroupMutationResultFfi
+    {
         try await marmot.demoteAdminDetailed(accountRef: accountRef, groupIdHex: groupIdHex, memberRef: memberRef)
     }
 
@@ -782,12 +813,18 @@ nonisolated final class MarmotClient: Sendable {
         try await marmot.acknowledgeDisbandFailure(accountRef: accountRef, groupIdHex: groupIdHex)
     }
 
-    func updateGroupProfile(accountRef: String, groupIdHex: String, name: String?, description: String?) async throws -> SendSummaryFfi {
-        try await marmot.updateGroupProfile(accountRef: accountRef, groupIdHex: groupIdHex, name: name, description: description)
+    func updateGroupProfile(accountRef: String, groupIdHex: String, name: String?, description: String?) async throws
+        -> SendSummaryFfi
+    {
+        try await marmot.updateGroupProfile(
+            accountRef: accountRef, groupIdHex: groupIdHex, name: name, description: description)
     }
 
-    func updateGroupAvatarUrl(accountRef: String, groupIdHex: String, url: String?, dim: String?, thumbhash: String?) async throws -> SendSummaryFfi {
-        try await marmot.updateGroupAvatarUrl(accountRef: accountRef, groupIdHex: groupIdHex, url: url, dim: dim, thumbhash: thumbhash)
+    func updateGroupAvatarUrl(accountRef: String, groupIdHex: String, url: String?, dim: String?, thumbhash: String?)
+        async throws -> SendSummaryFfi
+    {
+        try await marmot.updateGroupAvatarUrl(
+            accountRef: accountRef, groupIdHex: groupIdHex, url: url, dim: dim, thumbhash: thumbhash)
     }
 
     func updateGroupImage(
@@ -816,7 +853,9 @@ nonisolated final class MarmotClient: Sendable {
         try await marmot.downloadProfileImage(url: url, maxBytes: maxBytes)
     }
 
-    func updateMessageRetention(accountRef: String, groupIdHex: String, disappearingMessageSecs: UInt64) async throws -> SendSummaryFfi {
+    func updateMessageRetention(accountRef: String, groupIdHex: String, disappearingMessageSecs: UInt64) async throws
+        -> SendSummaryFfi
+    {
         try await marmot.updateMessageRetention(
             accountRef: accountRef,
             groupIdHex: groupIdHex,
@@ -907,41 +946,53 @@ nonisolated final class MarmotClient: Sendable {
         )
     }
 
-    func messageReports(accountRef: String, groupID: String, messageID: String, after: String?) async throws -> ContentReportPageFfi {
+    func messageReports(accountRef: String, groupID: String, messageID: String, after: String?) async throws
+        -> ContentReportPageFfi
+    {
         let marmot = self.marmot
         return try await Task.detached(priority: .utility) {
-            try marmot.contentReports(accountRef: accountRef, groupIdHex: groupID, messageId: messageID, after: after, limit: 50)
+            try marmot.contentReports(
+                accountRef: accountRef, groupIdHex: groupID, messageId: messageID, after: after, limit: 50)
         }.value
     }
 
     func contentReports(accountRef: String, groupID: String, after: String?) async throws -> ContentReportPageFfi {
         try await Task.detached { [marmot] in
-            try marmot.contentReports(accountRef: accountRef, groupIdHex: groupID, messageId: nil, after: after, limit: 50)
+            try marmot.contentReports(
+                accountRef: accountRef, groupIdHex: groupID, messageId: nil, after: after, limit: 50)
         }.value
     }
 
-    func reportedMessage(accountRef: String, groupID: String, messageID: String) async throws -> TimelineMessageRecordFfi? {
+    func reportedMessage(accountRef: String, groupID: String, messageID: String) async throws
+        -> TimelineMessageRecordFfi?
+    {
         try await Task.detached { [marmot] in
             try marmot.reportedMessage(accountRef: accountRef, groupIdHex: groupID, messageId: messageID)
         }.value
     }
 
-    func reportMessage(accountRef: String, groupID: String, messageID: String,
-                       reason: ReportReasonFfi, explanation: String) async throws -> SendSummaryFfi {
-        try await marmot.reportMessage(accountRef: accountRef, groupIdHex: groupID,
-                                      messageId: messageID, reason: reason, explanation: explanation)
+    func reportMessage(
+        accountRef: String, groupID: String, messageID: String,
+        reason: ReportReasonFfi, explanation: String
+    ) async throws -> SendSummaryFfi {
+        try await marmot.reportMessage(
+            accountRef: accountRef, groupIdHex: groupID,
+            messageId: messageID, reason: reason, explanation: explanation)
     }
 
     func dismissReport(accountRef: String, groupID: String, reportID: String) async throws -> SendSummaryFfi {
-        try await marmot.dismissReports(accountRef: accountRef, groupIdHex: groupID,
-                                       reportIds: [reportID], explanation: "")
+        try await marmot.dismissReports(
+            accountRef: accountRef, groupIdHex: groupID,
+            reportIds: [reportID], explanation: "")
     }
 
     func deleteMessage(accountRef: String, groupIdHex: String, targetMessageId: String) async throws -> SendSummaryFfi {
         try await marmot.deleteMessage(accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: targetMessageId)
     }
 
-    func editMessage(accountRef: String, groupIdHex: String, targetMessageId: String, content: String) async throws -> SendSummaryFfi {
+    func editMessage(accountRef: String, groupIdHex: String, targetMessageId: String, content: String) async throws
+        -> SendSummaryFfi
+    {
         try await marmot.editMessage(
             accountRef: accountRef,
             groupIdHex: groupIdHex,
@@ -951,58 +1002,82 @@ nonisolated final class MarmotClient: Sendable {
     }
 
     /// Durably queues an edit behind an original that has not settled yet.
-    func editLocalMessageWithClientToken(accountRef: String, groupIdHex: String, originalClientToken: String,
-                                         content: String, editClientToken: String) async throws -> LocalSendAcceptanceFfi {
-        try await marmot.editLocalMessageWithClientToken(accountRef: accountRef, groupIdHex: groupIdHex,
+    func editLocalMessageWithClientToken(
+        accountRef: String, groupIdHex: String, originalClientToken: String,
+        content: String, editClientToken: String
+    ) async throws -> LocalSendAcceptanceFfi {
+        try await marmot.editLocalMessageWithClientToken(
+            accountRef: accountRef, groupIdHex: groupIdHex,
             originalClientToken: originalClientToken, content: content, editClientToken: editClientToken)
     }
 
-    func reactToMessage(accountRef: String, groupIdHex: String, targetMessageId: String, emoji: String) async throws -> SendSummaryFfi {
-        try await marmot.reactToMessage(accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: targetMessageId, emoji: emoji)
+    func reactToMessage(accountRef: String, groupIdHex: String, targetMessageId: String, emoji: String) async throws
+        -> SendSummaryFfi
+    {
+        try await marmot.reactToMessage(
+            accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: targetMessageId, emoji: emoji)
     }
 
     /// NIP-30 custom emoji: a kind-9 whose `tags` name the already-uploaded
     /// `attachments` (`["emoji", shortcode, url]`).
-    func sendTaggedMedia(accountRef: String, groupIdHex: String, attachments: [MediaAttachmentReferenceFfi],
-                         caption: String?, tags: [[String]]) async throws -> SendSummaryFfi {
-        try await marmot.sendTaggedMedia(accountRef: accountRef, groupIdHex: groupIdHex, attachments: attachments,
-                                         caption: caption, tags: tags)
+    func sendTaggedMedia(
+        accountRef: String, groupIdHex: String, attachments: [MediaAttachmentReferenceFfi],
+        caption: String?, tags: [[String]]
+    ) async throws -> SendSummaryFfi {
+        try await marmot.sendTaggedMedia(
+            accountRef: accountRef, groupIdHex: groupIdHex, attachments: attachments,
+            caption: caption, tags: tags)
     }
 
-    func createPoll(accountRef: String, groupIdHex: String, question: String, options: [String],
-                    pollType: PollTypeFfi, endsAt: UInt64?) async throws -> SendSummaryFfi {
-        try await marmot.createPoll(accountRef: accountRef, groupIdHex: groupIdHex, question: question,
-                                    options: options, pollType: pollType, endsAt: endsAt)
+    func createPoll(
+        accountRef: String, groupIdHex: String, question: String, options: [String],
+        pollType: PollTypeFfi, endsAt: UInt64?
+    ) async throws -> SendSummaryFfi {
+        try await marmot.createPoll(
+            accountRef: accountRef, groupIdHex: groupIdHex, question: question,
+            options: options, pollType: pollType, endsAt: endsAt)
     }
 
-    func castPollVote(accountRef: String, groupIdHex: String, pollEventId: String,
-                      optionIds: [String]) async throws -> SendSummaryFfi {
-        try await marmot.castPollVote(accountRef: accountRef, groupIdHex: groupIdHex,
-                                      pollEventId: pollEventId, optionIds: optionIds)
+    func castPollVote(
+        accountRef: String, groupIdHex: String, pollEventId: String,
+        optionIds: [String]
+    ) async throws -> SendSummaryFfi {
+        try await marmot.castPollVote(
+            accountRef: accountRef, groupIdHex: groupIdHex,
+            pollEventId: pollEventId, optionIds: optionIds)
     }
 
     /// One page of per-voter poll results. `pollVotes` is a synchronous
     /// local query, so it runs off the MainActor.
-    func pollVotes(accountRef: String, groupIdHex: String, pollEventId: String,
-                   afterVotedAt: UInt64?, afterVoterAccountIdHex: String?,
-                   limit: UInt32) async throws -> PollVotePageFfi {
+    func pollVotes(
+        accountRef: String, groupIdHex: String, pollEventId: String,
+        afterVotedAt: UInt64?, afterVoterAccountIdHex: String?,
+        limit: UInt32
+    ) async throws -> PollVotePageFfi {
         try await Task.detached(priority: .userInitiated) { [marmot] in
-            try marmot.pollVotes(accountRef: accountRef, groupIdHex: groupIdHex, pollEventId: pollEventId,
-                                 afterVotedAt: afterVotedAt, afterVoterAccountIdHex: afterVoterAccountIdHex,
-                                 limit: limit)
+            try marmot.pollVotes(
+                accountRef: accountRef, groupIdHex: groupIdHex, pollEventId: pollEventId,
+                afterVotedAt: afterVotedAt, afterVoterAccountIdHex: afterVoterAccountIdHex,
+                limit: limit)
         }.value
     }
 
-    func unreactFromMessage(accountRef: String, groupIdHex: String, targetMessageId: String) async throws -> SendSummaryFfi {
-        try await marmot.unreactFromMessage(accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: targetMessageId)
+    func unreactFromMessage(accountRef: String, groupIdHex: String, targetMessageId: String) async throws
+        -> SendSummaryFfi
+    {
+        try await marmot.unreactFromMessage(
+            accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: targetMessageId)
     }
 
     // MARK: - Profile & key packages
 
     /// Profile and key-package wrappers. The generated bindings are already
     /// `async throws`, so these forward directly without `Task.detached`.
-    func publishUserProfile(accountRef: String, profile: UserProfileMetadataFfi, defaultRelays: [String], bootstrapRelays: [String]) async throws -> UserProfileMetadataFfi {
-        try await marmot.publishUserProfile(accountRef: accountRef, profile: profile, defaultRelays: defaultRelays, bootstrapRelays: bootstrapRelays)
+    func publishUserProfile(
+        accountRef: String, profile: UserProfileMetadataFfi, defaultRelays: [String], bootstrapRelays: [String]
+    ) async throws -> UserProfileMetadataFfi {
+        try await marmot.publishUserProfile(
+            accountRef: accountRef, profile: profile, defaultRelays: defaultRelays, bootstrapRelays: bootstrapRelays)
     }
 
     func publishUserProfileUsingAccountRelays(
@@ -1099,7 +1174,9 @@ nonisolated final class MarmotClient: Sendable {
         }.value
     }
 
-    func subscribeTimelineMessages(accountRef: String, groupIdHex: String?, limit: UInt32?) async throws -> TimelineMessagesSubscription {
+    func subscribeTimelineMessages(accountRef: String, groupIdHex: String?, limit: UInt32?) async throws
+        -> TimelineMessagesSubscription
+    {
         try await marmot.subscribeTimelineMessages(accountRef: accountRef, groupIdHex: groupIdHex, limit: limit)
     }
 
@@ -1107,8 +1184,12 @@ nonisolated final class MarmotClient: Sendable {
         try await marmot.subscribeGroupState(accountRef: accountRef, groupIdHex: groupIdHex)
     }
 
-    func watchAgentTextStream(accountRef: String, groupIdHex: String, streamIdHex: String?, serverCertDer: Data?, insecureLocal: Bool) async throws -> AgentStreamSubscription {
-        try await marmot.watchAgentTextStream(accountRef: accountRef, groupIdHex: groupIdHex, streamIdHex: streamIdHex, serverCertDer: serverCertDer, insecureLocal: insecureLocal)
+    func watchAgentTextStream(
+        accountRef: String, groupIdHex: String, streamIdHex: String?, serverCertDer: Data?, insecureLocal: Bool
+    ) async throws -> AgentStreamSubscription {
+        try await marmot.watchAgentTextStream(
+            accountRef: accountRef, groupIdHex: groupIdHex, streamIdHex: streamIdHex, serverCertDer: serverCertDer,
+            insecureLocal: insecureLocal)
     }
 
     func startRuntime() async throws {
