@@ -1,0 +1,60 @@
+{
+  "source_commit": "8d313d0d2bd778ce68d2818dc04d1e0c4d654986",
+  "source_inputs": 869,
+  "input_manifest_sha256": "e958c80fce938f46aa4dd18f10984e60763e6921c90f0fa72fd1f8a7b7a5dbc1",
+  "mdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "installed_manifest_sha256": "bdf6ceabbccdc193e430fc925bcf4f45d91ba816d5cff80adbaf6e3a153816c4",
+  "exit_code": 0,
+  "seconds": 119.28,
+  "log_sha256": "66dcdecb9aaab23e40abd46b23ad996c82d1bca9c2e00aa73572fd0cb5c01b1a",
+  "profile": "matched84113/experimental1/PersonalTeamStaging",
+  "disk_free_before": 13793792000,
+  "disk_free_after": 15137583104,
+  "rollback_app": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/rollback/ios-personal-signed-ready-before-genuine-history-approval/whitenoise-ios.app",
+  "rollback_executable_sha256": "712a33d1d420daa840738936d1f94169361dce6175d2f1d8dfe1fcc5b5ef2b98",
+  "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+  "executable_sha256": "3a9fa3416baa2734b008a2295c8acf36c30c22d9ed2efc23190405e82fa81390",
+  "native_products": [
+    {
+      "name": "whitenoise-ios",
+      "sha256": "3a9fa3416baa2734b008a2295c8acf36c30c22d9ed2efc23190405e82fa81390",
+      "architecture": "arm64"
+    },
+    {
+      "name": "whitenoise-ios.debug.dylib",
+      "sha256": "662bd11cb6b381b460ca887df78bea49f08c8a15e4330508a70d2aedcee65e1f",
+      "architecture": "arm64"
+    }
+  ],
+  "signed_bundles": [
+    {
+      "name": "whitenoise-ios.app",
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "executable_sha256": "3a9fa3416baa2734b008a2295c8acf36c30c22d9ed2efc23190405e82fa81390",
+      "entitlements_sha256": "d7c961768c724fad457d83a4ddf29675804a4414b55f5c3550dba2f822b85fdc",
+      "entitlements_unchanged_from_prior_ready": true,
+      "strict_signature_verified": true,
+      "development_profile_with_provisioned_devices": true,
+      "profile_expiration": "2026-10-16T11:24:29",
+      "profile_sha256": "423162dbc20b2fbb4d44bbef2af684fb934440730a9cd5bf93e4ba040282a3ff"
+    },
+    {
+      "name": "NotificationServiceExtension.appex",
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal.NotificationService",
+      "executable_sha256": "f42ad7d83b6da98143bdb1a33d133b1e0f41a73c974c083f0cd7d98e55797fa9",
+      "entitlements_sha256": "7c6ccce56de4253ca606c85e920b8d45e5b5046c9b33e55efc394d7c7ed2470a",
+      "entitlements_unchanged_from_prior_ready": true,
+      "strict_signature_verified": true,
+      "development_profile_with_provisioned_devices": true,
+      "profile_expiration": "2026-10-16T11:24:27",
+      "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
+    }
+  ],
+  "full_results_sha256": "afe901470907be3fd7f0feba32f3b6023a7ca48182d96ee7323a85612bdc8a67",
+  "full_results_path": "build/results/ios-native-personal-genuine-history-approval-v1-results.json",
+  "whole_bundle_hashes_recorded": 170,
+  "sdk_framework_files_recorded": 7,
+  "tests": "Both full PR cohorts qualified separately in genuine-history-approval-full-pr-verification.json; this is a signed device build, not another test or installation gate.",
+  "scope": "Same verified Personal Team development bundle/storage identity. App+extension entitlements remain byte-equivalent to prior ready build; strict development signatures, profiles, provisioned device presence and arm64 products verified. Exact whole bundle and SDK hashes are in the retained raw result.",
+  "physical_installation": "This runner did not install or launch; parent independently owns physical delivery after its verification. No production/TestFlight app or account storage touched."
+}
