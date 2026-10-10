@@ -1,5 +1,5 @@
-import SwiftUI
 import MarmotKit
+import SwiftUI
 
 private enum SettingsDestination: String, CaseIterable, Hashable {
     case profile
@@ -70,6 +70,20 @@ struct SettingsView: View {
                 .relays,
                 .aiAgents,
             ])
+
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                if appState.client?.deviceLinkingCapabilities().verificationSupported == true {
+                    Section {
+                        NavigationLink {
+                            DeviceVerificationDestinationView()
+                        } label: {
+                            Label("Device verification", systemImage: "checkmark.shield")
+                        }
+                        .disabled(appState.activeAccountRef == nil)
+                        .accessibilityIdentifier("settings.deviceVerification")
+                    }
+                }
+            #endif
 
             destinationSection([.support, .donate, .developerTools])
 
@@ -305,7 +319,8 @@ private struct AccountAvatarStack: View {
 nonisolated enum MarmotKitBuildLabel {
     static func text(tag: String, sha: String) -> String {
         let isSourceBuild = sha.hasSuffix("-dirty")
-        let shortHash = sha
+        let shortHash =
+            sha
             .replacingOccurrences(of: "-dirty", with: "")
             .prefix(8)
 
@@ -381,7 +396,8 @@ private struct SignOutView: View {
 
     private func signOut() {
         guard profileRef == appState.activeAccountRef,
-              !isBusy, !appState.isAccountExitInProgress else { return }
+            !isBusy, !appState.isAccountExitInProgress
+        else { return }
         isBusy = true
         error = nil
         Task {
@@ -416,11 +432,15 @@ private struct DeleteProfileView: View {
             } header: {
                 Text("What gets destroyed").wnSectionHeader()
             } footer: {
-                Text("Signing back in with the same key keeps your identity, but past groups, messages, and media can't be recovered on this device. You'll need to be re-invited to any groups.")
+                Text(
+                    "Signing back in with the same key keeps your identity, but past groups, messages, and media can't be recovered on this device. You'll need to be re-invited to any groups."
+                )
             }
 
             Section {
-                Text("White Noise cannot delete encrypted messages already delivered to other members or copies kept by independent relays.")
+                Text(
+                    "White Noise cannot delete encrypted messages already delivered to other members or copies kept by independent relays."
+                )
             }
 
             Section {
@@ -452,10 +472,11 @@ private struct DeleteProfileView: View {
                 )
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
-                .disabled(!ProfileExitConfirmation.matches(confirmation, expected: profileName)
-                          || isBusy
-                          || appState.isAccountExitInProgress
-                          || profileRef != appState.activeAccountRef)
+                .disabled(
+                    !ProfileExitConfirmation.matches(confirmation, expected: profileName)
+                        || isBusy
+                        || appState.isAccountExitInProgress
+                        || profileRef != appState.activeAccountRef)
             }
         }
         .disabled(isBusy)
@@ -490,8 +511,9 @@ private struct DeleteProfileView: View {
 
     private func deleteProfile() {
         guard profileRef == appState.activeAccountRef,
-              ProfileExitConfirmation.matches(confirmation, expected: profileName),
-              !isBusy, !appState.isAccountExitInProgress else { return }
+            ProfileExitConfirmation.matches(confirmation, expected: profileName),
+            !isBusy, !appState.isAccountExitInProgress
+        else { return }
         confirmationFocused = false
         isBusy = true
         error = nil

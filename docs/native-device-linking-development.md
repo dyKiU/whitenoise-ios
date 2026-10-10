@@ -193,3 +193,22 @@ zero-test named FFI PCM failures are preserved separately. Scoped strictSwiftLin
 The tests use generated-protocol controls with isolated actual AccountStore and
 RuntimeLifecycle paths; they do not prove genuine SDK pairing or native UI.
 Settings UI and final full experimental/published gates are next.
+
+## Verification-only Settings pane
+
+The experimental Settings pane composes its feature model from the original
+account/runtime owner and resets local opaque packet display on ownership change.
+It supports explicit start/approve, setup and packet transport, delivery ACK,
+and comparison of the rendered SAS revision. Enrollment remains unavailable;
+no continuation, permission DTO, retained snapshot reconstruction or global state
+was added. The persistent input label, cancellation/error state and explicit ACK
+remain separate from copying bytes.
+
+Initial and final affected30/30 passed; the final source uses strict scoped
+SwiftLint0.63.2 and Swiftformat6.2.3. Apple compiler stringsdata extraction and
+XLIFF export/import added18 strings in nine existing target languages while
+preserving all1,926 old entries. The first import was an accurately preserved
+feature-off/e6 configuration failure; only its own newly-created idle output was
+removed. See native-device-verification-settings-evidence.json. Full signed-source
+experimental/published qualification follows; genuine fresh native pairing,
+accessibility/visual acceptance and enrollment/chat delivery are separate gates.
