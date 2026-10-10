@@ -296,3 +296,21 @@ This adds no UI or capability advertising. e6 approval snapshots expose only
 revision/phase; authenticated B review metadata and actual native A/B/C enrollment
 acceptance remain required before general approval UI. No snapshot, decoded packet
 or model factory reconstructs consent. These checks are not a full PR run.
+
+## Explicit first-device setup attempt
+
+Verification offers a separate first-device setup action only after a successful
+empty target read under the current original account/runtime owner. Failed,
+in-flight and stale reads offer no action; an invalid selected target never falls
+back to nil. The original SDK factory receives nil only for this explicit attempt
+and retains authoritative policy errors. Empty metadata is not eligibility.
+
+Default-denying RED ran9 controls (7passed/2failed), unchanged GREEN9/9, strengthened
+actual owner-retirement controls10/10 and final affected selection58/58. Strict
+scoped formatting, SwiftLint0.63.2 and diff checks passed. Apple stringsdata/XLIFF
+sync and import added one translated key in nine languages, preserving all1944
+existing entries/order. Exact evidence is native-first-device-setup-evidence.json.
+
+These are native model/factory controls, not full native enrollment acceptance or
+a full PR run. Original e6 bindings, advertised capability and consent boundaries
+are unchanged. No physical or production app action occurred.

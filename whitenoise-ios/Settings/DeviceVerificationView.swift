@@ -64,17 +64,38 @@
                         )
                         .disabled(isWorking || !model.isActive)
                         if model.owner == nil {
-                            WNButton(title: "Approve setup", size: .standard, isLoading: model.isStarting) {
-                                perform {
-                                    guard let selectedTarget else {
-                                        throw DeviceVerificationPacketInput.Error.invalidPacket
+                            if model.offersFirstDeviceSetupAttempt {
+                                WNButton(
+                                    title: "Approve first-device setup", size: .standard,
+                                    isLoading: model.isStarting
+                                ) {
+                                    perform {
+                                        try await model.approveFirstDeviceSetup(request: decodedPacket())
+                                        setup = try model.setupPacket().base64EncodedString()
+                                        incoming = ""
                                     }
-                                    try await model.approve(request: decodedPacket(), target: selectedTarget)
-                                    setup = try model.setupPacket().base64EncodedString()
-                                    incoming = ""
                                 }
+                                .disabled(isWorking || !model.isActive || model.cleanupRequired)
+                            } else if !model.targets.isEmpty {
+                                WNButton(title: "Approve setup", size: .standard, isLoading: model.isStarting) {
+                                    perform {
+                                        guard let selectedTarget else {
+                                            throw DeviceVerificationPacketInput.Error.invalidPacket
+                                        }
+                                        try await model.approve(request: decodedPacket(), target: selectedTarget)
+                                        setup = try model.setupPacket().base64EncodedString()
+                                        incoming = ""
+                                    }
+                                }
+                                .disabled(
+                                    selectedTarget == nil || isWorking || !model.isActive || model.cleanupRequired)
                             }
-                            .disabled(selectedTarget == nil || isWorking || !model.isActive || model.cleanupRequired)
+                            if !model.hasLoadedTargets && !model.isReadingTargets && actionFailed {
+                                WNButton(title: "Try again", emphasis: .secondary, size: .standard) {
+                                    perform { try await model.loadTargets() }
+                                }
+                                .disabled(isWorking || !model.isActive)
+                            }
                         } else {
                             WNButton(title: "Receive setup", emphasis: .secondary, size: .standard) {
                                 perform {

@@ -10,6 +10,11 @@
             @MainActor (Data, Data?) async throws -> any DeviceVerificationSession
         @ObservationIgnored private let readTargets: @MainActor () async throws -> [DeviceLinkingTargetFfi]
         let verificationSupported: Bool
+        private var successfulTargetRead = false
+        // Cancellation alone cannot distinguish overlapping finite read completions.
+        @ObservationIgnored private var targetReadID: UUID?
+        var isReadingTargets: Bool { targetReadID != nil }
+        var hasLoadedTargets: Bool { isActive && successfulTargetRead && !isReadingTargets }
         private var cachedTargets: [DeviceLinkingTargetFfi] = []
         var targets: [DeviceLinkingTargetFfi] { isActive ? cachedTargets : [] }
         @ObservationIgnored private let cancelOriginal: @MainActor () async throws -> Void
@@ -72,13 +77,29 @@
 
         func loadTargets() async throws {
             guard isActive else { throw CancellationError() }
+            successfulTargetRead = false
+            cachedTargets = []
+            let id = UUID()
+            targetReadID = id
+            defer { if targetReadID == id { targetReadID = nil } }
             let values = try await readTargets()
-            guard isActive, !Task.isCancelled else { throw CancellationError() }
+            guard isActive, !Task.isCancelled, targetReadID == id else { throw CancellationError() }
             cachedTargets = values
+            successfulTargetRead = true
+        }
+
+        // Presentation of an explicit attempt, never a bootstrap permission.
+        var offersFirstDeviceSetupAttempt: Bool {
+            verificationSupported && hasLoadedTargets && targets.isEmpty && owner == nil && !isStarting
+        }
+        func approveFirstDeviceSetup(request: Data) async throws {
+            guard offersFirstDeviceSetupAttempt else { throw CancellationError() }
+            let approveOriginal = self.approveOriginal
+            try await start { try await approveOriginal(request, nil) }
         }
 
         func approve(request: Data, target: Data) async throws {
-            guard isActive, targets.contains(where: { $0.selector == target }) else {
+            guard hasLoadedTargets, targets.contains(where: { $0.selector == target }) else {
                 throw CancellationError()
             }
             let approveOriginal = self.approveOriginal
@@ -135,6 +156,8 @@
 
         func invalidate() {
             retired = true
+            successfulTargetRead = false
+            targetReadID = nil
             cachedTargets = []
             pending?.cancel()
             owner = nil
