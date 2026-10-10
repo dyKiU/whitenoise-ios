@@ -46,3 +46,27 @@ existing matched `e6b0e9c1` archive and Xcode cache. See
 Generated local binding overrides remain uncommitted and unchanged. This is
 capability and missing-account qualification; fresh pairing, account-owned UI,
 selected-chat admission, delivery and history are still separate gates.
+
+## Account-owned original session lifetime
+
+The experimental AccountStore now holds one original opaque DeviceLinkingSession
+and its subscription in a Session scope. Account replacement immediately removes
+the old owner, closes its subscription and cancels that exact object. Late
+snapshots cannot populate the replacement account. Cleanup failure remains on
+the retired owner for explicit retry; a new owner cannot bypass it. No snapshot
+is persisted or used to reconstruct SDK permission.
+
+Runtime suspension waits for original cancellation before closing Core. Sign-out
+and wipe use the same boundary, acquire the existing exit guard before any new
+await, and refuse account mutation on cancellation failure. Terminal runtime
+shutdown still releases SQLite after recording a failed exact cleanup.
+
+M5 focused checks passed eight lifecycle tests, five existing factory smoke tests
+and fifteen existing sign-out/wipe tests, with no failures or skips. Observable
+regressions first failed replacement/suspension (0/2) and concurrent exit (0/1).
+Tests use generated opaque-object doubles for delayed subscription and cancellation
+controls, plus actual isolated native runtime/storage routes; this is lifetime
+qualification, not fresh SDK pairing, selected-chat approval or delivery. See
+`native-device-linking-lifetime-verification.json` for hashes, original RED source
+preservation, compiler failures and the secondary RED diagnostics tooling failure.
+The four local generated e6 SDK overrides remain unchanged and uncommitted.

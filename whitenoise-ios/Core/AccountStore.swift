@@ -25,6 +25,9 @@ final class AccountStore {
     /// persisted to UserDefaults so the selection survives relaunch.
     var activeAccountRef: String? {
         didSet {
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                if oldValue != activeAccountRef { retireDeviceLinkingScope() }
+            #endif
             if let ref = activeAccountRef {
                 returnsToSettingsAfterSelection = false
                 prefersProfileSelection = false
@@ -38,6 +41,56 @@ final class AccountStore {
             }
         }
     }
+
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private(set) var deviceLinkingScope: DeviceLinkingAccountScope?
+        private(set) var retiringDeviceLinkingScope: DeviceLinkingAccountScope?
+        @ObservationIgnored private var deviceLinkingRetirement: Task<Void, Error>?
+
+        func holdDeviceLinkingSession(
+            _ session: any DeviceLinkingSessionProtocol, accountRef: String
+        ) async throws -> DeviceLinkingAccountScope {
+            guard activeAccountRef == accountRef else { throw CancellationError() }
+            try await cancelRetiringDeviceLinkingScope()
+            guard !Task.isCancelled, activeAccountRef == accountRef, deviceLinkingScope == nil else {
+                throw CancellationError()
+            }
+            let scope = DeviceLinkingAccountScope(accountRef: accountRef, session: session)
+            deviceLinkingScope = scope
+            return scope
+        }
+
+        private func retireDeviceLinkingScope() {
+            guard let scope = deviceLinkingScope else { return }
+            scope.invalidate()
+            deviceLinkingScope = nil
+            retiringDeviceLinkingScope = scope
+            deviceLinkingRetirement = Task { try await scope.cancel() }
+        }
+
+        func cancelDeviceLinking() async throws {
+            retireDeviceLinkingScope()
+            try await cancelRetiringDeviceLinkingScope()
+        }
+
+        private func cancelRetiringDeviceLinkingScope() async throws {
+            guard let scope = retiringDeviceLinkingScope else { return }
+            do {
+                if let retirement = deviceLinkingRetirement {
+                    try await retirement.value
+                } else {
+                    try await scope.cancel()
+                }
+                if retiringDeviceLinkingScope === scope {
+                    retiringDeviceLinkingScope = nil
+                    deviceLinkingRetirement = nil
+                }
+            } catch {
+                if retiringDeviceLinkingScope === scope { deviceLinkingRetirement = nil }
+                throw error
+            }
+        }
+    #endif
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
