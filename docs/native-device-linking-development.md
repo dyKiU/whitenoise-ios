@@ -97,3 +97,22 @@ provenance is not asserted unchanged. No account data was inspected or modified
 manually. See `native-device-linking-factory-verification.json` for current hashes,
 compiler/runner failures, exact counts and scope. Fresh pairing, native UI, selected
 chat admission, delivery and history remain separate gates.
+
+### Full lifecycle qualification — 2026-10-10
+
+Signed product source `3402bb997829c866238055be1db302889a40b53d` passes the
+full Staging suite with the matched experimental e6 SDK:2,722 passed, zero
+failures, two existing skips. Published0.12 default passes2,702 with zero
+failures and the same two skips. Root independently verifies all780 frozen
+inputs and complete terminal logs for both gates. Three compile-only published
+attempts diagnose separate stale FFI precompiled modules; only the exact named
+modules are retired after the target is idle. All share the final published
+input manifest; none ran tests. The four experimental overrides are retained
+in a named Git stash and restored byte for byte; all780 previous experimental
+inputs match again. See `native-device-linking-full-verification.json`.
+
+This qualifies application regressions for session ownership and delayed-factory
+fencing. Fresh pairing, ordinary recipient admission/delivery and history remain
+open. Hosted tests installed the published test host last; do not claim its binary
+is experimental until a new experimental rebuild. Physical installation stays
+deferred; the existing signed M1 ready build is preserved.
