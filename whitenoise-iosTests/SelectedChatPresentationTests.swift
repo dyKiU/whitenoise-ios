@@ -349,5 +349,115 @@ import Testing
             app.setAppSceneActive(false)
             await app.startRuntimeSuspension().value
         }
+        @Test func transferUsesExactSelectedChatAndTargetWithoutImplicitExport() async throws {
+            let original = PresentationCopy()
+            let copy = SelectedChatCopyViewModel(
+                original: SelectedChatCopyScope(accountRef: "isolated", original: original), isCurrent: { true })
+            let selector = Data([32, 31, 30])
+            let group = String(repeating: "ab", count: 32)
+            var receivedGroup: String?
+            var receivedTarget: Data?
+            let transfer = SelectedChatTransferViewModel(
+                begin: { value, target in
+                    receivedGroup = value
+                    receivedTarget = target
+                    return copy
+                },
+                receive: { _ in throw MarmotKitError.SelectedChatCopyUnsupported },
+                targets: { [.init(selector: selector, deviceCount: 2)] }, isCurrent: { true })
+            await #expect(throws: MarmotKitError.SelectedChatCopyNotReady) {
+                try await transfer.begin(groupIdHex: group, linkedRosterSelector: selector)
+            }
+            #expect(receivedGroup == nil)
+            try await transfer.loadTargets()
+            try await transfer.begin(groupIdHex: group, linkedRosterSelector: selector)
+            #expect(receivedGroup == group)
+            #expect(receivedTarget == selector)
+            #expect(transfer.copyGroupIdHex == group)
+            #expect(transfer.copy === copy)
+            #expect(original.requested.isEmpty)
+            try await copy.cancel()
+        }
+        @Test func transferReceivesCanonicalOpaqueRequestWithoutApproving() async throws {
+            let original = PresentationConsent()
+            let consent = SelectedChatConsentViewModel(
+                original: SelectedChatConsentScope(accountRef: "isolated", original: original), isCurrent: { true })
+            var received: Data?
+            let transfer = SelectedChatTransferViewModel(
+                begin: { _, _ in throw MarmotKitError.SelectedChatCopyUnsupported },
+                receive: { packet in
+                    received = packet
+                    return consent
+                }, targets: { [] }, isCurrent: { true })
+            await #expect(throws: MarmotKitError.SelectedChatCopyInvalidPacket) {
+                try await transfer.receive(input: "AB==")
+            }
+            #expect(received == nil)
+            let packet = Data([128, 0, 255])
+            try await transfer.receive(input: packet.base64EncodedString())
+            #expect(received == packet)
+            #expect(transfer.consent === consent)
+            #expect(consent.snapshot?.chatSelector == Data(repeating: 4, count: 32))
+            #expect(original.approved.isEmpty)
+            try await consent.cancel()
+        }
+        @Test func failedTargetReadNeverFallsBackToPreviousSelection() async throws {
+            var readFails = false
+            var invoked = false
+            let selector = Data([32])
+            let transfer = SelectedChatTransferViewModel(
+                begin: { _, _ in
+                    invoked = true
+                    throw MarmotKitError.SelectedChatCopyUnsupported
+                },
+                receive: { _ in throw MarmotKitError.SelectedChatCopyUnsupported },
+                targets: {
+                    if readFails { throw MarmotKitError.SelectedChatCopyBusy }
+                    return [.init(selector: selector, deviceCount: 2)]
+                }, isCurrent: { true })
+            try await transfer.loadTargets()
+            readFails = true
+            await #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try await transfer.loadTargets() }
+            #expect(transfer.targets.isEmpty)
+            await #expect(throws: MarmotKitError.SelectedChatCopyNotReady) {
+                try await transfer.begin(groupIdHex: String(repeating: "ab", count: 32), linkedRosterSelector: selector)
+            }
+            #expect(!invoked)
+        }
+        @Test func actualAccountCompositionOwnsAndRetiresTransferAcrossReturn() async throws {
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent("SelectedChatPane-\(UUID())")
+            defer { try? FileManager.default.removeItem(at: root) }
+            let client = try MarmotClient(rootPath: root.path, relayUrls: ["wss://relay.example.invalid"])
+            let app = AppState.test(client: client, accountDefaults: IsolatedAccountDefaults.make())
+            app.setAppSceneActive(true)
+            await app.bootstrap()
+            app.activeAccountRef = "A"
+            do {
+                let first = try app.makeSelectedChatTransferViewModel()
+                #expect(first.isActive)
+                #expect(try app.makeSelectedChatTransferViewModel() === first)
+                await #expect(throws: MarmotKitError.SelectedChatCopyRuntimeUnavailable) {
+                    try await first.receive(input: Data([1]).base64EncodedString())
+                }
+                #expect(first.consent == nil)
+                app.activeAccountRef = "B"
+                app.activeAccountRef = "A"
+                #expect(!first.isActive)
+                #expect(first.targets.isEmpty)
+                await #expect(throws: MarmotKitError.SelectedChatCopyClosed) {
+                    try await first.receive(input: Data([1]).base64EncodedString())
+                }
+                let second = try app.makeSelectedChatTransferViewModel()
+                #expect(second !== first)
+                app.setAppSceneActive(false)
+                #expect(!second.isActive)
+                await app.startRuntimeSuspension().value
+                #expect(!second.isActive)
+            } catch {
+                app.setAppSceneActive(false)
+                await app.startRuntimeSuspension().value
+                throw error
+            }
+        }
     }
 #endif

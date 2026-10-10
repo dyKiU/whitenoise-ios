@@ -44,6 +44,7 @@ final class AccountStore {
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
         let selectedChatLifetime = SelectedChatAccountLifetime()
+        var selectedChatTransferModel: SelectedChatTransferViewModel?
 
         private(set) var deviceLinkingScope: DeviceLinkingAccountScope?
         private(set) var retiringDeviceLinkingScope: DeviceLinkingAccountScope?
@@ -242,6 +243,8 @@ final class AccountStore {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
             selectedChatLifetime.invalidate()
+            selectedChatTransferModel?.invalidate()
+            selectedChatTransferModel = nil
             deviceEnrollmentModel?.invalidate()
             deviceEnrollmentModel = nil
             deviceEnrollmentApprovalModel?.invalidate()

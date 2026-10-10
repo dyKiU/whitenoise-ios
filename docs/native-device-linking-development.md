@@ -415,3 +415,16 @@ with genuine refusal and stale-display regressions recorded in
 `native-selected-chat-presentation-evidence.json`. UI, full published/experimental
 PR gates on the composed application, and native cryptographic chat acceptance
 remain separate.
+
+### Selected-chat transfer composition
+
+AccountStore now holds one transfer model under its existing original account
+epoch. AppState binds its callbacks to the exact concrete client, runtime
+generation, account and epoch; account replacement and suspension invalidate
+display synchronously. Copy creation uses the selected ordinary-chat identifier
+and a currently read linked-roster selector. Incoming packets remain opaque, and
+receiving or refreshing never approves them. Failed target reads clear selections.
+
+Actual account-composition RED 0/1 becomes focused 18/18 and affected 99/99; see
+`native-selected-chat-composition-evidence.json`. These qualify composition and
+lifetimes, with the separate native UI and cryptographic chat transfer still pending.

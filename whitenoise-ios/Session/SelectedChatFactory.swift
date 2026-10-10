@@ -16,6 +16,35 @@
                 try await client.receiveSelectedChatCopyRequest(accountRef: ref, packet: packet)
             }
         }
+        func makeSelectedChatTransferViewModel() throws -> SelectedChatTransferViewModel {
+            guard let client, let ref = activeAccountRef, let generation = runtimeEventsGeneration,
+                isAppSceneActive, !isAccountExitInProgress, !isErasingAppData
+            else { throw MarmotKitError.SelectedChatCopyClosed }
+            let epoch = accountStore.deviceLinkingOwnershipIdentity
+            let current: @MainActor () -> Bool = { [weak self, weak client] in
+                guard let self, let client else { return false }
+                return self.client === client && self.runtimeEventsGeneration == generation
+                    && self.activeAccountRef == ref && self.accountStore.deviceLinkingOwnershipIdentity == epoch
+                    && self.isAppSceneActive && !self.isAccountExitInProgress && !self.isErasingAppData
+            }
+            if let held = accountStore.selectedChatTransferModel, held.isActive { return held }
+            let model = SelectedChatTransferViewModel(
+                begin: { [weak self] group, target in
+                    guard let self, current() else { throw MarmotKitError.SelectedChatCopyClosed }
+                    return try await self.beginSelectedChatCopyPresentation(
+                        groupIdHex: group, linkedRosterSelector: target)
+                },
+                receive: { [weak self] packet in
+                    guard let self, current() else { throw MarmotKitError.SelectedChatCopyClosed }
+                    return try await self.receiveSelectedChatConsentPresentation(packet: packet)
+                },
+                targets: { [weak client] in
+                    guard let client, current() else { throw MarmotKitError.SelectedChatCopyClosed }
+                    return try await client.deviceLinkingTargets(accountRef: ref)
+                }, isCurrent: current)
+            accountStore.selectedChatTransferModel = model
+            return model
+        }
         func beginSelectedChatCopyPresentation(groupIdHex: String, linkedRosterSelector: Data) async throws
             -> SelectedChatCopyViewModel
         {
