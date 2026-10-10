@@ -9,6 +9,8 @@
         private let isCurrent: @MainActor () -> Bool
         private var isActive = true
         private var batch: [NativeHistoryConsentScope]?
+        private var sourceModel: HistorySourcePickerModel?
+        private var retiringSourceModels: [HistorySourcePickerModel] = []
         private var pending: Task<[any HistoryConsentProtocol], Error>?
 
         init(accountRef: String, runtime: MarmotClient, isCurrent: @escaping @MainActor () -> Bool) {
@@ -52,8 +54,38 @@
             if !held.isEmpty { batch = held }
             return held
         }
+        func sourcePicker(
+            groupIdHex: String,
+            readRecipients: @escaping @MainActor () async throws -> [HistoryTransferRecipientFfi],
+            beginOriginal: @escaping @MainActor (Data) async throws -> any HistoryTransferProtocol
+        ) throws -> HistorySourcePickerModel {
+            guard isCurrentOwner else { throw MarmotKitError.HistoryTransferClosed }
+            if let sourceModel, sourceModel.isActive, sourceModel.groupIdHex == groupIdHex { return sourceModel }
+            if let sourceModel {
+                sourceModel.cancel()
+                retiringSourceModels.append(sourceModel)
+                self.sourceModel = nil
+            }
+            try retryCleanup()
+            let model = HistorySourcePickerModel(
+                groupIdHex: groupIdHex, readRecipients: readRecipients, beginOriginal: beginOriginal,
+                isCurrent: { [weak self] in self?.isCurrentOwner == true })
+            sourceModel = model
+            return model
+        }
+        func releaseSourcePicker(_ model: HistorySourcePickerModel) {
+            guard sourceModel === model else { return }
+            model.cancel()
+            retiringSourceModels.append(model)
+            sourceModel = nil
+        }
         func invalidate() {
             isActive = false
+            if let sourceModel {
+                sourceModel.cancel()
+                retiringSourceModels.append(sourceModel)
+                self.sourceModel = nil
+            }
             pending?.cancel()
             for scope in batch ?? [] { scope.cancel() }
             batch = nil
@@ -61,6 +93,9 @@
         func retryCleanup() throws {
             // A factory ignoring cancellation still owns a future original. Destructive exit must retry.
             guard pending == nil else { throw MarmotKitError.HistoryTransferNotReady }
+            try sourceModel?.retryCleanup()
+            for model in retiringSourceModels { try model.retryCleanup() }
+            retiringSourceModels.removeAll()
         }
     }
 
@@ -82,6 +117,7 @@
             owner = value
             return value
         }
+        func releaseSourcePicker(_ model: HistorySourcePickerModel) { owner?.releaseSourcePicker(model) }
         func invalidate() {
             guard let owner else { return }
             owner.invalidate()

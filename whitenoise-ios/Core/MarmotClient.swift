@@ -59,6 +59,13 @@ nonisolated final class MarmotClient: Sendable {
             try await marmot.historyTransferRecipients(accountRef: accountRef, groupIdHex: groupIdHex)
         }
 
+        func beginHistoryTransfer(accountRef: String, groupIdHex: String, recipientDevice: Data) async throws
+            -> HistoryTransfer
+        {
+            try await marmot.beginHistoryTransfer(
+                accountRef: accountRef, groupIdHex: groupIdHex, recipientDevice: recipientDevice)
+        }
+
         func pendingHistoryRequests(accountRef: String) async throws -> [HistoryConsent] {
             try await marmot.pendingHistoryRequests(accountRef: accountRef)
         }
