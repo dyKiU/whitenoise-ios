@@ -1,0 +1,78 @@
+{
+  "base": "c2e8f78cbf9f99f61b38b18201f2834adba2d790",
+  "candidate_stash": "b6e7db096f916031c51a522a5cf1d1f3d4932856",
+  "tested_path_sha256": {
+    "whitenoise-iosTests/HistoryConsentReviewPaneTests.swift": "785ea408ce91cd84cd5334a1ffd7f088cd43ff7b12f10d11e4d8b8e0714d681c"
+  },
+  "runs": {
+    "ios-history-recipient-c2e8f78-full-v1": {
+      "source_base": "c2e8f78cbf9f99f61b38b18201f2834adba2d790",
+      "source_inputs": 854,
+      "input_manifest_sha256": "d26441ac2d6a08bef858bee913ec46eb4c50d294f8ce9c94036f1936743e2bd5",
+      "profile": "local-history84113/experimentalflag1/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 65,
+      "seconds": 197.6,
+      "log_sha256": "04f09ccc685a0ea8e4d87d39fb69b47ebe558e18ab21a304bc05e708301f8cc0",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered experimental iOS PR suite with validated84113 SDK; no real native multi-device acceptance or manual deployment",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2858,
+        "passedTests": 2855,
+        "failedTests": 1,
+        "skippedTests": 2
+      },
+      "test_failures": [
+        {
+          "failureText": "Crash: whitenoise-ios at +[XCTWaiter _synchronouslyWaitForTimeInterval:]",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 9,
+          "testIdentifierString": "MediaImageZoomTests/testHostedGalleryOnlyLoadsSelectedImageAndKeepsZoomAcrossChromeUpdates()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/MediaImageZoomTests/testHostedGalleryOnlyLoadsSelectedImageAndKeepsZoomAcrossChromeUpdates",
+          "testName": "testHostedGalleryOnlyLoadsSelectedImageAndKeepsZoomAcrossChromeUpdates()"
+        }
+      ]
+    },
+    "ios-history-recipient-host-fixture-green-v1": {
+      "source_base": "c2e8f78cbf9f99f61b38b18201f2834adba2d790",
+      "source_inputs": 854,
+      "input_manifest_sha256": "2b7b5af59da244df9af5035c7e49e073b398314b817768a4e3a98dffdc380011",
+      "profile": "local-84113/experimentalflag1/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 0,
+      "seconds": 18.23,
+      "log_sha256": "3a93c1bd9769bd05bc1ea0f80f73f697329021d164466035d956c31f515ae6fd",
+      "physical_phone_changed": false,
+      "scope": "Original recipient review pane on held account/runtime custody; injected-original presentation/actions, not actual native import UI acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 14,
+        "passedTests": 14,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "crash": {
+    "path": "ios-history-recipient-c2e8f78-full-v1-crash.ips",
+    "sha256": "c3dbd5d5bbfab638acfb6e20a857bddbe70aba2e08b720899dfa4192118f62c0",
+    "actual_trace": "SIGABRT malloc invalid free in TaskLocal::StopLookupScope during MainActor-backdeploy NativeHistoryConsentScope/HistoryConsentReviewModel deinit from delayed SwiftUI DisplayList/ViewGraph/UIHostingController teardown. XCTest associates crash with subsequent gallery test.",
+    "classification": "Hosted test-owner release timing; no gallery or recipient product code changed."
+  },
+  "change": "Retire and release the whole pane hosting controller inside the async MainActor test, await actual weak host deallocation while holding injected model and exact original scope. Added teardown assertion; existing behavioral assertions unchanged.",
+  "checks": {
+    "strict_scoped_swiftlint_0_63_2": 0,
+    "canonical_scoped_swift_format": 0,
+    "git_diff_check": 0
+  },
+  "raw_local_directory": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results",
+  "raw_m5_directory": "/Users/pj/project/build/results",
+  "limits": [
+    "Genuine failed full854-input cohort retained; no unfiltered pass claimed from14 focused tests.",
+    "This is a test-only fixture correction; production and SDK84113 unchanged.",
+    "Complete experimental and published suites must qualify the new signed source before integration.",
+    "Only compact proof added after focused freeze."
+  ]
+}
