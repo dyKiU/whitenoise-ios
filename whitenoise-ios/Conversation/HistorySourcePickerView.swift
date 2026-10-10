@@ -88,6 +88,7 @@
                                             }
                                         }
                                     }.disabled(model.isWorking)
+                                        .accessibilityIdentifier("history-source.choice-\(choice.leafIndex)")
                                 }
                                 WNButton(title: "Request history transfer", size: .standard, isLoading: model.isWorking)
                                 {
@@ -107,7 +108,7 @@
                             WNButton(title: "Cancel", emphasis: .secondary, size: .standard) {
                                 action?.cancel()
                                 model.cancel()
-                            }
+                            }.accessibilityIdentifier("history-source.cancel")
                         }
                     }
                     if failed || model.failed || !model.isActive {
