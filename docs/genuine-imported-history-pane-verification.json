@@ -1,0 +1,103 @@
+{
+  "source_base": "d1e5099b019896338ab453c46f6f03e81a47e8c3",
+  "test_source": "whitenoise-iosTests/GenuineImportedHistoryPaneTests.swift",
+  "test_sha256": "bd2327c10d2f34925cff1bcde34af304e819601a9d79107f8f7ca919bcdb1278",
+  "tested_stash": "17eb4665113753b55b8404d88df20ac0657e73f7",
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "sdk_original_m5_stash": "05a8cf8bdbcce73342a05be414aa8994fbb21fbf",
+  "constructor_tdd": "docs/native-secret-store-boundary-verification.json",
+  "handoff_controller_commit": "2b6fc11da8962081ea6c599e796990c5946c9360",
+  "native_fixture": {
+    "gate": "native-original-history",
+    "passed": 1,
+    "failed": 0,
+    "seconds": 45.52,
+    "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+    "binary_sha256": "67d00f845c885ecd570ec67655f677a390908c66b1948560621ac138af1f0b38",
+    "scope": "Actual iOS simulator SDK peer plus M1/M5; not installed application UI acceptance",
+    "simulator_device": "3F79E967-EE79-4A0E-BCF6-BCC4FE4A2ECC",
+    "simulator_role": "recipient",
+    "history_counts": {
+      "source_records": 2,
+      "imported_records": 1,
+      "archive_page_records": 1,
+      "verified_prejoin_records": 1,
+      "postjoin_live_record_present": true,
+      "source_complete": true,
+      "recipient_complete": true
+    }
+  },
+  "native_fixture_result_sha256": "d7cae995ff264e53ca9252a6e2901dcf5162fadb86ec2b0ff27ea1b6be6b75cf",
+  "private_handoff_sha256": "46f9de941996f2e030856d22958e37001bcaa386b14a6ea770df5d25f6301472",
+  "gates": {
+    "v1": {
+      "source_base": "d1e5099b019896338ab453c46f6f03e81a47e8c3",
+      "source_inputs": 860,
+      "input_manifest_sha256": "9f9f4b5ee2f83c7e6cd170826868bd92435b9f03ebb740e3da89ae3523fe5074",
+      "profile": "local-history84113/experimentalflag1/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 0,
+      "seconds": 29.65,
+      "log_sha256": "71c3b1d5d7b52e1341efc093517680bcf16c1bc1c2f5e28dad447b0d0be76835",
+      "physical_phone_changed": false,
+      "scope": "Actual SDK reopen of verified closed synthetic B recipient root through account-owned reader and hosted pane; recipient approval UI remains separate",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "affected-v1": {
+      "source_base": "d1e5099b019896338ab453c46f6f03e81a47e8c3",
+      "source_inputs": 860,
+      "input_manifest_sha256": "9f9f4b5ee2f83c7e6cd170826868bd92435b9f03ebb740e3da89ae3523fe5074",
+      "profile": "local-history84113/experimentalflag1/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 0,
+      "seconds": 11.53,
+      "log_sha256": "2d6dbead6dc301ab3756f4598b0bbb15375331fe7e8af634c0e40ba95807889f",
+      "physical_phone_changed": false,
+      "scope": "Focused explicit callback constructor/fresh-runtime controls using real isolated SDK identities; no imported reader or consent UI acceptance yet",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 105,
+        "passedTests": 105,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "source_freeze_count": 860,
+  "screenshot": {
+    "path": "/Users/pj/project/build/results/ios-genuine-imported-history-pane-v1-visual/6A7869C5-0F1B-4884-BB2C-881ED61BB4DD.png",
+    "sha256": "e7710983ac3760a19d5ab735e6f4627ff493924cb7f88c16c8fd191ad98a1940"
+  },
+  "checks": [
+    "strict SwiftLint",
+    "canonical swift-format",
+    "git diff --check"
+  ],
+  "ownership": [
+    "handoff only after successful original-worker close reply and exit0",
+    "same isolated recipient task root reopened publicly; no storage or credential copy",
+    "explicit read-only authenticated task callback; no platform Keychain",
+    "actual AppState account factory and hosted existing pane",
+    "actual scene suspension invalidates and clears reader; hosted graph retired before owners release"
+  ],
+  "limits": [
+    "This genuine integration was a first-pass acceptance control after constructor RED0/2\u2192GREEN3/3; not a newly reproduced reader defect.",
+    "Recipient approval was performed through native original harness handles; actual recipient approval pane bridge remains required.",
+    "This record has no expiry or deletion and media_count0; real ordered-media, late retention/tombstone and competing live-ID precedence UI cases remain unqualified.",
+    "Observed prejoin archive separate from known postjoin live row; no history row inserted into live transcript.",
+    "Screenshot is hosted isolated model/view acceptance, not installed application navigation acceptance.",
+    "No new full PR or physical installation claim; generated SDK4 unchanged."
+  ],
+  "diagnostics": [
+    "First attachment export mistakenly passed --only-failures false (flag enabled); empty export preserved; corrected unfiltered export produced one screenshot.",
+    "Affected runner scope description retains previous generic text; its exact105 tests include genuine reader and104 affected controls."
+  ]
+}
