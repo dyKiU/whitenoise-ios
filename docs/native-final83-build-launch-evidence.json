@@ -1,0 +1,116 @@
+{
+  "source_commit": "3f2508c8d06542c43998c4723208bf07d1bba5ca",
+  "SDK_source": "83f5a82d80c9f53bdcbab602f349544397ba07f6",
+  "simulator": {
+    "source_commit": "3f2508c8d06542c43998c4723208bf07d1bba5ca",
+    "source_inputs": 827,
+    "input_manifest_sha256": "239c0a5f7eb729663ce0dda89bdca8a805fd93e52302083875972fd48db49a8f",
+    "mdk_source": "83f5a82d80c9f53bdcbab602f349544397ba07f6",
+    "sdk_manifest_sha256": "142e1f6b21d2fc9546fc8dba3d11976c39c44f811052b7edb4bc29b974fa5915",
+    "build_exit_code": 0,
+    "log_sha256": "704a21b2305935495bc3c415dc268705f986cdce766725fe8afa14e0d4e456b9",
+    "built_code": {
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "executable_sha256": "fcc2be15efd3be607908a4bf123b4af3333c540b4816a019cdbf2761a3da3361",
+      "debug_dylib_sha256": "10bc0a12db97683684ea9932cd7afd51feace6133f1c82e5d54a6b544114ed46"
+    },
+    "installed_code": {
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "executable_sha256": "fcc2be15efd3be607908a4bf123b4af3333c540b4816a019cdbf2761a3da3361",
+      "debug_dylib_sha256": "10bc0a12db97683684ea9932cd7afd51feace6133f1c82e5d54a6b544114ed46"
+    },
+    "launch_exit_code": 0,
+    "pid": 4105,
+    "process_matches_dedicated_bundle": true,
+    "production_code_unchanged": true,
+    "production_before": null,
+    "previous_staging_code": {
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "executable_sha256": "fcc2be15efd3be607908a4bf123b4af3333c540b4816a019cdbf2761a3da3361",
+      "debug_dylib_sha256": "10bc0a12db97683684ea9932cd7afd51feace6133f1c82e5d54a6b544114ed46"
+    },
+    "rollback_app_bundle_only": "/Users/pj/project/build/rollback/ios-staging-before-final83-manual-launch/previous.app",
+    "physical_phone_changed": false,
+    "account_data_read_or_copied": false,
+    "harness_note": "Build succeeded; initial launch harness rejected already-stopped simctl code3. Same frozen built artifact adopted without rebuilding."
+  },
+  "signed_ready_iPhone": {
+    "source_commit": "3f2508c8d06542c43998c4723208bf07d1bba5ca",
+    "source_inputs": 827,
+    "input_manifest_sha256": "239c0a5f7eb729663ce0dda89bdca8a805fd93e52302083875972fd48db49a8f",
+    "mdk_source": "83f5a82d80c9f53bdcbab602f349544397ba07f6",
+    "installed_manifest_sha256": "142e1f6b21d2fc9546fc8dba3d11976c39c44f811052b7edb4bc29b974fa5915",
+    "exit_code": 0,
+    "seconds": 174.92,
+    "log_sha256": "51c2a54f11bff239bb264881be17153b188d3b3140e0a48986c52410f2d5b451",
+    "phone_installation": false,
+    "rollback_app": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/rollback/ios-personal-signed-ready-before-final83/whitenoise-ios.app",
+    "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+    "executable_sha256": "be86a1622c8ff3a8ad42f440b201e15fd63a9811e9da5d52b859fdb7f47987d5",
+    "signed_bundles": [
+      {
+        "name": "whitenoise-ios.app",
+        "entitlements_sha256": "d7c961768c724fad457d83a4ddf29675804a4414b55f5c3550dba2f822b85fdc",
+        "profile_expiration": "2026-10-16T11:24:29",
+        "profile_sha256": "423162dbc20b2fbb4d44bbef2af684fb934440730a9cd5bf93e4ba040282a3ff"
+      },
+      {
+        "name": "NotificationServiceExtension.appex",
+        "entitlements_sha256": "7c6ccce56de4253ca606c85e920b8d45e5b5046c9b33e55efc394d7c7ed2470a",
+        "profile_expiration": "2026-10-16T11:24:27",
+        "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
+      }
+    ]
+  },
+  "signature_and_provisioning": {
+    "signed_bundles": [
+      {
+        "bundle": "whitenoise-ios.app",
+        "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+        "team": "PZ7CU4G6YG",
+        "profile_identifier_matches": true,
+        "unexpired_profile": true,
+        "development_debug_entitlement": true,
+        "private_app_group_matches": true,
+        "unsupported_PersonalTeam_capabilities_absent": true,
+        "executable_sha256": "be86a1622c8ff3a8ad42f440b201e15fd63a9811e9da5d52b859fdb7f47987d5",
+        "debug_dylib_sha256": "6c6352a380d7e3c8fa138f66ce1b7751e1bfb0d01122b1a5bb334a2e504667f1"
+      },
+      {
+        "bundle": "NotificationServiceExtension.appex",
+        "bundle_id": "dev.ipf.whitenoise.ios.staging.personal.NotificationService",
+        "team": "PZ7CU4G6YG",
+        "profile_identifier_matches": true,
+        "unexpired_profile": true,
+        "development_debug_entitlement": true,
+        "private_app_group_matches": true,
+        "unsupported_PersonalTeam_capabilities_absent": true,
+        "executable_sha256": "35c99b869173701ea4cfa6aa8c97dbc61a689fa9103377e6271dea40486f6426",
+        "debug_dylib_sha256": null
+      }
+    ],
+    "phone_installation": false,
+    "source_manifest_identical_to_simulator": true,
+    "original_e6_sdk_stash": "f8036cb7ab865be4a670153cda0cccbd993dfe49"
+  },
+  "source_verification": {
+    "matched_signed_paths": 823,
+    "SDK4": {
+      "Packages/MarmotKit/MARMOT_VERSION": "0fb93740a313d4508f09e3da7e4ff6f45cdfa339a82185a51d4906ca3966d7e1",
+      "Packages/MarmotKit/Package.swift": "4c379ba9d572adb649c9692466ebbc80204af9ca0bf5acd63256ff6e0fa29b50",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKit.swift": "84e8f05d1beed082c81dccd1031f1e50b309499026e6df3680b5e97f22dbf8b4",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift": "b91dabbf1c210a0d3aedda5a626fcd4c595f03e740ce0dcf765e0fcae49e4dcb"
+    },
+    "mismatches": [],
+    "source_sha": "3f2508c8d06542c43998c4723208bf07d1bba5ca",
+    "full_log_verified": true
+  },
+  "limits": [
+    "Simulator-only Staging development launch on dedicated M5 device, previous app bundle retained; no account data read/copied.",
+    "Initial simulator harness rejected already-stopped terminate code3 after successful build; same frozen artifact installed/launched without rebuilding.",
+    "M1 signed-ready app and notification extension verified strict signature, matching PersonalTeam, exact bundle identifiers, app group, unexpired profiles and absent unsupported capabilities.",
+    "827 source inputs identical on both hosts; 823 signed paths plus exact four SDK83 overrides. SDK metadata and generated paths remain uncommitted.",
+    "Previous signed-ready iPhone app and original e6 SDK/framework retained; physical installation remains deferred.",
+    "Full PR qualification is recorded separately; real multi-device application acceptance remains required."
+  ]
+}
