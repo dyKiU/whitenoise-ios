@@ -148,6 +148,20 @@ nonisolated final class MarmotClient: Sendable {
         }.value
     }
 
+    func synchronizedHistoryPage(
+        accountRef: String, groupIdHex: String, afterMessageIdHex: String?, limit: UInt32
+    ) async throws -> SynchronizedHistoryPage {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            return try await Task.detached { [marmot] in
+                SynchronizedHistoryPage(try marmot.synchronizedHistoryPage(
+                    accountRef: accountRef, groupIdHex: groupIdHex,
+                    afterMessageIdHex: afterMessageIdHex, limit: limit))
+            }.value
+        #else
+            throw SynchronizedHistoryReadError.unavailable
+        #endif
+    }
+
     func freshRuntime() throws -> MarmotClient {
         try MarmotClient(rootPath: rootPath, relayUrls: relayUrls, cursorPersistence: cursorPersistence)
     }

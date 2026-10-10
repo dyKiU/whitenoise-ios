@@ -43,6 +43,19 @@ final class AccountStore {
     }
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private(set) var synchronizedHistoryModels: [String: SynchronizedHistoryViewModel] = [:]
+
+        func holdSynchronizedHistory(_ model: SynchronizedHistoryViewModel, groupIdHex: String) {
+            synchronizedHistoryModels[groupIdHex]?.invalidate()
+            synchronizedHistoryModels[groupIdHex] = model
+        }
+
+        func releaseSynchronizedHistory(_ model: SynchronizedHistoryViewModel, groupIdHex: String) {
+            guard synchronizedHistoryModels[groupIdHex] === model else { return }
+            model.invalidate()
+            synchronizedHistoryModels.removeValue(forKey: groupIdHex)
+        }
+
         let selectedChatLifetime = SelectedChatAccountLifetime()
         var selectedChatTransferModel: SelectedChatTransferViewModel?
 
@@ -242,6 +255,8 @@ final class AccountStore {
         private func retireDeviceLinkingScope() {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
+            for reader in synchronizedHistoryModels.values { reader.invalidate() }
+            synchronizedHistoryModels.removeAll()
             selectedChatLifetime.invalidate()
             selectedChatTransferModel?.invalidate()
             selectedChatTransferModel = nil

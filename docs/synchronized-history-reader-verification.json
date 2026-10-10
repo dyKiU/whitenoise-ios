@@ -1,0 +1,117 @@
+{
+  "source_base": "9e3fb3fb251aa15186e25e894026a90115325af8",
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "scope": "Bounded read-only source-attested history page, separate from live rows; original account/runtime and exact chat lifetime. No transfer, approval, download or UI adoption.",
+  "red_local_stash": "4acf6767a088d99114a48612218d3df353682f18",
+  "red_remote_stash": "eeeeaddb237fcd765d6f595f80cc7c8d2b51f956",
+  "green_local_stash": "ba68a6aef4326aad065a49f66c1f5622b1475fae",
+  "green_remote_stash": "0ad68250aca9bdbadea20dd4599c3b304268f5cf",
+  "sdk_local_stash": "b6944d561124b210a17da2c738f99a53bf300975",
+  "sdk_remote_stash": "42e976e6f4b7ffbcdfbe42089b3dd4269d488790",
+  "gates": {
+    "red-v1": {
+      "result": {
+        "source_base": "9e3fb3fb251aa15186e25e894026a90115325af8",
+        "source_inputs": 831,
+        "input_manifest_sha256": "77188b03254941872cbbd4d6de06bd1b4c5236056e4e8a0665459f6bc162de30",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 98.6,
+        "log_sha256": "329f524aa5e3725fc3ba0db9dc8275b1c607d0c96c4de45c9133e571350f108d",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Failed",
+          "totalTestCount": 1,
+          "passedTests": 0,
+          "failedTests": 1,
+          "skippedTests": 0
+        },
+        "test_failures": [
+          {
+            "failureText": "Expectation failed: model.records.map(\\.content) == [record.content]\nmodel.records.map(\\.content) \u2192 []\n[record.content] \u2192 [\"retained test message\"]",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 1,
+            "testIdentifierString": "SynchronizedHistoryViewModelTests/firstPageDisplaysSourceAttestedContentAndPreservesProvenance()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SynchronizedHistoryViewModelTests/firstPageDisplaysSourceAttestedContentAndPreservesProvenance()",
+            "testName": "firstPageDisplaysSourceAttestedContentAndPreservesProvenance()"
+          }
+        ]
+      },
+      "manifest_path": "build/results/ios-history-reader-red-v1-input.json",
+      "log_path": "build/results/ios-history-reader-red-v1.log",
+      "classification": "Behavioral RED: reader returned no source-attested record."
+    },
+    "green-v1": {
+      "result": {
+        "source_base": "9e3fb3fb251aa15186e25e894026a90115325af8",
+        "source_inputs": 834,
+        "input_manifest_sha256": "e243bd3540b823c4e5ea0680af7ff18c9c7190f6cf0dc687b9c45bede0ca2922",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 72.75,
+        "log_sha256": "348697aa318f6d775f7871ed41d1e1adc683e875441cbcbd9c05dbb6c07ddcf4",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection"
+      },
+      "manifest_path": "build/results/ios-history-reader-green-v1-input.json",
+      "log_path": "build/results/ios-history-reader-green-v1.log",
+      "classification": "Zero-test fixture compile failure: Marmot.close does not exist; corrected only to shutdownAndClose."
+    },
+    "green-v2": {
+      "result": {
+        "source_base": "9e3fb3fb251aa15186e25e894026a90115325af8",
+        "source_inputs": 834,
+        "input_manifest_sha256": "6560736826b5e4552a26cf432176bdc89e35ea7ce2d2d7b372d4e4a786007150",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 0,
+        "seconds": 103.03,
+        "log_sha256": "1d9cc03c19aa2e23badb06d90b33567a31b334a7e9c26a6f5e5b0049fb50e9b6",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 1,
+          "passedTests": 1,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      },
+      "manifest_path": "build/results/ios-history-reader-green-v2-input.json",
+      "log_path": "build/results/ios-history-reader-green-v2.log"
+    },
+    "affected-v2": {
+      "result": {
+        "source_base": "9e3fb3fb251aa15186e25e894026a90115325af8",
+        "source_inputs": 834,
+        "input_manifest_sha256": "6560736826b5e4552a26cf432176bdc89e35ea7ce2d2d7b372d4e4a786007150",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 0,
+        "seconds": 7.52,
+        "log_sha256": "089c010fb61e6245aa3ab72bed3023435be1e5c10c9dc2c6658b107e30a37946",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 62,
+          "passedTests": 62,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      },
+      "manifest_path": "build/results/ios-history-reader-affected-v2-input.json",
+      "log_path": "build/results/ios-history-reader-affected-v2.log"
+    }
+  },
+  "qualification_limits": [
+    "Injected page controls exercise model policies; actual native missing-account query refuses without creating account.",
+    "No actual archived recipient page rendered yet; native SDK imported-history acceptance is separate.",
+    "Conversation pane, localization and full Staging PR pending. Hosted tests may install/launch isolated test host."
+  ]
+}
