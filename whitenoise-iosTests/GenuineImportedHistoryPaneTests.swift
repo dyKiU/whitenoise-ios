@@ -58,7 +58,7 @@ import XCTest
     }
 
     /// Read the original task callback's authenticated envelope; no Keychain or credential copy.
-    nonisolated private final class ImportedHistoryReadOnlyStore: SecretStore {
+    nonisolated final class ImportedHistoryReadOnlyStore: SecretStore {
         private let values: [String: String]
         init(root: URL) throws {
             let directory = root.appendingPathComponent("credentials", isDirectory: true)

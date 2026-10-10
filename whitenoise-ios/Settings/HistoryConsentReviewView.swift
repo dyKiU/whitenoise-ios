@@ -74,7 +74,8 @@
                                 WNButton(title: "Approve", size: .standard, isLoading: model.isWorking) {
                                     let revision = review.revision
                                     perform { try await model.approve(displayedRevision: revision) }
-                                }.disabled(model.isWorking || !selected.isActive || review.complete)
+                                }.accessibilityIdentifier("history-original-approve")
+                                    .disabled(model.isWorking || !selected.isActive || review.complete)
                             }
                         }
                         Section {
