@@ -70,6 +70,7 @@
                                 WNButton(title: "Refresh", emphasis: .secondary, size: .standard) {
                                     perform { try await model.refresh() }
                                 }.disabled(model.isWorking)
+                                    .accessibilityIdentifier("history-source.refresh")
                             }
                         } else {
                             Section {
