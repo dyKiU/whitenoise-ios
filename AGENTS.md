@@ -134,6 +134,13 @@ Keep the XCFramework ignored. `CancellablePresentedChatList.swift` is a handwrit
 adapter using the released UniFFI native future cancellation API; preserve it on
 binding refresh and run its native cancellation test. Do not patch generated binding files directly or commit an expanded XCFramework. Change Rust/UniFFI, publish an immutable release, install it with the script, then validate the iOS app. The generated Swift source, binary URL, and checksum must always move together.
 
+Private development tests opt in with `WN_EXPERIMENTAL_DEVICE_SYNC=1` after
+installing matching local bindings. The test runner validates source, features
+and both native archive hashes before defining the Swift flag in both phases.
+Keep local generated overrides and `LOCAL_BUILD.json` out of commits. Native
+capability/factory smoke tests do not qualify fresh pairing or chat delivery.
+See `docs/native-device-linking-development.md` for the current acceptance scope.
+
 Avatar metadata from presented rows, conversation headers and identity sidecars
 is authoritative. Request only visible `avatarAsset.target` values and read the
 returned opaque references through MDK. Preserve account/runtime isolation;

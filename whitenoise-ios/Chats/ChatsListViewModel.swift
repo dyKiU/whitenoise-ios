@@ -557,7 +557,13 @@ final class ChatsListViewModel {
     }
 
     private func installWindowSnapshot(_ snapshot: ChatListWindowSnapshotFfi) {
-        if windowSnapshot?.rows != snapshot.rows { windowWillChange?(snapshot) }
+        // Compare presentation values; newer SDK draft leases are opaque handles.
+        let unchanged =
+            windowSnapshot?.rows.elementsEqual(snapshot.rows) { lhs, rhs in
+                lhs.preview == rhs.preview && lhs.actions == rhs.actions && lhs.row == rhs.row
+                    && lhs.presentation == rhs.presentation && lhs.avatarAsset == rhs.avatarAsset
+            } ?? false
+        if !unchanged { windowWillChange?(snapshot) }
         windowSnapshot = snapshot
         loadError = nil
         isLoading = false

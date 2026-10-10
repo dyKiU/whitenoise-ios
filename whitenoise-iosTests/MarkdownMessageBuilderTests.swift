@@ -8,6 +8,17 @@ import SwiftUI
 /// faithful styling, render-side link gating, and budget/sanitization safety.
 @MainActor
 struct MarkdownMessageBuilderTests {
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        @Test func timestampsRemainVisibleInTranscript() throws {
+            let attributed = try firstParagraph(
+                doc([
+                    para([
+                        .timestamp(unixSeconds: 1_700_000_000, style: .relative)
+                    ])
+                ]))
+            #expect(String(attributed.characters) == "<t:1700000000:R>")
+        }
+    #endif
 
     private func doc(_ blocks: [MarkdownBlockFfi]) -> MarkdownDocumentFfi {
         MarkdownDocumentFfi(blocks: blocks, truncated: false)

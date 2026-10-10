@@ -7,6 +7,21 @@ import Testing
 /// text — syntax dropped, content kept — without changing anything for
 /// records that carry no parsed tokens.
 struct MarkdownPlainTextTests {
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        @Test func timestampsPreserveCanonicalLiteralContent() {
+            let styles: [(MarkdownTimestampStyleFfi, String)] = [
+                (.shortTime, "t"), (.longTime, "T"), (.shortDate, "d"), (.longDate, "D"),
+                (.shortDateTime, "f"), (.longDateTime, "F"), (.compactDateTime, "s"),
+                (.compactDateTimeSeconds, "S"), (.relative, "R"),
+            ]
+            for (style, marker) in styles {
+                let document = doc([
+                    .paragraph(inlines: [.timestamp(unixSeconds: -1, style: style)])
+                ])
+                #expect(MarkdownPlainText.flatten(document) == "<t:-1:\(marker)>")
+            }
+        }
+    #endif
 
     private func doc(_ blocks: [MarkdownBlockFfi]) -> MarkdownDocumentFfi {
         MarkdownDocumentFfi(blocks: blocks, truncated: false)

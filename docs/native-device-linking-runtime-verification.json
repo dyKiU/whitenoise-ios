@@ -1,0 +1,74 @@
+{
+  "source_base": "c690ce260bd3494a29c151d02a3a13498804537b",
+  "mdk_source": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+  "verification": "Root independently verified both 773-input freezes against local handwritten source and preserved installed generated cohort, both complete passing logs and four earlier compiler-failure logs.",
+  "gates": [
+    {
+      "source_base": "c690ce260bd3494a29c151d02a3a13498804537b",
+      "source_inputs": 773,
+      "input_manifest_sha256": "8a43ffa1e49b9cf7f7894dc5ab72e8cdf7f7cdca972a4291f4565e6da41f8987",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 103.61,
+      "log_sha256": "e91485aa99eb4e815c4e2062b0419ffa6dc7171eb4a3225cbd6d8f52f1a12b68",
+      "physical_phone_changed": false,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 57,
+        "passedTests": 57,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "source_base": "c690ce260bd3494a29c151d02a3a13498804537b",
+      "source_inputs": 773,
+      "input_manifest_sha256": "8a43ffa1e49b9cf7f7894dc5ab72e8cdf7f7cdca972a4291f4565e6da41f8987",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 169.08,
+      "log_sha256": "a3974cfb1fee92f08127086e6b9ec2feffe55ccf8937c888fa807fd4dd603cbd",
+      "physical_phone_changed": false,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2711,
+        "passedTests": 2709,
+        "failedTests": 0,
+        "skippedTests": 2
+      },
+      "test_failures": []
+    }
+  ],
+  "compile_failures": [
+    {
+      "attempt": 1,
+      "exit_code": 65,
+      "log_sha256": "50baa49c38ec53d2c00992a389cc63d9934779d25133304a9e28fad75ef07eb0",
+      "type": "compile failure; no behavioral RED claimed"
+    },
+    {
+      "attempt": 2,
+      "exit_code": 65,
+      "log_sha256": "f6fd07200aa2c48ab89d2a018e00c7ef453e2d86ffac6b97c7082c717df7afb1",
+      "type": "compile failure; no behavioral RED claimed"
+    },
+    {
+      "attempt": 3,
+      "exit_code": 65,
+      "log_sha256": "e6951090bcb3ff06da0f4f81aa621da8e706d24ab447b8d26d5d5e9c316a9018",
+      "type": "compile failure; no behavioral RED claimed"
+    },
+    {
+      "attempt": 4,
+      "exit_code": 65,
+      "log_sha256": "22310cce220f13180ea037147349492b97fb3160265b393f53983e994c004e2c",
+      "type": "compile failure; no behavioral RED claimed"
+    }
+  ],
+  "scope": "Native capabilities and typed missing-account factories; no fresh pairing, selected-chat consent/admission, message delivery or history. Timestamp content preserved as canonical literal until localized live timestamp UI is implemented.",
+  "physical_phone_changed": false,
+  "published_baseline": "in progress"
+}

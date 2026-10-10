@@ -291,6 +291,14 @@ struct DiagnosticsView: View {
             return "pending commit recovered"
         case .groupHydrationRecovered:
             return "hydration recovered"
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            case .localGroupCopyTerminated:
+                return "local copy terminated"
+            case .localGroupCopyRestored:
+                return "local copy restored"
+            case .groupMemberLeavesRemoved:
+                return "member leaves removed"
+        #endif
         }
     }
 
