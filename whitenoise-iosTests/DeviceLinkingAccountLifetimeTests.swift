@@ -268,5 +268,187 @@ import Testing
             await app.startRuntimeSuspension().value
             session.stream.deliverDelayedSnapshot()
         }
+
+        @Test(arguments: [false, true]) func pendingFactoryCannotAttachAfterAccountOrRuntimeReplacement(
+            suspend: Bool
+        ) async throws {
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent("LinkingFactory-\(UUID())")
+            defer { try? FileManager.default.removeItem(at: directory) }
+            let client = try MarmotClient(rootPath: directory.path, relayUrls: ["wss://relay.example.invalid"])
+            let app = AppState.test(client: client, accountDefaults: defaults())
+            app.setAppSceneActive(true)
+            await app.bootstrap()
+            app.activeAccountRef = "original"
+            let session = LifetimeSession(noPointer: .init())
+            var returnSession: CheckedContinuation<any DeviceLinkingSessionProtocol, Never>?
+            let pending = Task {
+                do {
+                    _ = try await app.adoptDeviceLinkingFactory { exactClient, exactAccount in
+                        #expect(exactClient === client)
+                        #expect(exactAccount == "original")
+                        return await withCheckedContinuation { returnSession = $0 }
+                    }
+                    return true
+                } catch { return false }
+            }
+            await waitFor { returnSession != nil }
+            #expect(returnSession != nil)
+            if suspend {
+                app.setAppSceneActive(false)
+                await app.startRuntimeSuspension().value
+                #expect(app.client == nil)
+            } else {
+                app.activeAccountRef = "replacement"
+                app.activeAccountRef = "original"
+            }
+            returnSession?.resume(returning: session)
+            #expect(await pending.value == false)
+            #expect(app.accountStore.deviceLinkingScope == nil)
+            #expect(session.cancelCount == 1)
+            #expect(session.stream.closeCount == 1)
+            try await app.accountStore.cancelDeviceLinking()
+            session.stream.deliverDelayedSnapshot()
+            if !suspend {
+                app.setAppSceneActive(false)
+                await app.startRuntimeSuspension().value
+            }
+        }
+
+        private func withFactoryRuntime(_ body: (AppState, MarmotClient) async throws -> Void) async throws {
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent(
+                "LinkingFactoryControl-\(UUID())")
+            defer { try? FileManager.default.removeItem(at: directory) }
+            let client = try MarmotClient(rootPath: directory.path, relayUrls: ["wss://relay.example.invalid"])
+            let app = AppState.test(client: client, accountDefaults: defaults())
+            app.setAppSceneActive(true)
+            await app.bootstrap()
+            app.activeAccountRef = "original"
+            do {
+                try await body(app, client)
+                app.setAppSceneActive(false)
+                await app.startRuntimeSuspension().value
+            } catch {
+                app.setAppSceneActive(false)
+                await app.startRuntimeSuspension().value
+                throw error
+            }
+        }
+
+        @Test func pendingFactoryCannotAttachToSameAccountAfterRealRuntimeRestart() async throws {
+            try await withFactoryRuntime { app, oldClient in
+                let generation = app.runtimeGeneration
+                let session = LifetimeSession(noPointer: .init())
+                var result: CheckedContinuation<any DeviceLinkingSessionProtocol, Never>?
+                let pending = Task {
+                    do {
+                        _ = try await app.adoptDeviceLinkingFactory { _, _ in
+                            await withCheckedContinuation { result = $0 }
+                        }
+                        return true
+                    } catch { return false }
+                }
+                await waitFor { result != nil }
+                #expect(result != nil)
+                app.setAppSceneActive(false)
+                await app.startRuntimeSuspension().value
+                #expect(app.client == nil)
+                app.setAppSceneActive(true)
+                await app.startForegroundActivation().value
+                #expect(app.client != nil)
+                #expect(app.client !== oldClient)
+                #expect(app.runtimeGeneration > generation)
+                app.activeAccountRef = "original"
+                result?.resume(returning: session)
+                #expect(await pending.value == false)
+                #expect(app.accountStore.deviceLinkingScope == nil)
+                #expect(session.cancelCount == 1)
+                #expect(session.stream.closeCount == 1)
+                session.stream.deliverDelayedSnapshot()
+            }
+        }
+
+        @Test func lateFactoryCleanupFailureRetainsExactSessionForRetry() async throws {
+            try await withFactoryRuntime { app, _ in
+                let session = LifetimeSession(noPointer: .init())
+                session.setCancellationFailure(true)
+                var result: CheckedContinuation<any DeviceLinkingSessionProtocol, Never>?
+                let pending = Task {
+                    do {
+                        _ = try await app.adoptDeviceLinkingFactory { _, _ in
+                            await withCheckedContinuation { result = $0 }
+                        }
+                        return true
+                    } catch { return false }
+                }
+                await waitFor { result != nil }
+                #expect(result != nil)
+                app.activeAccountRef = "replacement"
+                result?.resume(returning: session)
+                #expect(await pending.value == false)
+                let retired = app.accountStore.retiringDeviceLinkingScope
+                #expect(retired != nil)
+                #expect(retired?.cleanupError != nil)
+                #expect(app.accountStore.deviceLinkingScope == nil)
+                #expect(session.cancelCount == 1)
+                #expect(session.stream.closeCount == 1)
+                session.setCancellationFailure(false)
+                try await app.accountStore.cancelDeviceLinking()
+                #expect(session.cancelCount == 2)
+                #expect(session.stream.closeCount == 1)
+                #expect(app.accountStore.retiringDeviceLinkingScope == nil)
+                session.stream.deliverDelayedSnapshot()
+                #expect(retired?.latestSnapshot == nil)
+            }
+        }
+
+        @Test func pendingFactoryIsBoundedAndCurrentOriginalResultIsAdopted() async throws {
+            try await withFactoryRuntime { app, _ in
+                let session = LifetimeSession(noPointer: .init())
+                var result: CheckedContinuation<any DeviceLinkingSessionProtocol, Never>?
+                let pending = Task {
+                    try await app.adoptDeviceLinkingFactory { _, _ in
+                        await withCheckedContinuation { result = $0 }
+                    }
+                }
+                await waitFor { result != nil }
+                #expect(result != nil)
+                var competingFactoryCalled = false
+                await #expect(throws: CancellationError.self) {
+                    _ = try await app.adoptDeviceLinkingFactory { _, _ in
+                        competingFactoryCalled = true
+                        return LifetimeSession(noPointer: .init())
+                    }
+                }
+                #expect(!competingFactoryCalled)
+                result?.resume(returning: session)
+                let scope = try await pending.value
+                #expect(app.accountStore.deviceLinkingScope === scope)
+                #expect(scope.accountRef == "original")
+                #expect(session.cancelCount == 0)
+                await waitFor { session.stream.isWaiting }
+                session.stream.deliverDelayedSnapshot()
+                await waitFor { scope.latestSnapshot?.revision == 7 }
+                #expect(scope.latestSnapshot?.revision == 7)
+                try await app.accountStore.cancelDeviceLinking()
+                session.stream.deliverDelayedSnapshot()
+                #expect(session.cancelCount == 1)
+                #expect(session.stream.closeCount == 1)
+            }
+        }
+
+        @Test func ownedAppFactoriesUseRealWrappersAndReleaseFailedReservations() async throws {
+            try await withFactoryRuntime { app, client in
+                await #expect(throws: MarmotKitError.DeviceLinkingRuntimeUnavailable) {
+                    _ = try await app.beginOwnedDeviceLinkingSession()
+                }
+                await #expect(throws: MarmotKitError.DeviceLinkingRuntimeUnavailable) {
+                    _ = try await app.approveOwnedDeviceLinkingSession(request: Data(), target: nil)
+                }
+                #expect(app.accountStore.deviceLinkingScope == nil)
+                #expect(app.accountStore.retiringDeviceLinkingScope == nil)
+                let actualAccounts = try client.marmot.listAccounts()
+                #expect(actualAccounts.isEmpty)
+            }
+        }
     }
 #endif

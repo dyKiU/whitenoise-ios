@@ -70,3 +70,30 @@ qualification, not fresh SDK pairing, selected-chat approval or delivery. See
 `native-device-linking-lifetime-verification.json` for hashes, original RED source
 preservation, compiler failures and the secondary RED diagnostics tooling failure.
 The four local generated e6 SDK overrides remain unchanged and uncommitted.
+
+## Factory-to-owner adoption
+
+Experimental AppState entrypoints now call the real MarmotClient begin/approve
+factories and retain the original returned session through AccountStore. One
+pending factory is bound to a private owner epoch plus exact runtime identity
+and generation. Replacement (including A→B→A), suspension and teardown invalidate
+the reservation synchronously. Core close does not wait for a cancellation-ignoring
+factory. Its exact late returned session is never adopted; its subscription closes
+and failed cancellation remains retained for explicit retry. These epochs are
+negative native lifetime fences, not SDK permission or persisted approval.
+
+The real stale-result regression failed first (one parameterized test, both
+replacement and suspension cases). Final M5 checks passed thirteen lifecycle tests
+and twenty existing factory/sign-out/wipe tests with no failures or skips. Controls
+include same-account actual runtime restart, bounded competing factories, exact
+late cleanup failure/retry, current original-object adoption and typed real SDK
+missing-account errors through both App entrypoints. Original RED source was
+preserved before Green in a named Git stash and matched the recorded manifest.
+
+Hosted Xcode tests implicitly install and launch their Staging test host in the
+dedicated simulator. Read-only post-test inspection confirms its executable and
+linked debug library match the tested product; the older installed executable
+provenance is not asserted unchanged. No account data was inspected or modified
+manually. See `native-device-linking-factory-verification.json` for current hashes,
+compiler/runner failures, exact counts and scope. Fresh pairing, native UI, selected
+chat admission, delivery and history remain separate gates.

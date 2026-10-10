@@ -1,0 +1,209 @@
+{
+  "base_commit": "0316dbf777e532480fae87ae148812b017bf294c",
+  "branch": "codex/native-device-linking-factory",
+  "sdk_source": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+  "test_policy_overrides": false,
+  "scope": "Native App factory-to-account scope adoption and original-object cleanup. Delayed factory doubles share actual isolated AppState/AccountStore/RuntimeLifecycle; actual owned begin/approve use unchanged MarmotClient/SDK forwards. No SDK pairing or membership proof.",
+  "owned_source_sha256": {
+    "whitenoise-ios/Core/AccountStore.swift": "b9fcf9eb7220a59bb5c275c5465b199ff5481bd0393a085706e1a4561420b49f",
+    "whitenoise-ios/Session/DeviceLinkingFactory.swift": "47861b446c5296043e3b6b1629b85ef154fad93e4696a875ad7a2d614c1ca632",
+    "whitenoise-iosTests/DeviceLinkingAccountLifetimeTests.swift": "f2f13a3c6cf221d018fd87a30335384c4d984323e43f2b744f9323f86a62af3b"
+  },
+  "red": {
+    "source_base": "0316dbf777e532480fae87ae148812b017bf294c",
+    "branch": "codex/native-device-linking-factory",
+    "source_inputs": 779,
+    "input_manifest_sha256": "8a6869f3fecd24e031473821a20c84dce755f6731e85bea6c8507b831d814342",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 65,
+    "seconds": 103.04,
+    "log_sha256": "8398a4f87d6bcbbe1cae81e90aac43cbb6953a3e629c0cde5e98fb65dfc26743",
+    "command": [
+      "bash",
+      "scripts/test.sh",
+      "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests/pendingFactoryCannotAttachAfterAccountOrRuntimeReplacement(suspend:)"
+    ],
+    "scope": "Native lifecycle doubles exercise actual account replacement and runtime suspension; no SDK pairing or approval proof",
+    "tests": {
+      "result": "Failed",
+      "totalTestCount": 1,
+      "passedTests": 0,
+      "failedTests": 1,
+      "skippedTests": 0
+    }
+  },
+  "red_exact_source_preservation": {
+    "stash": "56a79598b69d0ef5b8ad45453eed3a7a77e3b681",
+    "input_manifest_sha256": "8a6869f3fecd24e031473821a20c84dce755f6731e85bea6c8507b831d814342",
+    "owned_paths": {
+      "whitenoise-ios/Session/DeviceLinkingFactory.swift": "f26e1644d64b8723ca49cb1691b245f03fc7ed4b9c0566615cee15b011373a5f",
+      "whitenoise-iosTests/DeviceLinkingAccountLifetimeTests.swift": "48a3eaf40da7c725dfeb42cb083c2d2f09094418aac0b1bebf48bc20bb71c298"
+    },
+    "remaining_source_base": "0316dbf777e532480fae87ae148812b017bf294c"
+  },
+  "initial_green": {
+    "source_base": "0316dbf777e532480fae87ae148812b017bf294c",
+    "branch": "codex/native-device-linking-factory",
+    "source_inputs": 779,
+    "input_manifest_sha256": "507aa9e3f631026c25287652e2d0fa414f984eb021bbbd435d5c293f73766818",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 0,
+    "seconds": 70.35,
+    "log_sha256": "be43158ae68f8f7488ccb2959a583af795d07eea342b81e91f6a51d66398f030",
+    "command": [
+      "bash",
+      "scripts/test.sh",
+      "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests/pendingFactoryCannotAttachAfterAccountOrRuntimeReplacement(suspend:)"
+    ],
+    "scope": "Native lifecycle doubles exercise actual account replacement and runtime suspension; no SDK pairing or approval proof",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0
+    }
+  },
+  "final_gates": [
+    {
+      "source_base": "0316dbf777e532480fae87ae148812b017bf294c",
+      "branch": "codex/native-device-linking-factory",
+      "source_inputs": 779,
+      "input_manifest_sha256": "10de5b27cfdb06308ee5abbebe6b2d0336e99d7dc1d38c5ead2b820a9495bbfc",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 17.47,
+      "log_sha256": "1ed5f71017b0a0fe60c022fffa78a4e0e5aaa4f6f07136c956413570587d6d4f",
+      "command": [
+        "bash",
+        "scripts/test.sh",
+        "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests"
+      ],
+      "scope": "Native lifecycle doubles exercise actual account replacement and runtime suspension; no SDK pairing or approval proof",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 13,
+        "passedTests": 13,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    },
+    {
+      "source_base": "0316dbf777e532480fae87ae148812b017bf294c",
+      "branch": "codex/native-device-linking-factory",
+      "source_inputs": 779,
+      "input_manifest_sha256": "10de5b27cfdb06308ee5abbebe6b2d0336e99d7dc1d38c5ead2b820a9495bbfc",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 7.23,
+      "log_sha256": "92cb872a387bd9526791cf0acaf20b1822ce6e8b7188e7c332e6e9dae8b1c85a",
+      "command": [
+        "bash",
+        "scripts/test.sh",
+        "-only-testing:whitenoise-iosTests/NativeDeviceLinkingRuntimeTests",
+        "-only-testing:whitenoise-iosTests/SignOutAndWipeTests"
+      ],
+      "scope": "Native lifecycle doubles exercise actual account replacement and runtime suspension; no SDK pairing or approval proof",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 20,
+        "passedTests": 20,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    }
+  ],
+  "compile_failure": {
+    "result": {
+      "source_base": "0316dbf777e532480fae87ae148812b017bf294c",
+      "branch": "codex/native-device-linking-factory",
+      "source_inputs": 779,
+      "input_manifest_sha256": "f356a8e3270b874aa816672a35bbc80c6b11a7e11261a59ff87afab485a800e6",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 13.64,
+      "log_sha256": "22e135002c05eb5dbf68262a04c76b1df3d1bcdbe8a4496c3c65b2d57d511abf",
+      "command": [
+        "bash",
+        "scripts/test.sh",
+        "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests"
+      ],
+      "scope": "Native lifecycle doubles exercise actual account replacement and runtime suspension; no SDK pairing or approval proof"
+    },
+    "actual_tests": 0,
+    "error": "Fixture #expect(try listAccounts()) did not infer throwing closure; replaced with explicit throwing let, product unchanged",
+    "preserved_stash": "83c7946bc66bae0f733d8d53027a28d963f05196"
+  },
+  "redundant_selection": {
+    "result": {
+      "source_base": "0316dbf777e532480fae87ae148812b017bf294c",
+      "branch": "codex/native-device-linking-factory",
+      "source_inputs": 779,
+      "input_manifest_sha256": "10de5b27cfdb06308ee5abbebe6b2d0336e99d7dc1d38c5ead2b820a9495bbfc",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 7.61,
+      "log_sha256": "f73494a6d1df55db05ee6959838a0e09325ad3afc005070e6a948184da9d6e6f",
+      "command": [
+        "bash",
+        "scripts/test.sh",
+        "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests"
+      ],
+      "scope": "Native lifecycle doubles exercise actual account replacement and runtime suspension; no SDK pairing or approval proof",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 13,
+        "passedTests": 13,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    },
+    "note": "Runner selection replacement missed: reran lifecycle13, not affected20. Later affected-v3 actual20 qualified separately."
+  },
+  "hosted_simulator": {
+    "observed_at": "2026-10-10T01:34:38.033099+00:00",
+    "scope": "Read-only installed app bundle inspection after hosted Xcode tests; no account/data-container reads or manual install/launch",
+    "simulator": "3F79E967-EE79-4A0E-BCF6-BCC4FE4A2ECC",
+    "bundle_identifier": "dev.ipf.whitenoise.ios.staging.personal",
+    "bundle_version": "44",
+    "installed_bundle_path": "/Users/pj/Library/Developer/CoreSimulator/Devices/3F79E967-EE79-4A0E-BCF6-BCC4FE4A2ECC/data/Containers/Bundle/Application/B523F34D-362C-4B19-A82F-C1F0D388F593/whitenoise-ios.app",
+    "tested_product_path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Products/Debug-Staging-iphonesimulator/whitenoise-ios.app",
+    "files": {
+      "whitenoise-ios": {
+        "installed_sha256": "8ad86d2c0e96297626aa65f2eb2aeffef4857b9de62715eeaf8eb1d2a33f000b",
+        "tested_product_sha256": "8ad86d2c0e96297626aa65f2eb2aeffef4857b9de62715eeaf8eb1d2a33f000b",
+        "equal": true
+      },
+      "whitenoise-ios.debug.dylib": {
+        "installed_sha256": "9658de6750f5bd914bca9430803b5dc0f7ed951a9d34703168a8133ff6b64fe9",
+        "tested_product_sha256": "9658de6750f5bd914bca9430803b5dc0f7ed951a9d34703168a8133ff6b64fe9",
+        "equal": true
+      }
+    }
+  },
+  "lifetime_invariants": [
+    "Account owner epoch rotates synchronously on replacement or teardown, including before factory result exists.",
+    "Exact runtime client identity/generation and current foreground lifetime checked around factory adoption.",
+    "At most one pending factory; cancellation requests do not block terminal Core close if factory ignores cancellation.",
+    "Exact late returned original session closes subscription and remains retained for cleanup failure/retry; never attaches to replacement."
+  ],
+  "formatting": {
+    "tool": "xcrun swift-format6.2.3",
+    "configuration": "indentation4/lineLength120",
+    "scope": "New Session/test files and changed experimental AccountStore range only",
+    "lint": "passed",
+    "diff_check": "passed"
+  },
+  "generated_overrides_committed": false,
+  "local_remote_input_differences": [
+    "Packages/MarmotKit/MARMOT_VERSION",
+    "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift"
+  ],
+  "remote_evidence_prefix": "/Users/pj/project/build/results/ios-native-linking-lifetime-factory-adoption-",
+  "limits": [
+    "Hosted Xcode tests install/launch the dedicated Staging test host; prior installed app executable provenance is superseded by inspected current hashes. No manual install/launch or account data reads.",
+    "Physical apps unchanged, no Cargo/SDK rebuild, no UI/scanning/enrollment enabling.",
+    "Original SDK authority remains in opaque session; ephemeral owner epochs are negative lifecycle fences only.",
+    "No full PR suite or full pairing/chat/history qualification."
+  ]
+}

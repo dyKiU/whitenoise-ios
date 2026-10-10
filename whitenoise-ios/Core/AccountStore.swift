@@ -46,13 +46,62 @@ final class AccountStore {
         private(set) var deviceLinkingScope: DeviceLinkingAccountScope?
         private(set) var retiringDeviceLinkingScope: DeviceLinkingAccountScope?
         @ObservationIgnored private var deviceLinkingRetirement: Task<Void, Error>?
+        @ObservationIgnored private var deviceLinkingOwnerEpoch = UUID()
+        @ObservationIgnored private var pendingDeviceLinkingFactory:
+            (
+                id: UUID, task: Task<any DeviceLinkingSessionProtocol, Error>
+            )?
+
+        func adoptDeviceLinkingFactory(
+            accountRef: String,
+            isRuntimeCurrent: @MainActor () -> Bool,
+            factory: @escaping @MainActor () async throws -> any DeviceLinkingSessionProtocol
+        ) async throws -> DeviceLinkingAccountScope {
+            guard activeAccountRef == accountRef, isRuntimeCurrent(), pendingDeviceLinkingFactory == nil,
+                deviceLinkingScope == nil
+            else { throw CancellationError() }
+            let ownerEpoch = deviceLinkingOwnerEpoch
+            try await cancelRetiringDeviceLinkingScope()
+            guard !Task.isCancelled, activeAccountRef == accountRef, ownerEpoch == deviceLinkingOwnerEpoch,
+                isRuntimeCurrent(), pendingDeviceLinkingFactory == nil, deviceLinkingScope == nil
+            else { throw CancellationError() }
+            let id = UUID()
+            let task = Task {
+                try Task.checkCancellation()
+                return try await factory()
+            }
+            pendingDeviceLinkingFactory = (id, task)
+            defer {
+                if pendingDeviceLinkingFactory?.id == id { pendingDeviceLinkingFactory = nil }
+            }
+            let session = try await withTaskCancellationHandler {
+                try await task.value
+            } onCancel: {
+                task.cancel()
+            }
+            let scope = DeviceLinkingAccountScope(accountRef: accountRef, session: session)
+            guard !Task.isCancelled, ownerEpoch == deviceLinkingOwnerEpoch, activeAccountRef == accountRef,
+                isRuntimeCurrent()
+            else {
+                // Never adopt a late original result. Keep failed exact cleanup retryable.
+                scope.invalidate()
+                retiringDeviceLinkingScope = scope
+                deviceLinkingRetirement = Task { try await scope.cancel() }
+                try await cancelRetiringDeviceLinkingScope()
+                throw CancellationError()
+            }
+            deviceLinkingScope = scope
+            return scope
+        }
 
         func holdDeviceLinkingSession(
             _ session: any DeviceLinkingSessionProtocol, accountRef: String
         ) async throws -> DeviceLinkingAccountScope {
-            guard activeAccountRef == accountRef else { throw CancellationError() }
+            guard activeAccountRef == accountRef, pendingDeviceLinkingFactory == nil else { throw CancellationError() }
             try await cancelRetiringDeviceLinkingScope()
-            guard !Task.isCancelled, activeAccountRef == accountRef, deviceLinkingScope == nil else {
+            guard !Task.isCancelled, activeAccountRef == accountRef, deviceLinkingScope == nil,
+                pendingDeviceLinkingFactory == nil
+            else {
                 throw CancellationError()
             }
             let scope = DeviceLinkingAccountScope(accountRef: accountRef, session: session)
@@ -61,6 +110,9 @@ final class AccountStore {
         }
 
         private func retireDeviceLinkingScope() {
+            // Synchronous negative epoch also fences A→B→A and factories not yet returned.
+            deviceLinkingOwnerEpoch = UUID()
+            pendingDeviceLinkingFactory?.task.cancel()
             guard let scope = deviceLinkingScope else { return }
             scope.invalidate()
             deviceLinkingScope = nil
