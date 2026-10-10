@@ -1,0 +1,61 @@
+{
+  "profile": "Full unfiltered SDK83 experimental Staging iOS PR suite",
+  "result": {
+    "source_base": "523b1d9cf6c7a9e4a24b5e86f0a5e910290a2965",
+    "source_inputs": 826,
+    "input_manifest_sha256": "52b3963fe4453915bebb1c93cba86c1eba678749cc4e3749b721a68be0688729",
+    "profile": "local-final83/experimentalflag1/Staging",
+    "installed_manifest_sha256": "142e1f6b21d2fc9546fc8dba3d11976c39c44f811052b7edb4bc29b974fa5915",
+    "exit_code": 0,
+    "seconds": 287.55,
+    "log_sha256": "8aa32bdb50768a8b1b12712dd22f80ccae0b1a6aa023a199f5beb59a834e8a77",
+    "physical_phone_changed": false,
+    "scope": "Full unfiltered experimental iOS PR suite with validated83 SDK; no real native multi-device acceptance or manual deployment",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 2820,
+      "passedTests": 2818,
+      "failedTests": 0,
+      "skippedTests": 2
+    },
+    "test_failures": []
+  },
+  "verification": {
+    "source_sha": "523b1d9cf6c7a9e4a24b5e86f0a5e910290a2965",
+    "matched_signed_paths": 822,
+    "exact_sdk4": {
+      "Packages/MarmotKit/MARMOT_VERSION": "0fb93740a313d4508f09e3da7e4ff6f45cdfa339a82185a51d4906ca3966d7e1",
+      "Packages/MarmotKit/Package.swift": "4c379ba9d572adb649c9692466ebbc80204af9ca0bf5acd63256ff6e0fa29b50",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKit.swift": "84e8f05d1beed082c81dccd1031f1e50b309499026e6df3680b5e97f22dbf8b4",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift": "b91dabbf1c210a0d3aedda5a626fcd4c595f03e740ce0dcf765e0fcae49e4dcb"
+    },
+    "full_log_sha256": "8aa32bdb50768a8b1b12712dd22f80ccae0b1a6aa023a199f5beb59a834e8a77",
+    "SDK_source_sha": "83f5a82d80c9f53bdcbab602f349544397ba07f6",
+    "SDK_stash": "0061d9f79fcbc4b028db83acf474b97a0077ec96",
+    "symlink_semantics": "CLAUDE manifest hashes resolved AGENTS content",
+    "mismatches": []
+  },
+  "hosted_test_effect": {
+    "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+    "app_bundle": "/Users/pj/Library/Developer/CoreSimulator/Devices/3F79E967-EE79-4A0E-BCF6-BCC4FE4A2ECC/data/Containers/Bundle/Application/92EE8758-7280-4032-85B5-DE606140E1A7/whitenoise-ios.app",
+    "executable_sha256": "fcc2be15efd3be607908a4bf123b4af3333c540b4816a019cdbf2761a3da3361",
+    "effect": "xcodebuild hosted tests implicitly stage app; no manual install/launch",
+    "account_data_read": false
+  },
+  "provenance": {
+    "SDK4_stash": "0061d9f79fcbc4b028db83acf474b97a0077ec96",
+    "prior_SDK4_stash": "978b8352e855f193e27c18857311667b099f6281",
+    "prior_framework_rollback": "build/native-sdk-rollback-3fab/MarmotKit.xcframework",
+    "package_only_staging": "No Rust compilation or SDK generation; validated83 artifacts staged with exact metadata",
+    "native_hashes_manifest": "ios-selected-chat-523b1d9-full-final83-v1-sdk.json",
+    "raw_prefix": "build/results/ios-selected-chat-523b1d9-full-final83-v1"
+  },
+  "limits": [
+    "2818 passed, zero failed, two existing skips; total2820.",
+    "All826 frozen input paths and every native framework file unchanged before/after; 822 match signed523, four exact local SDK overrides.",
+    "Hosted tests stage simulator test host; no manual deployment during this gate.",
+    "This full PR qualification does not establish real multi-device enrollment or selected-chat application acceptance.",
+    "Generated SDK overrides and LOCAL_BUILD remain uncommitted; prior3fab rollback retained.",
+    "Staging v1/v2 packaging-only attempts failed rustc PATH lookup before app-file replacement; v3 succeeded."
+  ]
+}
