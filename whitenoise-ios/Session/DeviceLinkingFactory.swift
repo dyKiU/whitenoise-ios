@@ -41,6 +41,10 @@
                 enrollment: { [weak self] in
                     guard let self, current() else { throw MarmotKitError.DeviceLinkingClosed }
                     return try self.makeDeviceEnrollmentModel()
+                },
+                enrollmentApproval: { [weak self] in
+                    guard let self, current() else { throw MarmotKitError.DeviceLinkingClosed }
+                    return try await self.makeDeviceEnrollmentApprovalModel()
                 }
             )
         }

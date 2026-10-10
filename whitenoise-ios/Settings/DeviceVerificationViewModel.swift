@@ -12,6 +12,8 @@
         let verificationSupported: Bool
         let enrollmentSupported: Bool
         @ObservationIgnored private let enrollmentOriginal: @MainActor () throws -> DeviceEnrollmentViewModel
+        @ObservationIgnored private let approvalOriginal:
+            @MainActor () async throws -> DeviceEnrollmentApprovalViewModel
         private var successfulTargetRead = false
         // Cancellation alone cannot distinguish overlapping finite read completions.
         @ObservationIgnored private var targetReadID: UUID?
@@ -45,6 +47,9 @@
             verificationSupported: Bool = false, enrollmentSupported: Bool = false,
             enrollment: @escaping @MainActor () throws -> DeviceEnrollmentViewModel = {
                 throw MarmotKitError.DeviceLinkingNotReady
+            },
+            enrollmentApproval: @escaping @MainActor () async throws -> DeviceEnrollmentApprovalViewModel = {
+                throw MarmotKitError.DeviceLinkingNotReady
             }
         ) {
             self.owner = owner
@@ -57,6 +62,14 @@
             self.verificationSupported = verificationSupported
             self.enrollmentSupported = enrollmentSupported
             enrollmentOriginal = enrollment
+            approvalOriginal = enrollmentApproval
+        }
+
+        func enrollmentApproval() async throws -> DeviceEnrollmentApprovalViewModel {
+            guard isActive, enrollmentSupported, !Task.isCancelled else { throw MarmotKitError.DeviceLinkingNotReady }
+            let model = try await approvalOriginal()
+            guard isActive, model.isActive, !Task.isCancelled else { throw MarmotKitError.DeviceLinkingClosed }
+            return model
         }
 
         func enrollmentTransport() throws -> DeviceEnrollmentViewModel {

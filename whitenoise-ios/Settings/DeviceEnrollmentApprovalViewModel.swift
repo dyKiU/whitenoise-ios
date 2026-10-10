@@ -41,6 +41,51 @@
             }
             return currentReview
         }
+        struct ReviewDisplay {
+            let revision: UInt64
+            let sourceKey: String
+            let joiningKey: String
+            let existingDeviceCount: UInt32
+        }
+        var reviewDisplay: ReviewDisplay? {
+            guard let review else { return nil }
+            return .init(
+                revision: review.revision,
+                sourceKey: review.sourceDevicePublicKey.map { String(format: "%02x", $0) }.joined(),
+                joiningKey: review.joiningDevicePublicKey.map { String(format: "%02x", $0) }.joined(),
+                existingDeviceCount: review.existingDeviceCount)
+        }
+        private(set) var isWorking = false
+        private(set) var actionError: Error?
+        enum ReviewAction { case approve, receivePacket }
+        func performReviewAction(_ action: ReviewAction, displayedRevision: UInt64, input: String = "") async throws {
+            try checkActive()
+            guard !isWorking else { throw MarmotKitError.DeviceLinkingNotReady }
+            isWorking = true
+            actionError = nil
+            defer { isWorking = false }
+            do {
+                switch action {
+                case .approve:
+                    try await approveReviewed(displayedRevision: displayedRevision)
+                case .receivePacket:
+                    guard snapshot?.phase == .approvedAwaitingPacket, snapshot?.revision == displayedRevision else {
+                        throw MarmotKitError.DeviceLinkingStaleRevision
+                    }
+                    try await receiveEnrollmentPacket(
+                        displayedRevision: displayedRevision, packet: DeviceEnrollmentPacketInput.decode(input))
+                    try await refresh()
+                }
+                try checkActive()
+            } catch {
+                actionError = error
+                throw error
+            }
+        }
+        func refreshForDisplay() async throws {
+            try await refresh()
+            if snapshot?.phase == .awaitingApproval { try await refreshReview() }
+        }
         func refreshReview() async throws {
             try checkActive()
             currentReview = nil

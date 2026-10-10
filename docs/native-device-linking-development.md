@@ -351,3 +351,20 @@ control. StrictSwiftLint0.63.2, scoped formatting and diff checks pass. Exact so
 cohorts and raw-log hashes are in native-enrollment-approval-review-evidence.json.
 No UI, full native PR or actual native A/B/C enrollment acceptance is claimed.
 Final integrated SDK and application gates remain required before adoption.
+
+The separate enrollment review sheet now displays authenticated source/joining public
+keys and existing-device count on the original pending approval. Approval requires
+the captured displayed revision; receiving a bounded opaque packet uses the exact
+approved original revision and never decodes permission. The Settings entry uses
+the SDK capability and captured account/runtime owner, including late-factory fences.
+Snapshot-first display refresh resumes approved/waiting/settled originals without
+requiring pending review metadata; no snapshot can reconstruct an approval.
+
+Pane RED0/2 precedes GREEN2/2. A separate resumed-phase RED0/1 (three phase cases)
+precedes final GREEN1/1, focused12/12 and affected75/75. First settled control
+incorrectly requested terminal factory adoption and is preserved as a fixture
+contract failure, corrected to advance the already-held original. Scoped strict
+lint/format/diff and Apple localization checks pass. Exact source stashes, logs,
+hosted simulator bundle hashes and limits are in native-enrollment-approval-pane-evidence.json.
+This is focused native action/lifetime qualification, not full PR or actual native
+A/B/C enrollment acceptance; final integrated SDK/application gates remain required.

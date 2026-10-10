@@ -15,6 +15,7 @@
     struct DeviceVerificationView: View {
         @State private var model: DeviceVerificationViewModel
         @State private var enrollment: DeviceEnrollmentViewModel?
+        @State private var approval: DeviceEnrollmentApprovalViewModel?
         @State private var incoming = ""
         @State private var setup = ""
         @State private var outgoing: [DeviceLinkingOutgoingPacketFfi] = []
@@ -30,6 +31,13 @@
                 if !model.verificationSupported {
                     Text("Device verification is unavailable in this build.")
                 } else {
+                    if model.enrollmentSupported {
+                        Section {
+                            WNButton(title: "Review enrollment", size: .standard) {
+                                perform { approval = try await model.enrollmentApproval() }
+                            }.disabled(isWorking || !model.isActive || model.cleanupRequired)
+                        }
+                    }
                     Section {
                         if model.owner == nil {
                             WNButton(title: "Start verification", size: .standard, isLoading: model.isStarting) {
@@ -183,6 +191,9 @@
             .sheet(isPresented: Binding(get: { enrollment != nil }, set: { if !$0 { enrollment = nil } })) {
                 NavigationStack { DeviceEnrollmentTransportView(model: enrollment) }
             }
+            .sheet(isPresented: Binding(get: { approval != nil }, set: { if !$0 { approval = nil } })) {
+                NavigationStack { DeviceEnrollmentApprovalView(model: approval) }
+            }
             .task {
                 guard model.verificationSupported, model.isActive else { return }
                 do { try await model.loadTargets() } catch {
@@ -197,6 +208,7 @@
 
         private func clearPackets() {
             enrollment = nil
+            approval = nil
             incoming = ""
             setup = ""
             outgoing = []

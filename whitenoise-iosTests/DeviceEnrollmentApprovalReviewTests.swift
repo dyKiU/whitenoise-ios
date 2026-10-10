@@ -29,6 +29,7 @@ import Testing
             }
         }
         func advancePhase() { lock.withLock { phase = .approvedAwaitingPacket } }
+        func setPhase(_ value: DeviceLinkingApprovalPhaseFfi) { lock.withLock { phase = value } }
         func failCleanup(_ value: Bool) { lock.withLock { failedCleanup = value } }
         func finishReview() {
             let continuation = lock.withLock {
@@ -190,6 +191,123 @@ import Testing
                 try await model.cancel()
                 #expect(model.cleanupError == nil)
                 #expect(original.cancelCount == 2)
+                #expect(original.approvedRevisions.isEmpty)
+            }
+        }
+        @Test func paneDisplaysFullAuthenticatedKeysAndOriginalReviewedRevision() async throws {
+            try await withApp { app in
+                let original = ReviewApproval(noPointer: .init())
+                let model = try await heldModel(app, original: original)
+                try await model.refreshReview()
+                let display = try #require(model.reviewDisplay)
+                #expect(display.revision == 7)
+                #expect(display.sourceKey == String(repeating: "01", count: 32))
+                #expect(display.joiningKey == String(repeating: "02", count: 32))
+                #expect(display.existingDeviceCount == 2)
+                #expect(original.approvedRevisions.isEmpty)
+                app.activeAccountRef = "B"
+                #expect(model.reviewDisplay == nil)
+            }
+        }
+        @Test func paneActionInvokesOnlyExplicitReviewedOriginalRevision() async throws {
+            try await withApp { app in
+                let original = ReviewApproval(noPointer: .init())
+                let model = try await heldModel(app, original: original)
+                try await model.refreshReview()
+                try await model.performReviewAction(.approve, displayedRevision: 7)
+                #expect(original.approvedRevisions == [7])
+                #expect(model.reviewDisplay == nil)
+            }
+        }
+        @Test func panePacketActionRequiresApprovedPhaseAndExactRevisionAndBytes() async throws {
+            try await withApp { app in
+                let original = ReviewApproval(noPointer: .init())
+                let model = try await heldModel(app, original: original)
+                try await model.refreshReview()
+                let packet = Data([0, 1, 2, 255])
+                await #expect(throws: MarmotKitError.DeviceLinkingStaleRevision) {
+                    try await model.performReviewAction(
+                        .receivePacket, displayedRevision: 7, input: packet.base64EncodedString())
+                }
+                original.advancePhase()
+                try await model.refresh()
+                await #expect(throws: MarmotKitError.DeviceLinkingStaleRevision) {
+                    try await model.performReviewAction(
+                        .receivePacket, displayedRevision: 8, input: packet.base64EncodedString())
+                }
+                do {
+                    try await model.performReviewAction(.receivePacket, displayedRevision: 7, input: "not base64!")
+                    Issue.record("Malformed opaque input must not reach the original SDK handle")
+                } catch {}
+                #expect(original.receivedPackets.isEmpty)
+                try await model.performReviewAction(
+                    .receivePacket, displayedRevision: 7, input: packet.base64EncodedString())
+                let received = try #require(original.receivedPackets.first)
+                #expect(received.0 == 7)
+                #expect(received.1 == packet)
+                #expect(original.receivedPackets.count == 1)
+                #expect(original.approvedRevisions.isEmpty)
+                app.activeAccountRef = "B"
+                await #expect(throws: MarmotKitError.DeviceLinkingClosed) {
+                    try await model.performReviewAction(
+                        .receivePacket, displayedRevision: 7, input: packet.base64EncodedString())
+                }
+                #expect(original.receivedPackets.count == 1)
+            }
+        }
+        @Test(arguments: [0, 1]) func paneFactoryRequiresCapturedSdkCapabilityAndCurrentAppOwner(retirement: Int)
+            async throws
+        {
+            try await withApp { app in
+                let original = ReviewApproval(noPointer: .init())
+                let held = try await heldModel(app, original: original)
+                let actual = app.makeDeviceVerificationViewModel()
+                #expect(actual.enrollmentSupported)
+                #expect(try await actual.enrollmentApproval() === held)
+                var calls = 0
+                let unavailable = DeviceVerificationViewModel(
+                    enrollmentSupported: false,
+                    enrollmentApproval: {
+                        calls += 1
+                        return held
+                    })
+                await #expect(throws: MarmotKitError.DeviceLinkingNotReady) {
+                    try await unavailable.enrollmentApproval()
+                }
+                #expect(calls == 0)
+                let late = DeviceVerificationViewModel(
+                    enrollmentSupported: true,
+                    enrollmentApproval: {
+                        calls += 1
+                        if retirement == 0 {
+                            app.activeAccountRef = "B"
+                            app.activeAccountRef = "A"
+                            try await app.accountStore.cancelDeviceLinking()
+                        } else {
+                            app.setAppSceneActive(false)
+                            await app.startRuntimeSuspension().value
+                        }
+                        return held
+                    })
+                await #expect(throws: MarmotKitError.DeviceLinkingClosed) { try await late.enrollmentApproval() }
+                #expect(calls == 1)
+                #expect(!held.isActive)
+                #expect(original.cancelCount == 1)
+                #expect(original.approvedRevisions.isEmpty)
+            }
+        }
+        @Test(arguments: [DeviceLinkingApprovalPhaseFfi.approvedAwaitingPacket, .awaitingSettlement, .settled])
+        func resumedApprovalDisplayReadsSnapshotWithoutRequiringPendingReview(phase: DeviceLinkingApprovalPhaseFfi)
+            async throws
+        {
+            try await withApp { app in
+                let original = ReviewApproval(noPointer: .init())
+                let model = try await heldModel(app, original: original)
+                original.setPhase(phase)
+                try await model.refreshForDisplay()
+                #expect(model.snapshot?.phase == phase)
+                #expect(model.reviewDisplay == nil)
+                #expect(original.reviewedRevisions.isEmpty)
                 #expect(original.approvedRevisions.isEmpty)
             }
         }
