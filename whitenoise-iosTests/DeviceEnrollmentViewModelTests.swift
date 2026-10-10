@@ -195,7 +195,10 @@ import Testing
         @Test func unsupportedTransportNeverInvokesOriginal() async throws {
             try await withApp { app in
                 let original = EnrollmentSession(noPointer: .init())
-                let model = try await sessionModel(app, original: original)
+                let scope = try await app.adoptDeviceLinkingFactory { _, _ in original }
+                let model = DeviceEnrollmentViewModel(
+                    original: scope, isCurrent: { app.accountStore.deviceLinkingScope === scope },
+                    cancel: { try await app.accountStore.cancelDeviceLinking() }, enrollmentSupported: false)
                 await #expect(throws: MarmotKitError.DeviceLinkingNotReady) {
                     try await model.performTransportAction(.continueLinking, displayedRevision: 7)
                 }
@@ -253,13 +256,13 @@ import Testing
             }
         }
 
-        @Test func actualSdkCapabilityCannotOfferEnrollmentTransportFromHeldSession() async throws {
+        @Test func actualSdkCapabilityPreservesAlreadyHeldEnrollmentTransport() async throws {
             try await withApp { app in
                 let original = EnrollmentSession(noPointer: .init())
-                _ = try await sessionModel(app, original: original)
+                let held = try await sessionModel(app, original: original)
                 let verification = app.makeDeviceVerificationViewModel()
-                #expect(!verification.enrollmentSupported)
-                #expect(throws: MarmotKitError.DeviceLinkingNotReady) { try verification.enrollmentTransport() }
+                #expect(verification.enrollmentSupported)
+                #expect(try verification.enrollmentTransport() === held)
             }
         }
 

@@ -334,3 +334,20 @@ all1945 previous entries/order. Exact runs/source and runner-only preflight
 failure are recorded in native-enrollment-transport-evidence.json.
 These are native action/lifetime controls, not full PR or visual/native enrollment
 acceptance. No newSDK/manual app adoption/physical or production action occurred.
+
+The original account-owned approval now forwards authenticated review metadata
+with lifetime checks before and after the read. The separate model retains source
+and joining device public keys/count only in its original pending revision. Reading
+never approves; explicit reviewed approval passes that same displayed revision and
+clears metadata before calling the original SDK object. Account replacement, scene
+suspension, same-account runtime restart, stale/invalid review and failed exact
+cleanup cannot restore it.
+
+On matched candidate3fab, RED0/2 precedes GREEN2/2 and seven lifecycle control
+methods (eleven parameterized executions); final affected70/70 passes. The first
+affected67/70 kept three previouse6 unavailable-capability assumptions; only those
+fixtures were corrected, preserving an explicit unavailable-capability negative
+control. StrictSwiftLint0.63.2, scoped formatting and diff checks pass. Exact source
+cohorts and raw-log hashes are in native-enrollment-approval-review-evidence.json.
+No UI, full native PR or actual native A/B/C enrollment acceptance is claimed.
+Final integrated SDK and application gates remain required before adoption.

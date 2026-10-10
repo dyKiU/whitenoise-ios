@@ -25,11 +25,11 @@ import Testing
             }
         }
 
-        @Test func matchedRuntimeReportsVerificationWithoutAdvertisingEnrollment() async throws {
+        @Test func matchedRuntimeReportsQualifiedVerificationAndEnrollment() async throws {
             try await withRuntime { runtime in
                 let capabilities = runtime.deviceLinkingCapabilities()
                 #expect(capabilities.verificationSupported)
-                #expect(!capabilities.enrollmentSupported)
+                #expect(capabilities.enrollmentSupported)
             }
         }
 

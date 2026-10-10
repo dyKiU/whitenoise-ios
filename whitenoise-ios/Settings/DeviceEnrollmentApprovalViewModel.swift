@@ -10,6 +10,7 @@
         @ObservationIgnored private let isCurrent: @MainActor () -> Bool
         @ObservationIgnored private let cancelOriginal: @MainActor () async throws -> Void
         private var retired = false
+        private var currentReview: DeviceLinkingApprovalReviewMetadataFfi?
         private var currentSnapshot: DeviceLinkingApprovalSnapshotFfi?
         var isActive: Bool { !retired && isCurrent() }
         var snapshot: DeviceLinkingApprovalSnapshotFfi? { isActive ? currentSnapshot : nil }
@@ -32,7 +33,41 @@
             let value = try await original.snapshot()
             try checkActive()
             currentSnapshot = value
+            if value.phase != .awaitingApproval || currentReview?.revision != value.revision { currentReview = nil }
         }
+        var review: DeviceLinkingApprovalReviewMetadataFfi? {
+            guard isActive, snapshot?.phase == .awaitingApproval, currentReview?.revision == snapshot?.revision else {
+                return nil
+            }
+            return currentReview
+        }
+        func refreshReview() async throws {
+            try checkActive()
+            currentReview = nil
+            try await refresh()
+            guard let displayed = snapshot, displayed.phase == .awaitingApproval else {
+                throw MarmotKitError.DeviceLinkingNotReady
+            }
+            let value = try await original.reviewMetadata(displayedRevision: displayed.revision)
+            try checkActive()
+            guard value.revision == displayed.revision else { throw MarmotKitError.DeviceLinkingStaleRevision }
+            guard value.sourceDevicePublicKey.count == 32, value.joiningDevicePublicKey.count == 32,
+                (1...128).contains(value.existingDeviceCount)
+            else { throw MarmotKitError.DeviceLinkingNotReady }
+            try await refresh()
+            guard snapshot?.phase == .awaitingApproval, snapshot?.revision == displayed.revision else {
+                throw MarmotKitError.DeviceLinkingStaleRevision
+            }
+            currentReview = value
+        }
+        func approveReviewed(displayedRevision: UInt64) async throws {
+            try checkActive()
+            guard review?.revision == displayedRevision else { throw MarmotKitError.DeviceLinkingStaleRevision }
+            currentReview = nil
+            try await approve(displayedRevision: displayedRevision)
+            try await refresh()
+        }
+
         func approve(displayedRevision: UInt64) async throws {
             try checkActive()
             try await original.approve(displayedRevision: displayedRevision)
@@ -65,6 +100,7 @@
         func invalidate() {
             retired = true
             currentSnapshot = nil
+            currentReview = nil
         }
     }
 #endif

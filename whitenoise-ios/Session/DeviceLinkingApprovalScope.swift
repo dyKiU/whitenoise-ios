@@ -24,6 +24,13 @@
             return value
         }
 
+        func reviewMetadata(displayedRevision: UInt64) async throws -> DeviceLinkingApprovalReviewMetadataFfi {
+            try requireActive()
+            let value = try await approval.reviewMetadata(displayedRevision: displayedRevision)
+            try requireActive()
+            return value
+        }
+
         func approve(displayedRevision: UInt64) async throws {
             try requireActive()
             try await approval.approve(displayedRevision: displayedRevision)
