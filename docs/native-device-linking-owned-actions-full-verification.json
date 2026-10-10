@@ -1,0 +1,30 @@
+{
+  "source_commit": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+  "inputs": 783,
+  "verified_sources": {
+    "signed_c5afa4f": 779,
+    "preserved_M5_metadata": 2,
+    "preserved_e6_overrides": 2
+  },
+  "result": {
+    "source_base": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+    "source_inputs": 783,
+    "input_manifest_sha256": "756b3b1c07a7ed129285b234f68205c976942eafd11c7424daabf5920ae07a3f",
+    "profile": "local-e6/experimentalflag1/Staging",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 0,
+    "seconds": 187.99,
+    "log_sha256": "80afb4098272099899bafa3366c5e3573572584debb8d74f085990b04a58f521",
+    "physical_phone_changed": false,
+    "scope": "Full experimental Staging regression for signed action slice; not fresh SDK pairing, enrollment or delivery acceptance",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 2728,
+      "passedTests": 2726,
+      "failedTests": 0,
+      "skippedTests": 2
+    },
+    "test_failures": []
+  },
+  "scope": "Full experimental Staging regression only; canonical published regression next; no native pairing, enrollment or delivery qualification"
+}
