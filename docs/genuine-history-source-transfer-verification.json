@@ -1,0 +1,258 @@
+{
+  "base": "87823e284b7a94fb4dd4cdd0b61832d13a6b3943",
+  "scope": "Test-only genuine SDK987 source transfer through account-owned AppState/model: observed choice, fresh original, explicit native recipient approval, same-held-original immutable review refresh and Continue at current displayed revision, committed import, original retirement and actual Core storage closure. No public Continue tap, installed-app journey, physical phone or SDK promotion claim.",
+  "source_sha256": {
+    "whitenoise-iosTests/GenuineHistorySourceTransferTests.swift": "3a8ba88f34e8088f5f247fd30a9f02c9c9f2c334f338c01afc5b9aa61804afad"
+  },
+  "preserved_final_sources": {
+    "local": "a8a3300c2ef6e8b07a1640ada919cd6613df894a",
+    "m5": "81c8d2e61c2fcd508915c003a74408b45723cc2b"
+  },
+  "sdk": {
+    "source": "98707713a2cc02828c2d66ed858588991896b9b0",
+    "LOCAL_BUILD_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+    "generated_overrides_committed": false
+  },
+  "qualification": {
+    "ios-genuine-history-source-transfer-compile-v1": {
+      "exit_code": 65,
+      "seconds": 4.56,
+      "source_inputs": 886,
+      "input_manifest_sha256": "2538ee99d250a2ee7dd24f610e29417d28c74d59d9729e971ac9ef1570e99643",
+      "log_sha256": "cb61507e094c8017d0f1d0cef7cbca3a71322f81cdf8fef73265409b3a4e95c3"
+    },
+    "ios-genuine-history-source-transfer-compile-v2": {
+      "exit_code": 65,
+      "seconds": 10.02,
+      "source_inputs": 886,
+      "input_manifest_sha256": "87d7b9da6de59f7d2b2d92122301b6f865879e49ce06d801aee9531c77532663",
+      "log_sha256": "a78098c0d9754ef812ce5dae80ef782f2c251a25ae35389b9ea4560e2bb716f4"
+    },
+    "ios-genuine-history-source-transfer-compile-v3": {
+      "exit_code": 65,
+      "seconds": 7.12,
+      "source_inputs": 886,
+      "input_manifest_sha256": "87d7b9da6de59f7d2b2d92122301b6f865879e49ce06d801aee9531c77532663",
+      "log_sha256": "200099f3f4cff518b2cffde0ee0555c3cd553012ca962ecd78a9f05fe73dfd2d"
+    },
+    "ios-genuine-history-source-transfer-compile-v4": {
+      "exit_code": 0,
+      "seconds": 112.09,
+      "source_inputs": 886,
+      "input_manifest_sha256": "87d7b9da6de59f7d2b2d92122301b6f865879e49ce06d801aee9531c77532663",
+      "log_sha256": "d4f32a61b7301e44dfc73078687d1bb16653b45cce16cb1167145eeb9aa389e8"
+    },
+    "ios-genuine-history-source-transfer-compile-v5": {
+      "exit_code": 0,
+      "seconds": 13.43,
+      "source_inputs": 886,
+      "input_manifest_sha256": "b331101be088d13b3072a65e89b4b614e398e53d5de4a96af899b5ddfbaea12b",
+      "log_sha256": "6d5db6a5a7cccab0d0b0eefa9243e70ba62e1631db95fb0bb9284ca6ed826177"
+    },
+    "ios-genuine-history-source-transfer-compile-v6": {
+      "exit_code": 0,
+      "seconds": 12.73,
+      "source_inputs": 886,
+      "input_manifest_sha256": "a7456036bf4ebf6b892d3491acf8b550c236a7099d241b23f2776b1d4b593ecf",
+      "log_sha256": "034de7358a36d5d933ce08c507b25f7916c22ffb378cf08e4fc034748c3ab02c"
+    },
+    "ios-genuine-history-source-transfer-v1": {
+      "exit_code": 65,
+      "seconds": 127.68,
+      "source_inputs": 886,
+      "input_manifest_sha256": "a7456036bf4ebf6b892d3491acf8b550c236a7099d241b23f2776b1d4b593ecf",
+      "log_sha256": "2e9f1218f8dd7b25cf4a5f04ce6c02098f64d59e744c994932c4fe570b703cc1",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 1,
+        "passedTests": 0,
+        "failedTests": 1,
+        "skippedTests": 0
+      }
+    },
+    "ios-genuine-history-source-transfer-v2": {
+      "exit_code": 0,
+      "seconds": 69.36,
+      "source_inputs": 886,
+      "input_manifest_sha256": "a7456036bf4ebf6b892d3491acf8b550c236a7099d241b23f2776b1d4b593ecf",
+      "log_sha256": "d36a0b298b711d78cd6df9feaa2f7bead66a89fa6804d9f82c01d11cea8c4f33",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    },
+    "ios-genuine-history-source-transfer-affected-v1": {
+      "exit_code": 0,
+      "seconds": 10.32,
+      "source_inputs": 886,
+      "input_manifest_sha256": "a7456036bf4ebf6b892d3491acf8b550c236a7099d241b23f2776b1d4b593ecf",
+      "log_sha256": "f93f8e19e26a0b4d8fff425e730af02d2674267dc9a710f81cd55c5e205843ed",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 44,
+        "passedTests": 44,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    }
+  },
+  "failure_classification": {
+    "compile_v1_v2_v3": "Zero runtime tests. Three exact diagnosed stale FFI PCM paths retired only after owned cache idle; repair JSON retained. No broad cache clean.",
+    "runtime_v1": "Native three-device settlement prerequisite timed out before fixture publication. iOS unit failed absent fixture after bounded wait; no AppState/client constructed. Unexplained native failure retained, not product behavioral RED.",
+    "enrollment_diagnostic": "Unchanged native binaries/topology passed fresh enrollment-only diagnostic; does not establish root cause or fix for v1."
+  },
+  "reused_full_product_qualification": {
+    "commit": "1daf8059168a4efae1a77e4565d548e62635700a",
+    "experimental": "2876 passed, zero failed, seven opt-in/baseline skips",
+    "published": "2717 passed, zero failed, three baseline/opt-in skips",
+    "reason": "Only new opt-in test and this evidence record changed. Product, prior tests and SDK are unchanged. New real acceptance executed separately."
+  },
+  "physical_phone_changed": false,
+  "native_controllers": {
+    "native-ios-source-transfer-v1": {
+      "result_sha256": "a2d70214f8e1a48090a5d42731bc6e4fd1753f3515b10e40d00597dc795523e1",
+      "log_sha256": "fa0810907f569a88aa8e36fc131c082ff802b9b568f4b0b242875b8f5322f540",
+      "passed": 0,
+      "failed": 1,
+      "seconds": 50.07,
+      "history_counts": {
+        "native_three_device_phases": {
+          "coordinator": "verificationCompleteEnrollmentPending",
+          "joining": "verificationCompleteEnrollmentPending",
+          "sibling": "awaitingSettlement"
+        }
+      }
+    },
+    "native-ios-source-enrollment-diag-v1": {
+      "result_sha256": "7c9411101614a120d9df42260e39e5d2fa278ba5a55644908caa82295870b937",
+      "log_sha256": "a6a2bee3c62411681509ed11341a7e959464ebf03c04e438054ab2245a32d9ca",
+      "passed": 1,
+      "failed": 0,
+      "seconds": 26.09,
+      "native_runtime_cleanup": {
+        "originals": 3,
+        "closed": 3,
+        "failed": 0
+      },
+      "history_counts": {
+        "native_three_device_phases": {
+          "coordinator": "enrollmentComplete",
+          "joining": "enrollmentComplete",
+          "sibling": "settled"
+        },
+        "native_three_device_transitions": [
+          {
+            "coordinator": {
+              "phase": "verificationCompleteEnrollmentPending",
+              "revision": 5
+            },
+            "joining": {
+              "phase": "verificationCompleteEnrollmentPending",
+              "revision": 6
+            },
+            "sibling": {
+              "phase": "awaitingSettlement",
+              "revision": 3
+            }
+          },
+          {
+            "coordinator": {
+              "phase": "enrollmentComplete",
+              "revision": 6
+            },
+            "joining": {
+              "phase": "enrollmentComplete",
+              "revision": 7
+            },
+            "sibling": {
+              "phase": "settled",
+              "revision": 4
+            }
+          }
+        ],
+        "native_rosters_before_close": [
+          {
+            "target_count": 1,
+            "device_counts": [
+              3
+            ]
+          },
+          {
+            "target_count": 1,
+            "device_counts": [
+              3
+            ]
+          },
+          {
+            "target_count": 1,
+            "device_counts": [
+              3
+            ]
+          }
+        ]
+      }
+    },
+    "native-ios-source-transfer-v2": {
+      "result_sha256": "9665679939a9eaa8e601ac8b6f814486c8ae0346afaf455ec48e88e9e149a053",
+      "log_sha256": "3cdf3d68b3d56f299f32cd47de87b58aba89dc2564d66610358f65404825d685",
+      "passed": 1,
+      "failed": 0,
+      "seconds": 55.43,
+      "native_runtime_cleanup": {
+        "originals": 4,
+        "closed": 4,
+        "failed": 0
+      },
+      "history_counts": {
+        "native_three_device_phases": {
+          "coordinator": "enrollmentComplete",
+          "joining": "enrollmentComplete",
+          "sibling": "settled"
+        },
+        "native_three_device_transitions": [
+          {
+            "coordinator": {
+              "phase": "verificationCompleteEnrollmentPending",
+              "revision": 5
+            },
+            "joining": {
+              "phase": "verificationCompleteEnrollmentPending",
+              "revision": 6
+            },
+            "sibling": {
+              "phase": "awaitingSettlement",
+              "revision": 3
+            }
+          },
+          {
+            "coordinator": {
+              "phase": "enrollmentComplete",
+              "revision": 6
+            },
+            "joining": {
+              "phase": "enrollmentComplete",
+              "revision": 7
+            },
+            "sibling": {
+              "phase": "settled",
+              "revision": 4
+            }
+          }
+        ],
+        "eligible_recipients": 2,
+        "query_created_requests": 0,
+        "source_records": 2,
+        "imported_records": 1,
+        "archive_page_records": 1,
+        "verified_prejoin_records": 1,
+        "postjoin_live_record_present": true,
+        "source_complete": true,
+        "recipient_complete": true,
+        "app_source_model_complete": true
+      }
+    }
+  }
+}
