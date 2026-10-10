@@ -1,0 +1,117 @@
+{
+  "base": "b8c84b85d083c308fa853fa14ac3fba9c766a4cc",
+  "original_red_stash": "e08e67e1583c84753f4050acddb8e21b08bcfa5b",
+  "red_to_green_changed_inputs": [
+    "whitenoise-ios/Session/DeviceLinkingAccountScope.swift"
+  ],
+  "gates": [
+    {
+      "phase": "red-v4",
+      "verified_inputs": 785,
+      "sources": {
+        "git:e08e67e1583c84753f4050acddb8e21b08bcfa5b^3": 1,
+        "git:e08e67e1583c84753f4050acddb8e21b08bcfa5b": 779,
+        "current_owned_worktree": 3,
+        "preserved_M5_metadata": 2
+      },
+      "result": {
+        "source_base": "b8c84b85d083c308fa853fa14ac3fba9c766a4cc",
+        "source_inputs": 785,
+        "input_manifest_sha256": "770be548296e162dd4267f21d6862d94c1ab08c929f9f3786374cf1a74c2cbe5",
+        "profile": "local-e6/experimentalflag1/Staging",
+        "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+        "exit_code": 65,
+        "seconds": 117.73,
+        "log_sha256": "fe4100d755dde3cf3d65cc5d9098be89197f2f2a2c1b377bb158364f59482f53",
+        "physical_phone_changed": false,
+        "scope": "New opaque transport host API missing-feature RED with generated protocol controls; no fresh SDK pairing or delivery acceptance",
+        "tests": {
+          "result": "Failed",
+          "totalTestCount": 3,
+          "passedTests": 1,
+          "failedTests": 2,
+          "skippedTests": 0
+        },
+        "test_failures": [
+          {
+            "failureText": "Caught error: CancellationError()",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 2,
+            "testIdentifierString": "DeviceLinkingTransportActionTests/sdkPacketRejectionIsPreservedWithoutAcknowledgement()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceLinkingTransportActionTests/sdkPacketRejectionIsPreservedWithoutAcknowledgement()",
+            "testName": "sdkPacketRejectionIsPreservedWithoutAcknowledgement()"
+          },
+          {
+            "failureText": "Caught error: CancellationError()",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 3,
+            "testIdentifierString": "DeviceLinkingTransportActionTests/transportPreservesOriginalOpaqueBytesAndAcknowledgement()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceLinkingTransportActionTests/transportPreservesOriginalOpaqueBytesAndAcknowledgement()",
+            "testName": "transportPreservesOriginalOpaqueBytesAndAcknowledgement()"
+          }
+        ]
+      }
+    },
+    {
+      "phase": "green-v1",
+      "verified_inputs": 785,
+      "sources": {
+        "git:e08e67e1583c84753f4050acddb8e21b08bcfa5b^3": 1,
+        "git:e08e67e1583c84753f4050acddb8e21b08bcfa5b": 778,
+        "current_owned_worktree": 4,
+        "preserved_M5_metadata": 2
+      },
+      "result": {
+        "source_base": "b8c84b85d083c308fa853fa14ac3fba9c766a4cc",
+        "source_inputs": 785,
+        "input_manifest_sha256": "87088e3d381db89cbf7ad71b1ccd69746d062925c49ec821f0167b8ff5e7b208",
+        "profile": "local-e6/experimentalflag1/Staging",
+        "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+        "exit_code": 0,
+        "seconds": 18.84,
+        "log_sha256": "b2fe5f4e5591b47d6ac8f6a1485f71c6ffc3e185a796097dd7a780958ca0efbc",
+        "physical_phone_changed": false,
+        "scope": "New opaque transport host API missing-feature RED with generated protocol controls; no fresh SDK pairing or delivery acceptance",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 3,
+          "passedTests": 3,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      }
+    },
+    {
+      "phase": "affected-v1",
+      "verified_inputs": 785,
+      "sources": {
+        "git:e08e67e1583c84753f4050acddb8e21b08bcfa5b^3": 1,
+        "git:e08e67e1583c84753f4050acddb8e21b08bcfa5b": 778,
+        "current_owned_worktree": 4,
+        "preserved_M5_metadata": 2
+      },
+      "result": {
+        "source_base": "b8c84b85d083c308fa853fa14ac3fba9c766a4cc",
+        "source_inputs": 785,
+        "input_manifest_sha256": "87088e3d381db89cbf7ad71b1ccd69746d062925c49ec821f0167b8ff5e7b208",
+        "profile": "local-e6/experimentalflag1/Staging",
+        "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+        "exit_code": 0,
+        "seconds": 7.94,
+        "log_sha256": "cb42a7da50e595a1f41385a2f32ff63e9c29582a81f781e31aec89a36a2cae4d",
+        "physical_phone_changed": false,
+        "scope": "New opaque transport host API missing-feature RED with generated protocol controls; no fresh SDK pairing or delivery acceptance",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 40,
+          "passedTests": 40,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      }
+    }
+  ],
+  "scope": "Original native scope forwards exact opaque setup/packet/ack values; generated-protocol controls and retirement denial only. Fresh pairing, selected admission, actual delivery and new full PR qualification remain separate."
+}

@@ -63,6 +63,29 @@
             guard active else { throw CancellationError() }
         }
 
+        func setupPacket() throws -> Data {
+            try requireActive()
+            return session.setupPacket()
+        }
+
+        func receiveSetupPacket(_ packet: Data) async throws {
+            try requireActive()
+            try await session.receiveSetupPacket(packet: packet)
+            try requireActive()
+        }
+
+        func receivePacket(_ packet: Data) async throws {
+            try requireActive()
+            try await session.receivePacket(packet: packet)
+            try requireActive()
+        }
+
+        func acknowledgePacket(_ id: String) async throws {
+            try requireActive()
+            try await session.acknowledgePacket(acknowledgementId: id)
+            try requireActive()
+        }
+
         func cancel() async throws {
             invalidate()
             let task: Task<Void, Error>

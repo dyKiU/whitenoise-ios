@@ -149,3 +149,18 @@ byte for byte, and all 783 preceding experimental inputs match again. See
 `native-device-linking-owned-actions-full-verification.json`. The hosted simulator
 product is now the published test host until the next experimental rebuild;
 physical installation and fresh pairing/delivery remain unqualified.
+
+### Original-owner opaque transport actions
+
+The native account scope now forwards setup packet reads, setup/ordinary packet
+receipt and explicit delivery acknowledgement to its original SDK session.
+Retired scopes reject every action before touching that session; async operations
+also revalidate after the SDK returns. Exact opaque bytes and acknowledgement IDs
+are preserved, and SDK packet errors do not synthesize acknowledgements.
+The genuine missing-feature regression passed1/failed2 before implementation,
+then focused3/3 and affected40/40 passed on M5. Root independently verified all785
+frozen inputs and full logs; only the runtime scope changed from RED to GREEN.
+The exact RED source is retained in named Git stash `e08e67e1`.
+See `native-device-linking-transport-verification.json` for compact evidence.
+These generated-protocol controls do not qualify fresh native pairing or actual
+chat delivery; full new-source qualification remains a separate gate.
