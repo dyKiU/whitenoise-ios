@@ -56,6 +56,7 @@
 		C0F16000000000000000A003 /* Staging.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Staging.xcconfig; sourceTree = "<group>"; };
 		D8F785D58E06493C858F6C28 /* NotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		FD7505231BF5445F8BE52AD9 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		A8B100000000000000000001 /* whitenoise-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "whitenoise-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -74,6 +75,7 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		A8B100000000000000000002 /* whitenoise-iosUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = "whitenoise-iosUITests"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +103,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A8B100000000000000000004 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -112,6 +115,7 @@
 				D2B6FB15E3B24B4CA5B8A161 /* NotificationServiceExtension */,
 				1FF76DF02FBE3C9A00DCDFA7 /* whitenoise-ios */,
 				1FF76E002FBE3C9C00DCDFA7 /* whitenoise-iosTests */,
+                A8B100000000000000000002 /* whitenoise-iosUITests */,
 				1FF76DEF2FBE3C9A00DCDFA7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -122,6 +126,7 @@
 				1FF76DEE2FBE3C9A00DCDFA7 /* whitenoise-ios.app */,
 				707C5DCDB7AF47DFB23C7B96 /* NotificationServiceExtension.appex */,
 				1FF76DFD2FBE3C9C00DCDFA7 /* whitenoise-iosTests.xctest */,
+                A8B100000000000000000001 /* whitenoise-iosUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -223,6 +228,18 @@
 			productReference = 707C5DCDB7AF47DFB23C7B96 /* NotificationServiceExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		A8B100000000000000000006 /* whitenoise-iosUITests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = A8B100000000000000000007;
+            buildPhases = (A8B100000000000000000003, A8B100000000000000000004, A8B100000000000000000005);
+            buildRules = ();
+            dependencies = ();
+            fileSystemSynchronizedGroups = (A8B100000000000000000002);
+            name = "whitenoise-iosUITests";
+            productName = "whitenoise-iosUITests";
+            productReference = A8B100000000000000000001;
+            productType = "com.apple.product-type.bundle.ui-testing";
+        };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -275,6 +292,7 @@
 				1FF76DED2FBE3C9A00DCDFA7 /* whitenoise-ios */,
 				B34CACB28CA942DF81D66BA4 /* NotificationServiceExtension */,
 				1FF76DFC2FBE3C9C00DCDFA7 /* whitenoise-iosTests */,
+                A8B100000000000000000006 /* whitenoise-iosUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -301,6 +319,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A8B100000000000000000005 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -326,6 +345,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A8B100000000000000000003 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1054,6 +1074,78 @@
 			};
 			name = "Debug-Production";
 		};
+        A8B100000000000000000008 /* Debug-Production */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = V8U75D7Q49;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "dev.ipf.whitenoise.ios.automation";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = iphoneos;
+                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+                SWIFT_VERSION = 5.0;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "whitenoise-ios";
+            };
+            name = "Debug-Production";
+        };
+        A8B100000000000000000009 /* Release-Production */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = V8U75D7Q49;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "dev.ipf.whitenoise.ios.automation";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = iphoneos;
+                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+                SWIFT_VERSION = 5.0;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "whitenoise-ios";
+            };
+            name = "Release-Production";
+        };
+        A8B10000000000000000000A /* Debug-Staging */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = V8U75D7Q49;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "dev.ipf.whitenoise.ios.automation";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = iphoneos;
+                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+                SWIFT_VERSION = 5.0;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "whitenoise-ios";
+            };
+            name = "Debug-Staging";
+        };
+        A8B10000000000000000000B /* Release-Staging */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = V8U75D7Q49;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "dev.ipf.whitenoise.ios.automation";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SDKROOT = iphoneos;
+                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+                SWIFT_VERSION = 5.0;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "whitenoise-ios";
+            };
+            name = "Release-Staging";
+        };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1101,6 +1193,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release-Production";
 		};
+        A8B100000000000000000007 = {isa = XCConfigurationList; buildConfigurations = (A8B100000000000000000008, A8B100000000000000000009, A8B10000000000000000000A, A8B10000000000000000000B); defaultConfigurationIsVisible = 0; defaultConfigurationName = "Debug-Staging"; };
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
