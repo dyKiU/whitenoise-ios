@@ -26,3 +26,10 @@ extension with the matched experimental SDK. Signing, App Group identity and
 disabled unsupported capability checks pass; the provisioning profiles expire
 on 2026-10-16. The prior signed published-SDK build is retained as a rollback
 copy. Physical iPhone installation remains deferred.
+
+The matched native Staging app is installed and running in the dedicated M5
+simulator. Its installed executable and linked debug library hashes match the
+qualified build. The previous app and closed app/App Group storage are preserved
+as one rollback copy. The first launch wrapper misclassified an already stopped
+app (POSIX3); recovery reused the successful build after verifying no old app or
+extension process. This launch does not qualify fresh pairing or delivery.

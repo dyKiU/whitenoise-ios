@@ -123,5 +123,59 @@
         "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
       }
     ]
+  },
+  "simulator_build_launch": {
+    "verification": "Root verified all774 frozen inputs against signed011969a and preserved matched M5 local binding overrides, complete build log, successful simulator installation/launch report and matching installed executable/debug-library hashes.",
+    "build_launch": {
+      "source_commit": "011969a5f0b6dd2ac07efbf03432cec0a6a54289",
+      "source_inputs": 774,
+      "input_manifest_sha256": "0db002586340608851872a91018da07fa0e7e2f19a70a52df06e79345ab8ac2c",
+      "mdk_source": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "log_sha256": "ba8aea3fcb94765500f3c3502cb6acad973b930f18f7f49e7731ec6ad61caad8",
+      "phone_installation": false,
+      "simulator": "3F79E967-EE79-4A0E-BCF6-BCC4FE4A2ECC",
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "launched_pid": 4719,
+      "executable_sha256": "4089799f32a10cfdd6bbe4a48456d5f759a04f7368cfabb606d3c0136bae6549",
+      "linked_debug_dylib_sha256": "e7f07c7cc48d33743c0d0656533a9bffca3359723313828d8a3f91a81c00de63",
+      "installed_code_hashes_match": true,
+      "closed_storage_rollback": "/Users/pj/project/build/rollback/ios-simulator-before-native-011969a",
+      "qualification": "Reused original successful build; launch-wrapper stopped before installation because prior app was already closed. Recovery accepted exact POSIX3/not-running result after verifying no old app/extension process."
+    }
+  },
+  "personal_team_independent_verification": {
+    "build": {
+      "source_commit": "011969a5f0b6dd2ac07efbf03432cec0a6a54289",
+      "source_inputs": 774,
+      "input_manifest_sha256": "8fa883b9e0113f6971c8ad4de998f51c25de370453918b21fc18b68b63d0806f",
+      "mdk_source": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+      "installed_manifest_sha256": "4fd8e8758b02a08aceec2d764a11cc956c937168e33f5542d77f2038655fc6e3",
+      "exit_code": 0,
+      "seconds": 137.72,
+      "log_sha256": "5def8c4da93842f70de22ea38b64363fbc5b2be2b90564416dc01eb4667b9356",
+      "phone_installation": false,
+      "rollback_app": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/rollback/ios-personal-published-before-011969a/whitenoise-ios.app",
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "executable_sha256": "23d1f262e7fc56e9ea624c22a8121e525d0ee34adbc52ec66b7c17bda6426957",
+      "signed_bundles": [
+        {
+          "name": "whitenoise-ios.app",
+          "entitlements_sha256": "d7c961768c724fad457d83a4ddf29675804a4414b55f5c3550dba2f822b85fdc",
+          "profile_expiration": "2026-10-16T11:24:29",
+          "profile_sha256": "423162dbc20b2fbb4d44bbef2af684fb934440730a9cd5bf93e4ba040282a3ff"
+        },
+        {
+          "name": "NotificationServiceExtension.appex",
+          "entitlements_sha256": "7c6ccce56de4253ca606c85e920b8d45e5b5046c9b33e55efc394d7c7ed2470a",
+          "profile_expiration": "2026-10-16T11:24:27",
+          "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
+        }
+      ]
+    },
+    "root_verification": "All774 frozen source inputs match signed011969a plus four installed local artifact overrides. Input manifest and complete build log verified. Strict signature independently verified after build.",
+    "linked_debug_dylib_sha256": "4bb2fbf3effb44872e4cea053de4055da040ababa80f5b952c806708fc9a4492",
+    "phone_installation": false
   }
 }
