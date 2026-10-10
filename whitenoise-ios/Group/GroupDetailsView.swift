@@ -93,6 +93,24 @@ struct GroupDetailsView: View {
                 membersSection
                 relaysSection
             }
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                if appState.client != nil, appState.activeAccountRef != nil {
+                    Section {
+                        NavigationLink {
+                            SelectedChatEntryView(
+                                model: appState.accountStore.selectedChatTransferModel,
+                                groupIdHex: viewModel.group.groupIdHex,
+                                acquire: { try appState.makeSelectedChatTransferViewModel() }
+                            )
+                            .id(appState.accountStore.deviceLinkingOwnershipIdentity)
+                        } label: {
+                            Label("Copy selected chat", systemImage: "square.on.square")
+                        }
+                        .accessibilityIdentifier("chat.copyToLinkedDevice")
+                    }
+                }
+            #endif
+
             if viewModel.canModerateReports {
                 Section {
                     NavigationLink {

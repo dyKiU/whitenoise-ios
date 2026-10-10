@@ -1,6 +1,8 @@
 import Foundation
 import MarmotKit
+import SwiftUI
 import Testing
+import UIKit
 
 @testable import whitenoise_ios
 
@@ -423,6 +425,57 @@ import Testing
                 try await transfer.begin(groupIdHex: String(repeating: "ab", count: 32), linkedRosterSelector: selector)
             }
             #expect(!invoked)
+        }
+        private func renderPane<Content: View>(_ content: Content, name: String) async throws {
+            let controller = UIHostingController(
+                rootView: NavigationStack { Form { content } }.preferredColorScheme(.light))
+            let scene = try #require(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
+            let previousKeyWindow = scene.windows.first { $0.isKeyWindow }
+            let window = UIWindow(windowScene: scene)
+            window.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            defer {
+                window.isHidden = true
+                window.rootViewController = nil
+                previousKeyWindow?.makeKey()
+            }
+            controller.view.frame = window.bounds
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
+            try await Task.sleep(for: .milliseconds(100))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                #expect(window.drawHierarchy(in: window.bounds, afterScreenUpdates: true))
+            }
+            let data = try #require(image.pngData())
+            let directory =
+                ProcessInfo.processInfo.environment["WN_SELECTED_CHAT_VISUAL_DIR"].map {
+                    URL(fileURLWithPath: $0, isDirectory: true)
+                }
+                ?? FileManager.default.temporaryDirectory.appendingPathComponent(
+                    "selected-chat-ui-visuals", isDirectory: true)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try data.write(to: directory.appendingPathComponent(name + ".png"), options: .atomic)
+        }
+        @Test func renderingCopyAndConsentDoesNotExportOrApprove() async throws {
+            let originalCopy = PresentationCopy()
+            let copy = SelectedChatCopyViewModel(
+                original: SelectedChatCopyScope(accountRef: "isolated", original: originalCopy), isCurrent: { true })
+            try await copy.refresh()
+            try await renderPane(
+                SelectedChatCopyPaneView(model: copy, groupIdHex: String(repeating: "ab", count: 32)), name: "copy")
+            #expect(originalCopy.requested.isEmpty)
+            #expect(copy.outgoingPacket == nil)
+            let originalConsent = PresentationConsent()
+            let consent = SelectedChatConsentViewModel(
+                original: SelectedChatConsentScope(accountRef: "isolated", original: originalConsent),
+                isCurrent: { true })
+            try await consent.refresh()
+            try await renderPane(SelectedChatConsentPaneView(model: consent), name: "consent")
+            #expect(originalConsent.approved.isEmpty)
+            #expect(originalConsent.exported.isEmpty)
+            try await copy.cancel()
+            try await consent.cancel()
         }
         @Test func actualAccountCompositionOwnsAndRetiresTransferAcrossReturn() async throws {
             let root = FileManager.default.temporaryDirectory.appendingPathComponent("SelectedChatPane-\(UUID())")
