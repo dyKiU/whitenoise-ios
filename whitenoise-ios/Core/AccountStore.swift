@@ -43,6 +43,11 @@ final class AccountStore {
     }
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private(set) var historyConsentReviewModel: HistoryConsentReviewModel?
+        func holdHistoryConsentReview(_ model: HistoryConsentReviewModel) {
+            historyConsentReviewModel?.invalidate()
+            historyConsentReviewModel = model
+        }
         let historyConsentLifetime = HistoryConsentAccountLifetime()
         private(set) var synchronizedHistoryModels: [String: SynchronizedHistoryViewModel] = [:]
 
@@ -258,6 +263,8 @@ final class AccountStore {
             deviceLinkingOwnerEpoch = UUID()
             for reader in synchronizedHistoryModels.values { reader.invalidate() }
             synchronizedHistoryModels.removeAll()
+            historyConsentReviewModel?.invalidate()
+            historyConsentReviewModel = nil
             historyConsentLifetime.invalidate()
             selectedChatLifetime.invalidate()
             selectedChatTransferModel?.invalidate()
