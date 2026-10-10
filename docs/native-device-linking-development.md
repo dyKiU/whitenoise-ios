@@ -398,3 +398,20 @@ remain fenced. Focused 18 and affected 81 tests pass on the matched candidate SD
 See `native-selected-chat-lifetime-evidence.json` for exact source, raw-log hashes,
 regression counts, and the separate published-SDK check (33 passed). This is lifetime
 qualification, not real native chat consent/delivery acceptance or a UI change.
+
+### Original selected-chat presentation
+
+Separate copy and consent models use already-owned original scopes. AppState
+composition delegates to the existing scoped factories; it never derives an
+owner from a displayed selector. Refresh displays exact authenticated selector
+bytes and captured revision without approving or exporting. Only explicit actions
+forward consent, response/offer packets, and continuation to the original.
+
+Canonical bounded base64 transport is metadata; it grants no permission. Malformed
+snapshots, terminal consent phases at unchanged revision, and original SDK read
+errors clear prior display/output. Retired accounts hide late packets immediately;
+failed cleanup retries the exact original. Focused 14 and affected 95 tests pass,
+with genuine refusal and stale-display regressions recorded in
+`native-selected-chat-presentation-evidence.json`. UI, full published/experimental
+PR gates on the composed application, and native cryptographic chat acceptance
+remain separate.

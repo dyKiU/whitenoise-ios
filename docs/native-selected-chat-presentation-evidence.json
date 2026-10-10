@@ -1,0 +1,291 @@
+{
+  "base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+  "sdk_source": "3fab3184d8cc089c7a3d24988443ff2d38ee93a5",
+  "sdk4_stashes": {
+    "local": "dab38d6411604690093944cb12c87626b7db7ac3",
+    "remote": "c55f94c1159a81efd6e247127491d30bb59884bd"
+  },
+  "source_stashes": {
+    "default_deny_red": "c4521fb6f0388f3f266caac2965a8c45838c0300",
+    "initial_green": "2aca3f450dc9d2d18647d4fb1035dd5b3674b331",
+    "terminal_phase_red": "3d9fcd5dd7fb7e36df201925c68d07a183991922",
+    "terminal_phase_green": "6ec79d34fe2a903fc8a30b961587e71575e3b38f",
+    "read_error_red": "4f29d2920f094287ccb4242bdd70686aeb54b2c6",
+    "final_green": "a97a3a1421d18ca1e1b66927435f049497054f5d"
+  },
+  "phases": [
+    {
+      "prefix": "ios-selected-chat-presentation-red-v2",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "d1ff363900622a7df59843e5b058dd285b6b0a090b07f0457e21d2a53e55071e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 5.18,
+      "log_sha256": "fcec620719459ad8537873011ab39500a2951ecbbf546bfd384d19624f31633c",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance"
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-red-v3",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "d1ff363900622a7df59843e5b058dd285b6b0a090b07f0457e21d2a53e55071e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 11.28,
+      "log_sha256": "cc871ba187279d9fa1b5b4f512c9d8b34b3344a3036ecbd27a8110b3418a0b6c",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance"
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-red-v4",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "d1ff363900622a7df59843e5b058dd285b6b0a090b07f0457e21d2a53e55071e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 7.69,
+      "log_sha256": "0bc627c776ad0ab0204cebba4207d96c84df65eba6b2021617ddd480ac5dda43",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance"
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-red-v5",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "d1ff363900622a7df59843e5b058dd285b6b0a090b07f0457e21d2a53e55071e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 125.37,
+      "log_sha256": "9bb74067b420ff4fe1ce758c93398e3ccec496d8244a25b3c353246a27d13e6c",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2,
+        "passedTests": 0,
+        "failedTests": 2,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Caught error: .SelectedChatCopyNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "SelectedChatPresentationTests/consentDisplayDoesNotApproveAndActionUsesDisplayedOriginalRevision()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatPresentationTests/consentDisplayDoesNotApproveAndActionUsesDisplayedOriginalRevision()",
+          "testName": "consentDisplayDoesNotApproveAndActionUsesDisplayedOriginalRevision()"
+        },
+        {
+          "failureText": "Caught error: .SelectedChatCopyNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 2,
+          "testIdentifierString": "SelectedChatPresentationTests/requestDisplayExportsOnlyExplicitOriginalRevision()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatPresentationTests/requestDisplayExportsOnlyExplicitOriginalRevision()",
+          "testName": "requestDisplayExportsOnlyExplicitOriginalRevision()"
+        }
+      ]
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-green-v5",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "69de8eea8bb06f8dd98a08e852ff7271dc17c182fbbc1f37abfed4d0d0d1220f",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 31.15,
+      "log_sha256": "91d155c2c0688f653d7b70ac00c5b0c8c6ab73af9c7dd5c7678a4dc8573e2615",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 12,
+        "passedTests": 12,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-phase-red-v1",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "a722cea5335afd8f5421d76483c37c3301576713521e56b0319b1649c03d2d0d",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 17.15,
+      "log_sha256": "9e2cb7cd906da783e49af94ef270063f7e17c782b9cd9c4611d1384fdaeb3881",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 1,
+        "passedTests": 0,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: model.outgoingPacket == nil\nmodel.outgoingPacket \u2192 \"Cww=\"",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "SelectedChatPresentationTests/terminalConsentPhaseClearsPacketAtUnchangedRevision(phase:)",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatPresentationTests/terminalConsentPhaseClearsPacketAtUnchangedRevision(phase:)",
+          "testName": "terminalConsentPhaseClearsPacketAtUnchangedRevision(phase:)"
+        }
+      ]
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-green-v6",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "cfc3afe0b642a4e7df0dc1bee59a867c3db6ad92d32e722378b201060405ef27",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 22.45,
+      "log_sha256": "438aa98186493a86f5c345a87d4076179e60e6ce94148988113a22025ce896b2",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 13,
+        "passedTests": 13,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-affected-v6",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "cfc3afe0b642a4e7df0dc1bee59a867c3db6ad92d32e722378b201060405ef27",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 8.48,
+      "log_sha256": "02dd60171e901c5d4d17d1294232d3afe2259643b4338eb2c2e4730aba31d2c5",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 94,
+        "passedTests": 94,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-readerror-red-v1",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "15d43b1ec4c6d7af57f2fc95f893aa74da463e77784fa26fc497749fdc55a8a1",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 17.11,
+      "log_sha256": "2c37f9993220d8014501f50229f6621680107985de77083515d05883f7b85980",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 1,
+        "passedTests": 0,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: model.snapshot == nil\nmodel.snapshot \u2192 SelectedChatCopySnapshotFfi(revision: 19, phase: MarmotKit.SelectedChatCopyPhaseFfi.awaitingSiblingConsent, siblingCount: 2, consentingSiblingCount: 0, offeredSiblingCount: 0)",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "SelectedChatPresentationTests/originalSnapshotErrorClearsPreviousPacket(consent:)",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatPresentationTests/originalSnapshotErrorClearsPreviousPacket(consent:)",
+          "testName": "originalSnapshotErrorClearsPreviousPacket(consent:)"
+        }
+      ]
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-green-v7",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "105f69e7f48f1a23c935076cb305e41c3c5bce0d4f083324523a9d454af9cf4e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 20.25,
+      "log_sha256": "987c429a77bce817d9d0604ef64afbe3b00e1005d3cd2181455dc3899c9afcae",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 14,
+        "passedTests": 14,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "prefix": "ios-selected-chat-presentation-affected-v7",
+      "source_base": "953cc59f83a0fad1cdc133a51d496fad808354ef",
+      "source_inputs": 819,
+      "input_manifest_sha256": "105f69e7f48f1a23c935076cb305e41c3c5bce0d4f083324523a9d454af9cf4e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 8.05,
+      "log_sha256": "09f517a00b95d48b50999ff6379d0d00ed48af392045db57b552484aceb3c763",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 95,
+        "passedTests": 95,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  ],
+  "checks": [
+    "canonical three-file strict swift-format",
+    "SwiftLint0.63.2 strict:0 violations",
+    "git diff --check"
+  ],
+  "named_pcm_retirements": [
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "bytes": 500456,
+      "sha256": "95f7a2ed7d02f2be3ec6b1049db24bbd300c4f81ec25b729c0317d2973330dda",
+      "reason": "candidate header after published switch; exact diagnosed stale PCM; no active iOS Xcode"
+    },
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "bytes": 500408,
+      "sha256": "ab1439f86391f8c9c8164c93c175c01959b0d25187b4b3ab1eafa2091754eb0b",
+      "reason": "second exact diagnosed stale published PCM on candidate switch; iOS idle"
+    },
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "bytes": 500408,
+      "sha256": "9a18914c53043d76a9a170ef174a5d554b45779e0bfd59fc3cf7c795d4eb673d",
+      "reason": "third exact diagnosed stale published PCM on candidate switch; iOS idle"
+    }
+  ],
+  "limits": [
+    "REDv2/v3/v4 are zero-test named stale PCM compiler failures; v5 is actual semantic0/2. Failure diagnostics also report simctl utility unavailable after assertions, separately from executed tests.",
+    "Parameterized phase and read-error methods exercise three and two cases; report suite method counts, not additive unique tests.",
+    "Original generated SDK protocol controls and actual AccountStore replacement qualify native ownership/display, not real cryptographic chat transfer.",
+    "Feature-only models, no UI or capability enabling, artifact changes, installs/publishing/fullPR claim. Published33 gate qualified base953, not this subsequent model cohort."
+  ]
+}

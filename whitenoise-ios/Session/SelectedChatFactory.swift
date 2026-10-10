@@ -16,6 +16,17 @@
                 try await client.receiveSelectedChatCopyRequest(accountRef: ref, packet: packet)
             }
         }
+        func beginSelectedChatCopyPresentation(groupIdHex: String, linkedRosterSelector: Data) async throws
+            -> SelectedChatCopyViewModel
+        {
+            let scope = try await beginOwnedSelectedChatCopy(
+                groupIdHex: groupIdHex, linkedRosterSelector: linkedRosterSelector)
+            return SelectedChatCopyViewModel(original: scope, isCurrent: { scope.isActive })
+        }
+        func receiveSelectedChatConsentPresentation(packet: Data) async throws -> SelectedChatConsentViewModel {
+            let scope = try await receiveOwnedSelectedChatCopyRequest(packet: packet)
+            return SelectedChatConsentViewModel(original: scope, isCurrent: { scope.isActive })
+        }
         private func selectedChatOwner() async throws -> SelectedChatAccountOwner {
             guard let client, let ref = activeAccountRef, let generation = runtimeEventsGeneration,
                 isAppSceneActive, !isAccountExitInProgress, !isErasingAppData
