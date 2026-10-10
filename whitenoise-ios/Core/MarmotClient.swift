@@ -52,6 +52,13 @@ nonisolated final class MarmotClient: Sendable {
     private let relayPolicy: RelayPolicyFfi?
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        /// Current Core-derived choices are observations; only a fresh original transfer can request consent.
+        func historyTransferRecipients(accountRef: String, groupIdHex: String) async throws
+            -> [HistoryTransferRecipientFfi]
+        {
+            try await marmot.historyTransferRecipients(accountRef: accountRef, groupIdHex: groupIdHex)
+        }
+
         func pendingHistoryRequests(accountRef: String) async throws -> [HistoryConsent] {
             try await marmot.pendingHistoryRequests(accountRef: accountRef)
         }
