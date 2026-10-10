@@ -50,6 +50,10 @@ nonisolated final class MarmotClient: Sendable {
     let telemetryConfig: TelemetryBuildConfig
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        func pendingHistoryRequests(accountRef: String) async throws -> [HistoryConsent] {
+            try await marmot.pendingHistoryRequests(accountRef: accountRef)
+        }
+
         func beginSelectedChatCopy(accountRef: String, groupIdHex: String, linkedRosterSelector: Data) async throws
             -> SelectedChatCopy
         {
@@ -153,9 +157,10 @@ nonisolated final class MarmotClient: Sendable {
     ) async throws -> SynchronizedHistoryPage {
         #if WN_EXPERIMENTAL_DEVICE_SYNC
             return try await Task.detached { [marmot] in
-                SynchronizedHistoryPage(try marmot.synchronizedHistoryPage(
-                    accountRef: accountRef, groupIdHex: groupIdHex,
-                    afterMessageIdHex: afterMessageIdHex, limit: limit))
+                SynchronizedHistoryPage(
+                    try marmot.synchronizedHistoryPage(
+                        accountRef: accountRef, groupIdHex: groupIdHex,
+                        afterMessageIdHex: afterMessageIdHex, limit: limit))
             }.value
         #else
             throw SynchronizedHistoryReadError.unavailable

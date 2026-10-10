@@ -43,6 +43,7 @@ final class AccountStore {
     }
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        let historyConsentLifetime = HistoryConsentAccountLifetime()
         private(set) var synchronizedHistoryModels: [String: SynchronizedHistoryViewModel] = [:]
 
         func holdSynchronizedHistory(_ model: SynchronizedHistoryViewModel, groupIdHex: String) {
@@ -257,6 +258,7 @@ final class AccountStore {
             deviceLinkingOwnerEpoch = UUID()
             for reader in synchronizedHistoryModels.values { reader.invalidate() }
             synchronizedHistoryModels.removeAll()
+            historyConsentLifetime.invalidate()
             selectedChatLifetime.invalidate()
             selectedChatTransferModel?.invalidate()
             selectedChatTransferModel = nil
@@ -300,9 +302,13 @@ final class AccountStore {
             do { try await selectedChatLifetime.retryCleanup() } catch {
                 if firstError == nil { firstError = error }
             }
+            do { try historyConsentLifetime.retryCleanup() } catch {
+                if firstError == nil { firstError = error }
+            }
             if let firstError { throw firstError }
         }
 
+        func prepareHistoryConsentAcquisition() async throws { try await retryDeviceLinkingCleanup() }
         func prepareSelectedChatAcquisition() async throws { try await retryDeviceLinkingCleanup() }
         func retrySelectedChatCleanup() async throws { try await selectedChatLifetime.retryCleanup() }
 
