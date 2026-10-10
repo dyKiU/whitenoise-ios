@@ -74,6 +74,7 @@ import UIKit
     nonisolated private final class PresentationConsent: SelectedChatConsentProtocol, @unchecked Sendable {
         private let lock = NSLock()
         private var revisions: [UInt64] = []
+        var cancelFails = false
         var invalidSnapshot = false
         var snapshotFails = false
         private var packetRevisions: [UInt64] = []
@@ -99,7 +100,9 @@ import UIKit
             lock.withLock { packetRevisions.append(revision) }
             return Data([13, 14])
         }
-        func cancel() async throws {}
+        func cancel() async throws {
+            if cancelFails { throw MarmotKitError.SelectedChatCopyBusy }
+        }
     }
     @MainActor @Suite struct SelectedChatPresentationTests {
         @Test func requestDisplayExportsOnlyExplicitOriginalRevision() async throws {
@@ -425,6 +428,67 @@ import UIKit
                 try await transfer.begin(groupIdHex: String(repeating: "ab", count: 32), linkedRosterSelector: selector)
             }
             #expect(!invoked)
+        }
+        @Test func explicitCopyResetRequiresOriginalCleanupAndNeverStartsAnotherFactory() async throws {
+            let original = PresentationCopy()
+            let child = SelectedChatCopyViewModel(
+                original: SelectedChatCopyScope(accountRef: "isolated", original: original), isCurrent: { true })
+            let selector = Data([32])
+            var factories = 0
+            let transfer = SelectedChatTransferViewModel(
+                begin: { _, _ in
+                    factories += 1
+                    return child
+                },
+                receive: { _ in throw MarmotKitError.SelectedChatCopyUnsupported },
+                targets: { [.init(selector: selector, deviceCount: 2)] }, isCurrent: { true })
+            try await transfer.loadTargets()
+            try await transfer.begin(groupIdHex: String(repeating: "ab", count: 32), linkedRosterSelector: selector)
+            #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try transfer.resetCopyPresentation() }
+            #expect(transfer.copy === child)
+            original.cancelFails = true
+            await #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try await child.cancel() }
+            #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try transfer.resetCopyPresentation() }
+            #expect(transfer.copy === child)
+            #expect(child.cleanupError != nil)
+            original.cancelFails = false
+            try await child.cancel()
+            try transfer.resetCopyPresentation()
+            #expect(transfer.copy == nil)
+            #expect(transfer.copyGroupIdHex == nil)
+            #expect(factories == 1)
+            #expect(original.requested.isEmpty)
+            transfer.invalidate()
+            #expect(throws: MarmotKitError.SelectedChatCopyClosed) { try transfer.resetCopyPresentation() }
+        }
+        @Test func explicitConsentResetRequiresOriginalCleanupAndNeverApproves() async throws {
+            let original = PresentationConsent()
+            let child = SelectedChatConsentViewModel(
+                original: SelectedChatConsentScope(accountRef: "isolated", original: original), isCurrent: { true })
+            var factories = 0
+            let transfer = SelectedChatTransferViewModel(
+                begin: { _, _ in throw MarmotKitError.SelectedChatCopyUnsupported },
+                receive: { _ in
+                    factories += 1
+                    return child
+                }, targets: { [] }, isCurrent: { true })
+            try await transfer.receive(input: Data([128]).base64EncodedString())
+            #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try transfer.resetConsentPresentation() }
+            #expect(transfer.consent === child)
+            original.cancelFails = true
+            await #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try await child.cancel() }
+            #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try transfer.resetConsentPresentation() }
+            #expect(transfer.consent === child)
+            #expect(child.cleanupError != nil)
+            original.cancelFails = false
+            try await child.cancel()
+            try transfer.resetConsentPresentation()
+            #expect(transfer.consent == nil)
+            #expect(factories == 1)
+            #expect(original.approved.isEmpty)
+            #expect(original.exported.isEmpty)
+            transfer.invalidate()
+            #expect(throws: MarmotKitError.SelectedChatCopyClosed) { try transfer.resetConsentPresentation() }
         }
         private func renderPane<Content: View>(_ content: Content, name: String) async throws {
             let controller = UIHostingController(

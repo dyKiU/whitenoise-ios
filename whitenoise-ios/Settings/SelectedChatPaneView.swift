@@ -55,6 +55,15 @@
                 if model.isActive {
                     if let copy = model.copy {
                         SelectedChatCopyPaneView(model: copy, groupIdHex: model.copyGroupIdHex)
+                        if !copy.isActive, copy.cleanupError == nil, groupIdHex != nil {
+                            WNButton(title: "Copy selected chat", size: .standard) {
+                                do {
+                                    try model.resetCopyPresentation()
+                                    selectedTarget = nil
+                                    incoming = ""
+                                } catch { failed = true }
+                            }.disabled(model.isWorking)
+                        }
                     } else if let groupIdHex {
                         Section {
                             CopyableValueRow(title: "Chat ID", value: groupIdHex)
@@ -80,6 +89,14 @@
                     }
                     if let consent = model.consent {
                         SelectedChatConsentPaneView(model: consent)
+                        if !consent.isActive, consent.cleanupError == nil {
+                            WNButton(title: "Receive chat copy request", size: .standard) {
+                                do {
+                                    try model.resetConsentPresentation()
+                                    incoming = ""
+                                } catch { failed = true }
+                            }.disabled(model.isWorking)
+                        }
                     } else {
                         Section {
                             Text("Opaque chat copy request").font(.subheadline)

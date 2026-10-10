@@ -78,6 +78,22 @@
             try await model.refresh()
             try checkActive()
         }
+        func resetCopyPresentation() throws {
+            try checkActive()
+            guard !isWorking, let child = currentCopy, !child.isActive, child.cleanupError == nil else {
+                throw MarmotKitError.SelectedChatCopyBusy
+            }
+            currentCopy = nil
+            currentGroupIdHex = nil
+            currentTargets = []
+        }
+        func resetConsentPresentation() throws {
+            try checkActive()
+            guard !isWorking, let child = currentConsent, !child.isActive, child.cleanupError == nil else {
+                throw MarmotKitError.SelectedChatCopyBusy
+            }
+            currentConsent = nil
+        }
         func invalidate() {
             retired = true
             currentGroupIdHex = nil
