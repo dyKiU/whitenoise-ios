@@ -174,3 +174,22 @@ retired after each target stopped. The preserved e6 overrides were restored and
 all786 experimental inputs verified byte for byte before further work.
 See `native-device-linking-transport-full-verification.json`. No physical
 installation or fresh native pairing/delivery is implied by these full regressions.
+
+## Account-owned verification display
+
+The feature model uses only original scoped verification operations, composed in
+Session through the existing AppState factories. Its current-owner check captures
+the actual client, runtime generation and existing AccountStore ownership epoch;
+A→B→A and runtime suspension cannot adopt or display an old result. That epoch is
+observable negative identity, never SDK permission. No new counter, persisted
+snapshot, enrollment action or permission constructor was added. Exact retired
+cleanup remains in AccountStore; the feature exposes a negative cleanup-error state.
+
+Missing-model RED0/2 was preserved before Green in named compact stash e3f46751.
+Initial unchanged Green2/2 and final affected30/30 passed (model5 plus original
+account lifetime, transport, owned actions and real factory controls). Three
+zero-test named FFI PCM failures are preserved separately. Scoped strictSwiftLint
+0.63.2 and Swiftformat6.2.3 pass. See native-device-verification-model-evidence.json.
+The tests use generated-protocol controls with isolated actual AccountStore and
+RuntimeLifecycle paths; they do not prove genuine SDK pairing or native UI.
+Settings UI and final full experimental/published gates are next.

@@ -6,7 +6,7 @@
     /// Native lifetime for one original SDK session; observations never restore permission.
     @MainActor
     @Observable
-    final class DeviceLinkingAccountScope {
+    final class DeviceLinkingAccountScope: DeviceVerificationSession {
         let accountRef: String
         private(set) var latestSnapshot: DeviceLinkingSnapshotFfi?
         private(set) var cleanupError: Error?

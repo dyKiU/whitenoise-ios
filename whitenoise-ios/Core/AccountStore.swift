@@ -46,7 +46,9 @@ final class AccountStore {
         private(set) var deviceLinkingScope: DeviceLinkingAccountScope?
         private(set) var retiringDeviceLinkingScope: DeviceLinkingAccountScope?
         @ObservationIgnored private var deviceLinkingRetirement: Task<Void, Error>?
-        @ObservationIgnored private var deviceLinkingOwnerEpoch = UUID()
+        // Observable negative identity resets display across A→B→A and runtime retirement.
+        private var deviceLinkingOwnerEpoch = UUID()
+        var deviceLinkingOwnershipIdentity: UUID { deviceLinkingOwnerEpoch }
         @ObservationIgnored private var pendingDeviceLinkingFactory:
             (
                 id: UUID, task: Task<any DeviceLinkingSessionProtocol, Error>
