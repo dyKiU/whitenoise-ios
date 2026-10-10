@@ -212,3 +212,13 @@ feature-off/e6 configuration failure; only its own newly-created idle output was
 removed. See native-device-verification-settings-evidence.json. Full signed-source
 experimental/published qualification follows; genuine fresh native pairing,
 accessibility/visual acceptance and enrollment/chat delivery are separate gates.
+
+The signed Settings product `3812b882` subsequently passed both full Staging
+cohorts: experimental2,734 passed/zero failed/two existing skips; published0.12
+2,702 passed/zero failed/two existing skips. All793 input paths were frozen
+before/after each run. Three published attempts compiled zero tests due to stale
+FFI modules; each exact compiler-named file was preserved after an idle check,
+without broad cache deletion. All four e6 generated overrides were restored
+byte for byte after the canonical published run. See
+native-device-verification-settings-full-evidence.json. These are full regression
+results, not native pairing, visual acceptance, enrollment or chat delivery proof.
