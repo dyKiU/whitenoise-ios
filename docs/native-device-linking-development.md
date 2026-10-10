@@ -17,8 +17,12 @@ recorded as compiler failures, not behavioral regressions.
 
 The compatibility paths preserve canonical timestamp literal content and compare
 actual chat-row presentation values, excluding opaque SDK draft lease handles.
-They do not supply live localized timestamp rendering. Published-SDK baseline
-qualification is in progress. Fresh application pairing, selected-chat consent,
+They do not supply live localized timestamp rendering. The published-SDK baseline also passes 2,702 tests with zero failures and the
+same two skips. The initial reused-cache FFI header/module mismatch was resolved
+by retiring only three named FFI precompiled modules after Xcode stopped. Fresh application pairing, selected-chat consent,
 ordinary membership/message delivery and history remain separate acceptance
-gates. Physical iPhone installation is deferred; retain the signed Personal Team
-baseline until a replacement is verified.
+gates. M1 has rebuilt and strictly verified the Personal Team app and notification
+extension with the matched experimental SDK. Signing, App Group identity and
+disabled unsupported capability checks pass; the provisioning profiles expire
+on 2026-10-16. The prior signed published-SDK build is retained as a rollback
+copy. Physical iPhone installation remains deferred.

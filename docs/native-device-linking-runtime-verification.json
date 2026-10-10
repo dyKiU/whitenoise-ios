@@ -70,5 +70,58 @@
   ],
   "scope": "Native capabilities and typed missing-account factories; no fresh pairing, selected-chat consent/admission, message delivery or history. Timestamp content preserved as canonical literal until localized live timestamp UI is implemented.",
   "physical_phone_changed": false,
-  "published_baseline": "in progress"
+  "published_baseline": {
+    "verification": "Root verified all 774 frozen inputs against signed Git tree011969a and complete terminal log",
+    "gate": {
+      "source_base": "011969a5f0b6dd2ac07efbf03432cec0a6a54289",
+      "source_inputs": 774,
+      "input_manifest_sha256": "feb800c99057ff62d1ffd8ed5ef96c32497639914ef4e1a78998669fbbfb0330",
+      "profile": "published-0.12.0/experimentalflag0/Staging",
+      "exit_code": 0,
+      "seconds": 267.13,
+      "log_sha256": "30175a0e1a6019b7020ea280a411855035a137a5e415768ce6d5e1dd69e30e1d",
+      "physical_phone_changed": false,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2704,
+        "passedTests": 2702,
+        "failedTests": 0,
+        "skippedTests": 2
+      },
+      "test_failures": []
+    }
+  },
+  "published_cohort_cache_compile_failure": {
+    "exit_code": 65,
+    "log_sha256": "42e4775d758f461a19d8e6ddb9f4ad7b5dbcc61fb3d07087aee13db90015790d",
+    "resolution": "After Xcode stopped, retired only three named marmot_uniffiFFI PCM cache entries; retry verified774 inputs against signed011969a and passed2702 with two skips."
+  },
+  "personal_team_build": {
+    "source_commit": "011969a5f0b6dd2ac07efbf03432cec0a6a54289",
+    "source_inputs": 774,
+    "input_manifest_sha256": "8fa883b9e0113f6971c8ad4de998f51c25de370453918b21fc18b68b63d0806f",
+    "mdk_source": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+    "installed_manifest_sha256": "4fd8e8758b02a08aceec2d764a11cc956c937168e33f5542d77f2038655fc6e3",
+    "exit_code": 0,
+    "seconds": 137.72,
+    "log_sha256": "5def8c4da93842f70de22ea38b64363fbc5b2be2b90564416dc01eb4667b9356",
+    "phone_installation": false,
+    "rollback_app": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/rollback/ios-personal-published-before-011969a/whitenoise-ios.app",
+    "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+    "executable_sha256": "23d1f262e7fc56e9ea624c22a8121e525d0ee34adbc52ec66b7c17bda6426957",
+    "signed_bundles": [
+      {
+        "name": "whitenoise-ios.app",
+        "entitlements_sha256": "d7c961768c724fad457d83a4ddf29675804a4414b55f5c3550dba2f822b85fdc",
+        "profile_expiration": "2026-10-16T11:24:29",
+        "profile_sha256": "423162dbc20b2fbb4d44bbef2af684fb934440730a9cd5bf93e4ba040282a3ff"
+      },
+      {
+        "name": "NotificationServiceExtension.appex",
+        "entitlements_sha256": "7c6ccce56de4253ca606c85e920b8d45e5b5046c9b33e55efc394d7c7ed2470a",
+        "profile_expiration": "2026-10-16T11:24:27",
+        "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
+      }
+    ]
+  }
 }
