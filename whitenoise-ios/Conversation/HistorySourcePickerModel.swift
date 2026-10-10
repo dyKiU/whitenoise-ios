@@ -20,6 +20,7 @@
         @ObservationIgnored private let beginOriginal: @MainActor (Data) async throws -> any HistoryTransferProtocol
         @ObservationIgnored private let isCurrent: @MainActor () -> Bool
         var isActive: Bool { !retired && isCurrent() }
+        var hasOriginal: Bool { original != nil }
 
         init(
             groupIdHex: String,

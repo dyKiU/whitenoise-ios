@@ -117,6 +117,29 @@ import Testing
             model.cancel()
             #expect(original.captured.1 == 1)
         }
+        @Test func failedContinueRetainsExactOriginalForRefreshWithoutFreshFactory() async throws {
+            let original = HistorySourceOriginal(failContinue: true)
+            var begins = 0
+            let model = HistorySourcePickerModel(
+                groupIdHex: "ab", readRecipients: { [choice] in [choice] },
+                beginOriginal: { _ in
+                    begins += 1
+                    return original
+                }, isCurrent: { true })
+            try await model.loadRecipients()
+            try model.select(device: device)
+            try await model.begin()
+            await #expect(throws: MarmotKitError.HistoryTransferStaleRevision) {
+                try await model.continueTransfer(displayedRevision: 7)
+            }
+            #expect(model.review == nil)
+            #expect(model.hasOriginal)
+            try await model.refresh()
+            #expect(model.review?.revision == 7)
+            #expect(begins == 1)
+            model.cancel()
+            #expect(!model.hasOriginal)
+        }
         @Test func changedImmutableReviewCancelsExactOriginalAndClearsDisplay() async throws {
             let original = HistorySourceOriginal()
             let model = model(original)
