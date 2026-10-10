@@ -52,6 +52,37 @@
             }
         }
 
+        func pendingOwnedDeviceLinkingApproval() async throws -> DeviceLinkingApprovalScope {
+            guard let client, let accountRef = activeAccountRef, let generation = runtimeEventsGeneration,
+                isAppSceneActive, !isAccountExitInProgress, !isErasingAppData
+            else { throw CancellationError() }
+            return try await accountStore.adoptDeviceLinkingApprovalBatch(
+                accountRef: accountRef,
+                isRuntimeCurrent: {
+                    self.client === client && self.runtimeEventsGeneration == generation
+                        && self.isAppSceneActive && !self.isAccountExitInProgress && !self.isErasingAppData
+                },
+                factory: { try await client.pendingDeviceLinkingApprovals(accountRef: accountRef) }
+            )
+        }
+
+        /// Approval acquisition is separate from verification/session ownership.
+        func adoptDeviceLinkingApprovalFactory(
+            _ factory: @escaping @MainActor (MarmotClient, String) async throws -> any DeviceLinkingApprovalProtocol
+        ) async throws -> DeviceLinkingApprovalScope {
+            guard let client, let accountRef = activeAccountRef, let generation = runtimeEventsGeneration,
+                isAppSceneActive, !isAccountExitInProgress, !isErasingAppData
+            else { throw CancellationError() }
+            return try await accountStore.adoptDeviceLinkingApprovalFactory(
+                accountRef: accountRef,
+                isRuntimeCurrent: {
+                    self.client === client && self.runtimeEventsGeneration == generation
+                        && self.isAppSceneActive && !self.isAccountExitInProgress && !self.isErasingAppData
+                },
+                factory: { try await factory(client, accountRef) }
+            )
+        }
+
         /// Internal factory seam keeps the actual SDK object; test factories only delay its return.
         func adoptDeviceLinkingFactory(
             _ factory: @escaping @MainActor (MarmotClient, String) async throws -> any DeviceLinkingSessionProtocol

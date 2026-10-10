@@ -240,6 +240,34 @@ native-device-linking-enrollment-scope-verification.json.
 
 This is a scoped native forwarding/lifetime check, not actual SDK enrollment or
 chat acceptance. The verification protocol, pane and advertised capability remain
-unchanged. Separate original approval custody and enrollment model/UI are still
-required. Xcode's hosted Staging test installation is separate from manual app
+unchanged. Separate enrollment model/UI is still required; original approval custody is
+qualified below. Xcode's hosted Staging test installation is separate from manual app
 adoption; no physical phone or production app action occurred.
+
+
+## Original approval custody (development only)
+
+AccountStore retains one original SDK approval under account/runtime ownership.
+Snapshot, explicit approval and packet reception use exact revisions/opaque bytes
+and check native lifetime before and after awaits. Cancellation invalidates first;
+failed exact cleanup remains retryable. A bounded multiple-pending SDK batch is
+retained on refusal, without choosing an original or dropping it implicitly.
+Repeated acquisition checks the held original's current SDK phase. Late factory
+results after account replacement or suspension are never adopted.
+
+Initial default-deny RED failed six of six controls; the unchanged controls then
+passed six. A separate cross-owner regression failed one of one: failed session
+cleanup allowed fresh approval acquisition. A shared cleanup boundary now attempts
+both original owner types independently and blocks either factory on failure.
+Final approval controls passed10/10 and affected enrollment/action/transport,
+account lifetime and runtime controls passed40/40. One incorrect function selector
+ran zero tests and is preserved without behavioral qualification. Strict scoped
+SwiftLint0.63.2, Swiftformat6.2.3 and diff checks pass. See
+native-device-linking-approval-scope-verification.json for exact798-input manifests,
+source stashes and terminal hashes.
+
+This qualifies original-handle native custody with generated test controls and
+actual account/runtime lifecycle. It does not prove actual SDK approval,
+enrollment, chat delivery or a full PR suite. Verification UI/protocol and advertised
+capability are unchanged. No manual simulator adoption or physical/production app
+operation occurred; hosted Staging tests use their own application test host.

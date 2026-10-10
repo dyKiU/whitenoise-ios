@@ -54,6 +54,120 @@ final class AccountStore {
                 id: UUID, task: Task<any DeviceLinkingSessionProtocol, Error>
             )?
 
+        private(set) var deviceLinkingApprovalScope: DeviceLinkingApprovalScope?
+        private var retiringApprovalScopes: [DeviceLinkingApprovalScope] = []
+        var retiringDeviceLinkingApprovalScope: DeviceLinkingApprovalScope? { retiringApprovalScopes.first }
+        // SDK e6 returns at most128 original handles. Refusal must not Drop/cancel a batch.
+        private var unselectedApprovalScopes: [DeviceLinkingApprovalScope] = []
+        @ObservationIgnored private var pendingApprovalFactory:
+            (id: UUID, task: Task<[any DeviceLinkingApprovalProtocol], Error>)?
+        @ObservationIgnored private var approvalRetirement: Task<Void, Error>?
+
+        func adoptDeviceLinkingApprovalFactory(
+            accountRef: String,
+            isRuntimeCurrent: @MainActor () -> Bool,
+            factory: @escaping @MainActor () async throws -> any DeviceLinkingApprovalProtocol
+        ) async throws -> DeviceLinkingApprovalScope {
+            try await adoptDeviceLinkingApprovalBatch(
+                accountRef: accountRef, isRuntimeCurrent: isRuntimeCurrent,
+                factory: { [try await factory()] }
+            )
+        }
+
+        func adoptDeviceLinkingApprovalBatch(
+            accountRef: String,
+            isRuntimeCurrent: @MainActor () -> Bool,
+            factory: @escaping @MainActor () async throws -> [any DeviceLinkingApprovalProtocol]
+        ) async throws -> DeviceLinkingApprovalScope {
+            guard activeAccountRef == accountRef, isRuntimeCurrent(), pendingApprovalFactory == nil else {
+                throw CancellationError()
+            }
+            let epoch = deviceLinkingOwnerEpoch
+            try await retryDeviceLinkingCleanup()
+            guard !Task.isCancelled, epoch == deviceLinkingOwnerEpoch, activeAccountRef == accountRef,
+                isRuntimeCurrent(), pendingApprovalFactory == nil
+            else { throw CancellationError() }
+            if let held = deviceLinkingApprovalScope {
+                let snapshot = try await held.snapshot()
+                guard epoch == deviceLinkingOwnerEpoch, deviceLinkingApprovalScope === held, isRuntimeCurrent() else {
+                    throw CancellationError()
+                }
+                switch snapshot.phase {
+                case .awaitingApproval, .approvedAwaitingPacket, .awaitingSettlement: return held
+                case .settled, .cancelled, .expired: throw MarmotKitError.DeviceLinkingClosed
+                }
+            }
+            guard unselectedApprovalScopes.isEmpty else { throw MarmotKitError.DeviceLinkingNotReady }
+            let id = UUID()
+            let task = Task {
+                try Task.checkCancellation()
+                return try await factory()
+            }
+            pendingApprovalFactory = (id, task)
+            defer { if pendingApprovalFactory?.id == id { pendingApprovalFactory = nil } }
+            let originals = try await withTaskCancellationHandler {
+                try await task.value
+            } onCancel: {
+                task.cancel()
+            }
+            let scopes = originals.map { DeviceLinkingApprovalScope(accountRef: accountRef, approval: $0) }
+            guard !Task.isCancelled, epoch == deviceLinkingOwnerEpoch, activeAccountRef == accountRef,
+                isRuntimeCurrent()
+            else {
+                for scope in scopes { scope.invalidate() }
+                retiringApprovalScopes.append(contentsOf: scopes)
+                try await cancelRetiringApprovalScopes()
+                throw CancellationError()
+            }
+            guard scopes.count == 1, let scope = scopes.first else {
+                // Do not choose among or silently Drop the SDK's bounded original batch.
+                unselectedApprovalScopes = scopes
+                throw MarmotKitError.DeviceLinkingNotReady
+            }
+            deviceLinkingApprovalScope = scope
+            return scope
+        }
+
+        private func retireDeviceLinkingApprovalScopes() {
+            pendingApprovalFactory?.task.cancel()
+            var scopes = unselectedApprovalScopes
+            unselectedApprovalScopes = []
+            if let scope = deviceLinkingApprovalScope { scopes.append(scope) }
+            deviceLinkingApprovalScope = nil
+            for scope in scopes { scope.invalidate() }
+            retiringApprovalScopes.append(contentsOf: scopes)
+            if !scopes.isEmpty {
+                approvalRetirement = Task { try await self.cancelRetiringApprovalScopes() }
+            }
+        }
+
+        private func retryApprovalCleanup() async throws {
+            do {
+                if let retirement = approvalRetirement {
+                    try await retirement.value
+                } else {
+                    try await cancelRetiringApprovalScopes()
+                }
+                approvalRetirement = nil
+            } catch {
+                approvalRetirement = nil
+                throw error
+            }
+        }
+
+        private func cancelRetiringApprovalScopes() async throws {
+            var firstError: Error?
+            for scope in retiringApprovalScopes {
+                do {
+                    try await scope.cancel()
+                    retiringApprovalScopes.removeAll { $0 === scope }
+                } catch {
+                    if firstError == nil { firstError = error }
+                }
+            }
+            if let firstError { throw firstError }
+        }
+
         func adoptDeviceLinkingFactory(
             accountRef: String,
             isRuntimeCurrent: @MainActor () -> Bool,
@@ -63,7 +177,7 @@ final class AccountStore {
                 deviceLinkingScope == nil
             else { throw CancellationError() }
             let ownerEpoch = deviceLinkingOwnerEpoch
-            try await cancelRetiringDeviceLinkingScope()
+            try await retryDeviceLinkingCleanup()
             guard !Task.isCancelled, activeAccountRef == accountRef, ownerEpoch == deviceLinkingOwnerEpoch,
                 isRuntimeCurrent(), pendingDeviceLinkingFactory == nil, deviceLinkingScope == nil
             else { throw CancellationError() }
@@ -100,7 +214,7 @@ final class AccountStore {
             _ session: any DeviceLinkingSessionProtocol, accountRef: String
         ) async throws -> DeviceLinkingAccountScope {
             guard activeAccountRef == accountRef, pendingDeviceLinkingFactory == nil else { throw CancellationError() }
-            try await cancelRetiringDeviceLinkingScope()
+            try await retryDeviceLinkingCleanup()
             guard !Task.isCancelled, activeAccountRef == accountRef, deviceLinkingScope == nil,
                 pendingDeviceLinkingFactory == nil
             else {
@@ -115,6 +229,7 @@ final class AccountStore {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
             pendingDeviceLinkingFactory?.task.cancel()
+            retireDeviceLinkingApprovalScopes()
             guard let scope = deviceLinkingScope else { return }
             scope.invalidate()
             deviceLinkingScope = nil
@@ -124,7 +239,17 @@ final class AccountStore {
 
         func cancelDeviceLinking() async throws {
             retireDeviceLinkingScope()
-            try await cancelRetiringDeviceLinkingScope()
+            try await retryDeviceLinkingCleanup()
+        }
+
+        private func retryDeviceLinkingCleanup() async throws {
+            // Every original owner is attempted; a failed owner blocks either factory.
+            var firstError: Error?
+            do { try await cancelRetiringDeviceLinkingScope() } catch { firstError = error }
+            do { try await retryApprovalCleanup() } catch {
+                if firstError == nil { firstError = error }
+            }
+            if let firstError { throw firstError }
         }
 
         private func cancelRetiringDeviceLinkingScope() async throws {
