@@ -45,6 +45,24 @@
             observation = nil
         }
 
+        func confirmComparison(displayedRevision: UInt64) async throws {
+            try requireActive()
+            try await session.confirmComparison(displayedRevision: displayedRevision)
+            try requireActive()
+        }
+
+        func outgoingPackets() async throws -> [DeviceLinkingOutgoingPacketFfi] {
+            try requireActive()
+            let packets = try await session.outgoingPackets()
+            try requireActive()
+            return packets
+        }
+
+        private func requireActive() throws {
+            try Task.checkCancellation()
+            guard active else { throw CancellationError() }
+        }
+
         func cancel() async throws {
             invalidate()
             let task: Task<Void, Error>

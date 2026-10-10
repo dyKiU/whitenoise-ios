@@ -116,3 +116,25 @@ fencing. Fresh pairing, ordinary recipient admission/delivery and history remain
 open. Hosted tests installed the published test host last; do not claim its binary
 is experimental until a new experimental rebuild. Physical installation stays
 deferred; the existing signed M1 ready build is preserved.
+
+### Original-session verification actions — 2026-10-10
+
+The account scope now forwards comparison confirmation with the exact displayed
+revision and reads opaque outgoing SDK packets. Both operations check cancellation
+and the original scope before and after awaiting the SDK. An account replacement
+therefore discards a late packet result; SDK stale-revision errors remain errors.
+No enrollment, continuation or finalization action is enabled.
+
+Generated-protocol controls first demonstrate the missing host API: one passes
+and three fail. The unchanged four tests then pass, followed by all 37 affected
+action, account-lifetime, native-runtime and sign-out tests. Root independently
+checks all 782 frozen inputs and complete logs for each run; only the scope
+implementation changes between semantic RED and GREEN. The original RED is
+retained in a named Git stash. See
+`native-device-linking-owned-actions-verification.json` for hashes and scope.
+
+These are host-boundary tests, including actual AccountStore replacement, rather
+than fresh SDK pairing or message-delivery acceptance. The newer action slice
+still needs full PR qualification before integration. Hosted tests have now
+rebuilt the experimental Staging test host; the previous published-host statement
+above records the earlier full-suite stage. Physical installation remains deferred.
