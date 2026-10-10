@@ -33,3 +33,16 @@ qualified build. The previous app and closed app/App Group storage are preserved
 as one rollback copy. The first launch wrapper misclassified an already stopped
 app (POSIX3); recovery reused the successful build after verifying no old app or
 extension process. This launch does not qualify fresh pairing or delivery.
+
+## iOS app wrapper boundary
+
+The feature-gated `MarmotClient` now forwards capabilities, targets, pending
+approvals, new-device sessions and approver sessions. The existing five isolated
+native runtime tests call these app wrappers, retaining the original opaque SDK
+objects and typed missing-account failures. On M5 the focused Staging simulator
+run passed all five tests with no failures or skips in102.71 seconds, using the
+existing matched `e6b0e9c1` archive and Xcode cache. See
+`native-device-linking-wrapper-verification.json` for exact input/log hashes.
+Generated local binding overrides remain uncommitted and unchanged. This is
+capability and missing-account qualification; fresh pairing, account-owned UI,
+selected-chat admission, delivery and history are still separate gates.

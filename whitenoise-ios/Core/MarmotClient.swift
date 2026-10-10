@@ -49,6 +49,30 @@ nonisolated final class MarmotClient: Sendable {
     let productConfig: ProductAnalyticsBuildConfig
     let telemetryConfig: TelemetryBuildConfig
 
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        func deviceLinkingCapabilities() -> DeviceLinkingCapabilitiesFfi {
+            marmot.deviceLinkingCapabilities()
+        }
+
+        func deviceLinkingTargets(accountRef: String) async throws -> [DeviceLinkingTargetFfi] {
+            try await marmot.deviceLinkingTargets(accountRef: accountRef)
+        }
+
+        func pendingDeviceLinkingApprovals(accountRef: String) async throws -> [DeviceLinkingApproval] {
+            try await marmot.pendingDeviceLinkingApprovals(accountRef: accountRef)
+        }
+
+        func beginDeviceLinkingSession(accountRef: String) async throws -> DeviceLinkingSession {
+            try await marmot.beginDeviceLinkingSession(accountRef: accountRef)
+        }
+
+        func approveDeviceLinkingSession(accountRef: String, request: Data, target: Data?) async throws
+            -> DeviceLinkingSession
+        {
+            try await marmot.approveDeviceLinkingSession(accountRef: accountRef, request: request, target: target)
+        }
+    #endif
+
     convenience init() throws {
         try self.init(rootPath: AppContainerConfig.productionMarmotRoot().path, relayUrls: Self.seedRelays)
     }

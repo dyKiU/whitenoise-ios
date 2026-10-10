@@ -6,7 +6,7 @@ import Testing
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     @MainActor @Suite struct NativeDeviceLinkingRuntimeTests {
-        private func withRuntime(_ body: (Marmot) async throws -> Void) async throws {
+        private func withRuntime(_ body: (MarmotClient) async throws -> Void) async throws {
             let root = FileManager.default.temporaryDirectory
                 .appendingPathComponent(
                     "white-noise-linking-runtime-\(UUID().uuidString)", isDirectory: true)
@@ -16,7 +16,7 @@ import Testing
                 relayUrls: ["wss://relay.example.invalid"]
             )
             do {
-                try await body(client.marmot)
+                try await body(client)
                 #expect(try client.marmot.listAccounts().isEmpty)
                 try await client.marmot.shutdownAndClose()
             } catch {
