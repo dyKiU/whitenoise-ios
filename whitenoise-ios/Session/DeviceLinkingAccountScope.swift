@@ -51,6 +51,32 @@
             try requireActive()
         }
 
+        // Enrollment is a separate explicit action on this original owner.
+        func continueLinking(displayedRevision: UInt64) async throws {
+            try requireActive()
+            try await session.continueLinking(displayedRevision: displayedRevision)
+            try requireActive()
+        }
+
+        func enrollmentPacket(displayedRevision: UInt64) async throws -> Data {
+            try requireActive()
+            let packet = try await session.enrollmentPacket(displayedRevision: displayedRevision)
+            try requireActive()
+            return packet
+        }
+
+        func receiveEnrollmentPacket(displayedRevision: UInt64, packet: Data) async throws {
+            try requireActive()
+            try await session.receiveEnrollmentPacket(displayedRevision: displayedRevision, packet: packet)
+            try requireActive()
+        }
+
+        func finalizeLinking(displayedRevision: UInt64) async throws {
+            try requireActive()
+            try await session.finalizeLinking(displayedRevision: displayedRevision)
+            try requireActive()
+        }
+
         func outgoingPackets() async throws -> [DeviceLinkingOutgoingPacketFfi] {
             try requireActive()
             let packets = try await session.outgoingPackets()

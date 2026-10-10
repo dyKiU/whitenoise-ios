@@ -222,3 +222,24 @@ without broad cache deletion. All four e6 generated overrides were restored
 byte for byte after the canonical published run. See
 native-device-verification-settings-full-evidence.json. These are full regression
 results, not native pairing, visual acceptance, enrollment or chat delivery proof.
+
+## Original-owner enrollment forwards (development only)
+
+The existing account scope now forwards explicit revision-bound `continueLinking`,
+`enrollmentPacket`, `receiveEnrollmentPacket` and `finalizeLinking` to its retained
+original SDK session. It checks native owner/task liveness before and after each
+await; late packets after A→B→A or runtime suspension cannot escape the old scope.
+SDK revision errors and exact opaque bytes pass through unchanged.
+
+Default-deny missing-feature RED ran five tests and failed all five. The unchanged
+controls passed five after implementation; affected original action, transport,
+account lifetime and runtime-factory tests passed30/30. Strict scoped SwiftLint
+0.63.2, Swiftformat6.2.3 and diff checks pass. Exact RED source is retained in a
+named compact Git stash and verified against the frozen795-input manifest. See
+native-device-linking-enrollment-scope-verification.json.
+
+This is a scoped native forwarding/lifetime check, not actual SDK enrollment or
+chat acceptance. The verification protocol, pane and advertised capability remain
+unchanged. Separate original approval custody and enrollment model/UI are still
+required. Xcode's hosted Staging test installation is separate from manual app
+adoption; no physical phone or production app action occurred.
