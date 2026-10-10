@@ -138,3 +138,14 @@ than fresh SDK pairing or message-delivery acceptance. The newer action slice
 still needs full PR qualification before integration. Hosted tests have now
 rebuilt the experimental Staging test host; the previous published-host statement
 above records the earlier full-suite stage. Physical installation remains deferred.
+
+The signed action slice `c5afa4f83803827a690ef71788c1ed4a396cd826`
+subsequently passes both full Staging cohorts: experimental 2,726 and published
+0.12 baseline 2,702, zero failures and two existing skips each. Root independently
+checks all 783 inputs and complete logs for each cohort. Three published attempts
+are compile-only stale FFI-header failures; only their exact named modules are
+retired after the target stops. The four experimental overrides are restored
+byte for byte, and all 783 preceding experimental inputs match again. See
+`native-device-linking-owned-actions-full-verification.json`. The hosted simulator
+product is now the published test host until the next experimental rebuild;
+physical installation and fresh pairing/delivery remain unqualified.
