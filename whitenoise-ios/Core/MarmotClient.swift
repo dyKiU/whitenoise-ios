@@ -48,6 +48,8 @@ nonisolated final class MarmotClient: Sendable {
     let cursorPersistence: CursorPersistenceFfi
     let productConfig: ProductAnalyticsBuildConfig
     let telemetryConfig: TelemetryBuildConfig
+    private let secretStore: (any SecretStore)?
+    private let relayPolicy: RelayPolicyFfi?
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
         func pendingHistoryRequests(accountRef: String) async throws -> [HistoryConsent] {
@@ -110,11 +112,14 @@ nonisolated final class MarmotClient: Sendable {
         )
     }
 
+    /// Explicit SDK dependencies remain attached to this runtime family; nil keeps production defaults.
     init(
         rootPath: String,
         relayUrls: [String],
         cursorPersistence: CursorPersistenceFfi,
-        telemetryConfig: TelemetryBuildConfig
+        telemetryConfig: TelemetryBuildConfig,
+        secretStore: (any SecretStore)? = nil,
+        relayPolicy: RelayPolicyFfi? = nil
     ) throws {
         let constructionStartedAt = ContinuousClock.now
         self.rootPath = rootPath
@@ -122,12 +127,14 @@ nonisolated final class MarmotClient: Sendable {
         self.cursorPersistence = cursorPersistence
         self.telemetryConfig = telemetryConfig
         self.productConfig = .current()
+        self.secretStore = secretStore
+        self.relayPolicy = relayPolicy
         self.marmot = try Marmot.newWithConfiguration(
             rootPath: rootPath,
             relayUrls: relayUrls,
             options: MarmotOptions(
-                cursorPersistence: cursorPersistence, clientName: "whitenoise",
-                attachmentAcquisitionMode: .hostManaged)
+                relayPolicy: relayPolicy, cursorPersistence: cursorPersistence, clientName: "whitenoise",
+                secretStore: secretStore, attachmentAcquisitionMode: .hostManaged)
         )
         // A rejected audit destination must not block startup; recordings stay local.
         do {
@@ -168,7 +175,9 @@ nonisolated final class MarmotClient: Sendable {
     }
 
     func freshRuntime() throws -> MarmotClient {
-        try MarmotClient(rootPath: rootPath, relayUrls: relayUrls, cursorPersistence: cursorPersistence)
+        try MarmotClient(
+            rootPath: rootPath, relayUrls: relayUrls, cursorPersistence: cursorPersistence,
+            telemetryConfig: .current(), secretStore: secretStore, relayPolicy: relayPolicy)
     }
 
     /// Lists local accounts off the main actor. `Marmot.listAccounts()` is a
