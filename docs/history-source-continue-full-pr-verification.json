@@ -1,0 +1,110 @@
+{
+  "product_commit": "ba6478528113af22893f29986b47d4781d0b8535",
+  "scope": "Final full unfiltered iOS PR suites on signed public source-transfer candidate. Real source-choice/Request/Refresh/Continue and recipient/import acceptance separately qualified in genuine-history-source-continue-buttons-verification.json. No phone-ready replacement, physical install, external iOS release or whole installed navigation claim.",
+  "qualification": {
+    "ios-history-source-ba64785-full-v1": {
+      "source_base": "ba6478528113af22893f29986b47d4781d0b8535",
+      "source_inputs": 889,
+      "input_manifest_sha256": "ae83f46ce5ff2c911312d693ec934a8ec8b09ee7fda72746bdc0cb3ebc4f19e9",
+      "profile": "local-history987/experimentalflag1/Staging",
+      "exit_code": 0,
+      "seconds": 192.27,
+      "log_sha256": "e9753691384c7bd1d0ea834cc39dca6368c3a03c832827f4165726a629f74d0c",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2885,
+        "passedTests": 2876,
+        "failedTests": 0,
+        "skippedTests": 9
+      }
+    },
+    "ios-history-source-ba64785-full-published-v1": {
+      "source_base": "ba6478528113af22893f29986b47d4781d0b8535",
+      "source_inputs": 889,
+      "input_manifest_sha256": "8dec875eac28f449ce6f23d54f38b8bfb0ff48ae6662afcadae88f5cebed9b41",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 6.47,
+      "log_sha256": "ddde16aed499cf7a93e7f2d78cae4e759f41b4f22cc0979757224381f6dee1b2"
+    },
+    "ios-history-source-ba64785-full-published-v2": {
+      "source_base": "ba6478528113af22893f29986b47d4781d0b8535",
+      "source_inputs": 889,
+      "input_manifest_sha256": "8dec875eac28f449ce6f23d54f38b8bfb0ff48ae6662afcadae88f5cebed9b41",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 8.76,
+      "log_sha256": "4218f3d2427436838ba95fec322020fc7e5eca72c4310412c526414c5cda14fc"
+    },
+    "ios-history-source-ba64785-full-published-v3": {
+      "source_base": "ba6478528113af22893f29986b47d4781d0b8535",
+      "source_inputs": 889,
+      "input_manifest_sha256": "8dec875eac28f449ce6f23d54f38b8bfb0ff48ae6662afcadae88f5cebed9b41",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 11.12,
+      "log_sha256": "8d1535853417d9a312e843203b56541dffb89e706165b0dd3f9253d3dba9703d"
+    },
+    "ios-history-source-ba64785-full-published-v4": {
+      "source_base": "ba6478528113af22893f29986b47d4781d0b8535",
+      "source_inputs": 889,
+      "input_manifest_sha256": "8dec875eac28f449ce6f23d54f38b8bfb0ff48ae6662afcadae88f5cebed9b41",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 0,
+      "seconds": 250.15,
+      "log_sha256": "45cb6e8555976ee1d7efb425ecb20b2e6e4f7bd60c891c151a15b94752bd6340",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2720,
+        "passedTests": 2717,
+        "failedTests": 0,
+        "skippedTests": 3
+      }
+    }
+  },
+  "sdk987_source": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "SDK4_preserved_stash": "90a99a675778ecec4841652bf35ed979b7beebb1",
+  "SDK12_restored_byteexact": true,
+  "generated_overrides_committed": false,
+  "pcm_repairs": [
+    {
+      "original": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "retired": "/Users/pj/project/build/retired-ba64785-published-v1-FFI.pcm",
+      "sha256": "b4537a5cf2f53b0891dd3377174b7ca536a97e9891e837a7a020526c092deabd",
+      "bytes": 556712,
+      "reason": "Exact stale header/PCM compiler diagnostic; zero-test compile failure retained",
+      "owned_cache_idle": true
+    },
+    {
+      "original": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "retired": "/Users/pj/project/build/retired-ba64785-published-v2-FFI.pcm",
+      "sha256": "8585eb7e7c690d00e1504310849f222c966dba96c62a531de3cf38d162d6c7a7",
+      "bytes": 556664,
+      "reason": "Exact extension stale header/PCM compiler diagnostic; zero-test failure retained",
+      "owned_cache_idle": true
+    },
+    {
+      "original": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "retired": "/Users/pj/project/build/retired-ba64785-published-v3-FFI.pcm",
+      "sha256": "0d143d7a0424c6bcb83bf507c576f2b59a54aeab6ffe4ccfe1e622cbbf8b7484",
+      "bytes": 556664,
+      "reason": "Exact test target stale header/PCM compiler diagnostic; zero-test failure retained",
+      "owned_cache_idle": true
+    }
+  ],
+  "compile_failures": "Published v1\u2013v3 executed zero tests: exact package, extension and test FFI PCM header mismatches. Each reported PCM moved only after owned cache idle. No source edits, broad cache clean or blind duplicates; same canonical 889-input cohort passed v4.",
+  "skip_scope": {
+    "experimental_total": 9,
+    "published_total": 3,
+    "experimental_only_native_optins": [
+      "ExternalHostedUIControlTests testExternalDriverAttachesWithoutReplacingHostedApp",
+      "GenuineHistoryApprovalPaneTests testHostedExplicitOriginalApprovalCommitsRealRelayImport",
+      "GenuineHistorySourcePickerTests testActualNativeChoicesCreateRefreshAndCancelOriginalThroughAccountOwner",
+      "GenuineHistorySourcePickerTests testHostedNativeChoiceRequestAndCancelThroughPublicDriver",
+      "GenuineHistorySourceTransferTests testCompleteFreshSourceOriginalThroughAppStateAndNativeRecipient",
+      "GenuineHistorySourceTransferTests testHostedFreshSourceTransferThroughPublicButtons",
+      "GenuineImportedHistoryPaneTests testRealCommittedImportThroughAccountOwnedReaderAndHostedPane"
+    ],
+    "baseline_and_host_optins": "Existing generated account attention, physical Data Protection and external-host controls remain opt-in; full suites do not replace separately executed native acceptance."
+  }
+}
