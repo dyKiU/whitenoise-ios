@@ -1,0 +1,184 @@
+{
+  "base": "1966090d3e81c137e98c7cf9e032164da382b007",
+  "scope": "Test fixture teardown only; product runtime, account permissions, SDK and history reader/pane unchanged. Full PR remains pending.",
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "sdk_local_build_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+  "raw_local_directory": "../build/results",
+  "raw_remote_directory": "/Users/pj/project/build/results",
+  "diagnosis": "Unchanged hosted gallery followed by history pane reproduces Swift TaskLocal destruction abort during deferred AppState/AccountStore destruction. Profile-only adjacency does not reproduce. No underlying Swift runtime root-cause claim.",
+  "implementation": "Retain original injected AppState; capture a weakly observed lifetime token in the old hosted root; replace root with EmptyView and await actual token release using existing bounded hosted-update loop before releasing account state. No arbitrary teardown delay.",
+  "candidates": {
+    "empty_nonisolated_deinit_failed": {
+      "local": "d8625f92c399784b9a1ca17ed17eb4b7c7a1aa84",
+      "remote": "786002658018cf5cdbb056951d805db99ca54444"
+    },
+    "fixed_delay_initial_pass": {
+      "local": "2eb6bfd1cbc55f73183abce34ca2783a0eb30edf",
+      "remote": "9f6935fa9e0a86f0307cf6718264feeeeaed8981"
+    },
+    "ca_completion_failed": {
+      "local": "407657093b918e71933e9170a6cbe98827a724d0",
+      "remote": "4623a250a041c761c2c854fe90833fc4b7b063f1"
+    },
+    "final": {
+      "local": "8a0de5305d5e7634e59b5b8cba24e06e6503968d",
+      "remote": "2441a830d743b50bb52ef9f624fa2e6c00f5d94a"
+    }
+  },
+  "cohorts": [
+    {
+      "prefix": "ios-history-reader-pane-1966090-full-v1",
+      "inputs": 840,
+      "manifest_sha256": "d91dcb90c2298f14cc48decdd39395e3c9771199b04c63e56967a7b1451f5a44",
+      "log_sha256": "d0750e2d8df301c002071915de4cf06c037f10cbae1b7bbe0922e20aa569ec7f",
+      "result_sha256": "14c3b2786c727351dce8c03ded21c74afebd9dd039766777f09d39bca5589bc9",
+      "exit_code": 65,
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2836,
+        "passedTests": 2833,
+        "failedTests": 1,
+        "skippedTests": 2
+      },
+      "seconds": 231.77
+    },
+    {
+      "prefix": "ios-history-pane-deinit-repro-v1",
+      "inputs": 840,
+      "manifest_sha256": "d91dcb90c2298f14cc48decdd39395e3c9771199b04c63e56967a7b1451f5a44",
+      "log_sha256": "7d9489ba6b708ebd126331b288a61e328ef5bf2e65a061a067f7e31aca772897",
+      "result_sha256": "19a540bc4c22b65715d06812c60d34ef5043245c47c65c3ae13a6d711e7a5df9",
+      "exit_code": 0,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2,
+        "passedTests": 2,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "seconds": 12.34
+    },
+    {
+      "prefix": "ios-history-pane-deinit-repro-v2",
+      "inputs": 840,
+      "manifest_sha256": "d91dcb90c2298f14cc48decdd39395e3c9771199b04c63e56967a7b1451f5a44",
+      "log_sha256": "b12a915710e4f4f61633aeb54fd602992b7c722ab182efdddfdab244c8462f16",
+      "result_sha256": "e3a358485f0ef7f5d9434a5e2ed8dbc4bbf3ef124a35199cb9e1ae6e79ee1512",
+      "exit_code": 65,
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 7,
+        "passedTests": 6,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "seconds": 18.57
+    },
+    {
+      "prefix": "ios-history-pane-deinit-repro-v3",
+      "inputs": 840,
+      "manifest_sha256": "d91dcb90c2298f14cc48decdd39395e3c9771199b04c63e56967a7b1451f5a44",
+      "log_sha256": "9956ea4dc7e0896e0d2d5b0dd1e4b9339a4b4961ae55550db6d7b933b41d12f6",
+      "result_sha256": "cc8389478d7f1c03d18b77d5515c1473d1de0ce992d6f3baeebbb0ea679f45e3",
+      "exit_code": 65,
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2,
+        "passedTests": 1,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "seconds": 11.49
+    },
+    {
+      "prefix": "ios-history-pane-deinit-repro-experiment-v1",
+      "inputs": 840,
+      "manifest_sha256": "cd05bc971f276660aac8238b4714f3726ed2aca71b98fef15e83996b4cdd4f03",
+      "log_sha256": "4ec450f1040a4ff85fbc3fd076c5d7d1330a8f3d5762078d2f20ed0e3ba51f17",
+      "result_sha256": "0c3f90813fb9e48121726073a7c3ea162a2b9f195c653eb5ba61103a508eb846",
+      "exit_code": 65,
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2,
+        "passedTests": 1,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "seconds": 30.52
+    },
+    {
+      "prefix": "ios-history-pane-deinit-repro-fixture-v1",
+      "inputs": 840,
+      "manifest_sha256": "e0746779e3bd1db9437b4cbad3b45a8c0217542d63b863dc6a2cc9478fbf9bf6",
+      "log_sha256": "2a78f226bf57644bbb69895c60fa283982be30f243f497593a45d1af88f1937c",
+      "result_sha256": "c06f2a27930909df1ccfb2fe6cbfc40723e507f3ec650946fbfb6d530d32c69e",
+      "exit_code": 0,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2,
+        "passedTests": 2,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "seconds": 27.68
+    },
+    {
+      "prefix": "ios-history-pane-deinit-repro-fixture-v2",
+      "inputs": 840,
+      "manifest_sha256": "5b713e995c110875dfbdb38a724f821a9751a05fd5c2cfbb60199b604ea9978c",
+      "log_sha256": "9ad111d17ddc938fc3c0b17df67c4ec1a637d0d07c0d16876130fb15813d7a9c",
+      "result_sha256": "37035c4d32ab22859d46648f205702584db697f26dd1f38fb26df7e7e5055cde",
+      "exit_code": 65,
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2,
+        "passedTests": 1,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "seconds": 20.04
+    },
+    {
+      "prefix": "ios-history-pane-deinit-repro-fixture-v3",
+      "inputs": 840,
+      "manifest_sha256": "63da33456e40dfc98378277e8202c135e99fc3b0e1a3e5724dc9836d048b1776",
+      "log_sha256": "b332a0dc2528c5d6944abc9bbd91f52c5cf04e8b87e96c0ba113ae9d2e1a577f",
+      "result_sha256": "3b46152960bc689bce3219b3fbea4462cb16581b9b72fbe5cafd20745142d2b3",
+      "exit_code": 0,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2,
+        "passedTests": 2,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "seconds": 16.57
+    },
+    {
+      "prefix": "ios-history-host-teardown-affected-v1",
+      "inputs": 840,
+      "manifest_sha256": "63da33456e40dfc98378277e8202c135e99fc3b0e1a3e5724dc9836d048b1776",
+      "log_sha256": "834c1525f7422e296c9062166f606ac8714640c5c3e4e3f16928b3d32a34aeba",
+      "result_sha256": "2286150fb227027ed8768c53cc1f94ce8ac6a6a3fde423682e4e9b3a9231e34a",
+      "exit_code": 0,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 7,
+        "passedTests": 7,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "seconds": 19.91
+    }
+  ],
+  "checks": [
+    "Pinned SwiftLint0.63.2 strict on changed test file",
+    "git diff --check"
+  ],
+  "postgate_delta": "This evidence file only",
+  "limits": [
+    "Filtered tests do not qualify full Staging suite",
+    "No physical installation, new SDK, production state, history grant or UI acceptance implied"
+  ],
+  "v1_diagnostic_scope_note": "Profile+pane v1 had two filtered tests despite inherited full scope label; counts authoritative."
+}
