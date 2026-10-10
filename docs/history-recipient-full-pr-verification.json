@@ -1,0 +1,149 @@
+{
+  "tested_commit": "92982401889b067435be5053e5508ea1f6106497",
+  "pane_commit": "c2e8f78cbf9f99f61b38b18201f2834adba2d790",
+  "sdk": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "runs": {
+    "ios-history-recipient-9298240-full-v1": {
+      "source_base": "92982401889b067435be5053e5508ea1f6106497",
+      "source_inputs": 855,
+      "input_manifest_sha256": "ad362b9c64a472f98ea6655de10d265875e46d3039f59c39dff181b714252a98",
+      "profile": "local-history84113/experimentalflag1/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 0,
+      "seconds": 175.76,
+      "log_sha256": "574bc3a06fe5991b2ce60bf85207d9fd11edbe42ecaf5a00ecc9616e99e21a1e",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered experimental iOS PR suite with validated84113 SDK; no real native multi-device acceptance or manual deployment",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2858,
+        "passedTests": 2856,
+        "failedTests": 0,
+        "skippedTests": 2
+      },
+      "test_failures": []
+    },
+    "ios-history-recipient-9298240-full-published-v1": {
+      "source_base": "92982401889b067435be5053e5508ea1f6106497",
+      "source_inputs": 855,
+      "input_manifest_sha256": "a37fa262f714ba0fe339d12e6c47608ccbb3594846674fa7ff55fb6cd65f6b79",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 65,
+      "seconds": 5.67,
+      "log_sha256": "8dd8a9c0039af35af925ab8df156d4b16b2f870d93e42b4c32e6735d90a6f3f4",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed9298240 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-history-recipient-9298240-full-published-v2": {
+      "source_base": "92982401889b067435be5053e5508ea1f6106497",
+      "source_inputs": 855,
+      "input_manifest_sha256": "a37fa262f714ba0fe339d12e6c47608ccbb3594846674fa7ff55fb6cd65f6b79",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 65,
+      "seconds": 8.14,
+      "log_sha256": "cc2198cb9b266d54286fba3de69a93fdb2bb4ad4ee5391991e3547019b93a0d2",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed9298240 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-history-recipient-9298240-full-published-v3": {
+      "source_base": "92982401889b067435be5053e5508ea1f6106497",
+      "source_inputs": 855,
+      "input_manifest_sha256": "a37fa262f714ba0fe339d12e6c47608ccbb3594846674fa7ff55fb6cd65f6b79",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 65,
+      "seconds": 13.0,
+      "log_sha256": "f998af4ef91943097705dfa6d7ce04bbc8e6b7aaa455a75a62f8b6c6e49a5d24",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed9298240 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-history-recipient-9298240-full-published-v4": {
+      "source_base": "92982401889b067435be5053e5508ea1f6106497",
+      "source_inputs": 855,
+      "input_manifest_sha256": "a37fa262f714ba0fe339d12e6c47608ccbb3594846674fa7ff55fb6cd65f6b79",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 0,
+      "seconds": 252.75,
+      "log_sha256": "322257c767628fec9bc907ec5ec37188fe9c2127d8ee64b72b389ea0aed3f63f",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed9298240 with canonical publishedSDK; no experimental native crypto acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2716,
+        "passedTests": 2714,
+        "failedTests": 0,
+        "skippedTests": 2
+      },
+      "test_failures": []
+    }
+  },
+  "all_canonical_855_inputs_match_signed_Git_archive_following_symlinks": true,
+  "experimental_sdk_inputs": {
+    "path": "ios-history-recipient-9298240-full-v1-sdk.json",
+    "sha256": "ec6c455dc94d8df118628fd8b95a7662efb6cebc76150c9e5dfb0857a7c02504"
+  },
+  "published_compile_failures": "v1-v3 are zero-test exact stale FFI PCM/header failures. Each log/manifest is retained; same canonical input hash across all four attempts. No source changes or broad cache clean.",
+  "pcm_repairs": [
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "bytes": 555704,
+      "sha256": "23e294928b9a359c07a6858080532d2df04b4fd3998911f108b1d23f8e0d4ddb",
+      "diagnosed_log": "ios-history-recipient-9298240-full-published-v1.log",
+      "reason": "Exact previous-header FFI PCM mismatch; zero tests; own iOS target idle, file not open",
+      "retained_at": "/Users/pj/project/build/retired-ios-history-recipient-published-v1/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm"
+    },
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "bytes": 555656,
+      "sha256": "5b71458a65d18be7618ea0abbe253eedd8fd0c70dcc9873807060cda684f8e6c",
+      "diagnosed_log": "ios-history-recipient-9298240-full-published-v2.log",
+      "reason": "Exact previous-header PCM mismatch; zero tests; own iOS target idle, file not open",
+      "retained_at": "/Users/pj/project/build/retired-ios-history-recipient-published-v2/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm"
+    },
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "bytes": 555656,
+      "sha256": "ef4674e38cd4b55b641a6a2fa3058fbefff548e5da7de137a771ed3adc347859",
+      "diagnosed_log": "ios-history-recipient-9298240-full-published-v3.log",
+      "reason": "Exact previous-header PCM mismatch; zero tests; own iOS target idle, file not open",
+      "retained_at": "/Users/pj/project/build/retired-ios-history-recipient-published-v3/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm"
+    }
+  ],
+  "preflight": {
+    "path": "ios-history-recipient-9298240-published-preflight-v1.log",
+    "sha256": "9b699c7c1dc885629e7223656b175d9c88f9678dc54938132647d96367447e1a",
+    "scope": "Pre-build cleanliness refusal after a global Xcode check; no source mutation/test/build. Subsequent idle guards were narrowed to the owned iOS cache, independent Mac jobs untouched."
+  },
+  "SDK4_restoration": {
+    "source": "92982401889b067435be5053e5508ea1f6106497",
+    "stash": "202428397823bcb394658bdb86a8368fb72a68a5",
+    "SDK4_restored_sha256": {
+      "Packages/MarmotKit/MARMOT_VERSION": "bc26500dd12a74d981c8c4340e33c02c097846fa8bb9b964661e377e4bc4216d",
+      "Packages/MarmotKit/Package.swift": "4c379ba9d572adb649c9692466ebbc80204af9ca0bf5acd63256ff6e0fa29b50",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKit.swift": "ee50aae01fff2d451f3957181eb6643ceda9503e84899a89538684259348e36a",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift": "c2a560f7841709d13d560c6bb6a85bd8489df2ddb96683706dc7996826542843"
+    },
+    "LOCAL_BUILD_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+    "all_preserved_framework_hashes_unchanged": true,
+    "last_hosted_test_profile": "canonical published0.12; restoring source does not reinstall a simulator app",
+    "manual_install_or_physical_phone": false
+  },
+  "SDK4_preservation": {
+    "local": "c8360f803a53b1b1c39411c4c1f7963c9e88962a",
+    "M5": "202428397823bcb394658bdb86a8368fb72a68a5"
+  },
+  "raw_local_directory": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results",
+  "raw_M5_directory": "/Users/pj/project/build/results",
+  "limits": [
+    "Full unfiltered Staging PR suites: experimental2856/0/2existing skips and canonical published2714/0/2existing skips; no empty-filter pass or double-counting.",
+    "Earlier c2 full2855/1/2 crash and test-only14/14 correction remain in signed hosted-fixture proof. Production code unchanged by the fixture correction.",
+    "Fixture directly observes weak hosting-controller release; this does not independently prove a separate old ViewGraph token lifetime or repair a general Swift runtime defect. The corrected full cohort passed once.",
+    "Original account/runtime-owned recipient pane/model/custody are qualified with isolated protocol doubles and hosted UI checks, not actual imported-history UI acceptance.",
+    "SDK84113 archives and ignored metadata remain byte-exact; four tracked overrides restored. Hosted tests implicitly installed their dev test host, last canonicalpublished; no manual app install/launch, account copies, physical phone or TestFlight changes.",
+    "Current PersonalTeam signed-ready rollback/app remains preserved; integration/publication and any later ready-build refresh require separate authorization.",
+    "Only this qualification JSON is appended after full855-input freezes."
+  ]
+}
