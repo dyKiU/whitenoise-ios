@@ -43,6 +43,8 @@ final class AccountStore {
     }
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        let selectedChatLifetime = SelectedChatAccountLifetime()
+
         private(set) var deviceLinkingScope: DeviceLinkingAccountScope?
         private(set) var retiringDeviceLinkingScope: DeviceLinkingAccountScope?
         @ObservationIgnored private var deviceLinkingRetirement: Task<Void, Error>?
@@ -239,6 +241,7 @@ final class AccountStore {
         private func retireDeviceLinkingScope() {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
+            selectedChatLifetime.invalidate()
             deviceEnrollmentModel?.invalidate()
             deviceEnrollmentModel = nil
             deviceEnrollmentApprovalModel?.invalidate()
@@ -276,8 +279,14 @@ final class AccountStore {
             do { try await retryApprovalCleanup() } catch {
                 if firstError == nil { firstError = error }
             }
+            do { try await selectedChatLifetime.retryCleanup() } catch {
+                if firstError == nil { firstError = error }
+            }
             if let firstError { throw firstError }
         }
+
+        func prepareSelectedChatAcquisition() async throws { try await retryDeviceLinkingCleanup() }
+        func retrySelectedChatCleanup() async throws { try await selectedChatLifetime.retryCleanup() }
 
         private func cancelRetiringDeviceLinkingScope() async throws {
             guard let scope = retiringDeviceLinkingScope else { return }

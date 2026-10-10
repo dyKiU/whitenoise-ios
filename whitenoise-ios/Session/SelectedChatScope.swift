@@ -7,13 +7,18 @@
     @MainActor @Observable private final class SelectedChatLifetime {
         private(set) var isActive = true
         private(set) var cleanupError: Error?
+        @ObservationIgnored private let isCurrent: @MainActor () -> Bool
         @ObservationIgnored private let cancelOriginal: @MainActor () async throws -> Void
         @ObservationIgnored private var cleanup: Task<Void, Error>?
 
-        init(cancel: @escaping @MainActor () async throws -> Void) { cancelOriginal = cancel }
+        init(isCurrent: @escaping @MainActor () -> Bool, cancel: @escaping @MainActor () async throws -> Void) {
+            self.isCurrent = isCurrent
+            cancelOriginal = cancel
+        }
+        var isLive: Bool { isActive && isCurrent() }
         func checkActive() throws {
             try Task.checkCancellation()
-            guard isActive else { throw MarmotKitError.SelectedChatCopyClosed }
+            guard isLive else { throw MarmotKitError.SelectedChatCopyClosed }
         }
         func invalidate() { isActive = false }
         func cancel() async throws {
@@ -41,13 +46,16 @@
         let accountRef: String
         @ObservationIgnored private let original: any SelectedChatCopyProtocol
         private let lifetime: SelectedChatLifetime
-        var isActive: Bool { lifetime.isActive }
+        var isActive: Bool { lifetime.isLive }
         var cleanupError: Error? { lifetime.cleanupError }
 
-        init(accountRef: String, original: any SelectedChatCopyProtocol) {
+        init(
+            accountRef: String, original: any SelectedChatCopyProtocol,
+            isCurrent: @escaping @MainActor () -> Bool = { true }
+        ) {
             self.accountRef = accountRef
             self.original = original
-            lifetime = SelectedChatLifetime { try await original.cancel() }
+            lifetime = SelectedChatLifetime(isCurrent: isCurrent) { try await original.cancel() }
         }
         func snapshot() async throws -> SelectedChatCopySnapshotFfi {
             try lifetime.checkActive()
@@ -85,13 +93,16 @@
         let accountRef: String
         @ObservationIgnored private let original: any SelectedChatConsentProtocol
         private let lifetime: SelectedChatLifetime
-        var isActive: Bool { lifetime.isActive }
+        var isActive: Bool { lifetime.isLive }
         var cleanupError: Error? { lifetime.cleanupError }
 
-        init(accountRef: String, original: any SelectedChatConsentProtocol) {
+        init(
+            accountRef: String, original: any SelectedChatConsentProtocol,
+            isCurrent: @escaping @MainActor () -> Bool = { true }
+        ) {
             self.accountRef = accountRef
             self.original = original
-            lifetime = SelectedChatLifetime { try await original.cancel() }
+            lifetime = SelectedChatLifetime(isCurrent: isCurrent) { try await original.cancel() }
         }
         func snapshot() async throws -> SelectedChatConsentSnapshotFfi {
             try lifetime.checkActive()

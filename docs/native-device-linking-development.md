@@ -382,3 +382,19 @@ harness limitation, not terminal qualification. Exact source/logs are recorded
 in native-selected-chat-scope-evidence.json. Account/runtime factory adoption,
 canonical default/full PR qualification and real selected-chat acceptance remain
 separate. No SDK/generated artifacts or native consent UI are committed here.
+
+### Selected-chat account lifetime
+
+Original request and consent scopes now share the actual AccountStore negative
+epoch, concrete runtime identity, runtime generation, and scene/exit guards.
+Retirement invalidates synchronously; a late original is retained only for exact
+negative cleanup. Failed cleanup blocks new factory acquisition and retries that
+original instead of reconstructing permission from a selector or snapshot.
+
+Actual isolated AppState controls cover A→B→A, suspension/restart, caller
+cancellation, and sign-out/wipe/explicit Core-close refusal while an ignored
+factory can still return. Scene suspension is best-effort; destructive exits
+remain fenced. Focused 18 and affected 81 tests pass on the matched candidate SDK.
+See `native-selected-chat-lifetime-evidence.json` for exact source, raw-log hashes,
+regression counts, and the separate published-SDK check (33 passed). This is lifetime
+qualification, not real native chat consent/delivery acceptance or a UI change.
