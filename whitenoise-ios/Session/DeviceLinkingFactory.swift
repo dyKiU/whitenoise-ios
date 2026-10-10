@@ -36,7 +36,12 @@
                     guard let client, let accountRef, current() else { throw CancellationError() }
                     return try await client.deviceLinkingTargets(accountRef: accountRef)
                 },
-                verificationSupported: client?.deviceLinkingCapabilities().verificationSupported ?? false
+                verificationSupported: client?.deviceLinkingCapabilities().verificationSupported ?? false,
+                enrollmentSupported: client?.deviceLinkingCapabilities().enrollmentSupported ?? false,
+                enrollment: { [weak self] in
+                    guard let self, current() else { throw MarmotKitError.DeviceLinkingClosed }
+                    return try self.makeDeviceEnrollmentModel()
+                }
             )
         }
 
@@ -55,14 +60,17 @@
                     && self.accountStore.deviceLinkingScope === original
             }
             if let held = accountStore.deviceEnrollmentModel, held.isActive { return held }
-            let model = DeviceEnrollmentViewModel(original: original, isCurrent: current) { [weak self] in
-                guard let self else { throw MarmotKitError.DeviceLinkingClosed }
-                if current() {
-                    try await self.accountStore.cancelDeviceLinking()
-                } else {
-                    try await self.accountStore.retryDeviceLinkingCleanup(for: original)
-                }
-            }
+            let model = DeviceEnrollmentViewModel(
+                original: original, isCurrent: current,
+                cancel: { [weak self] in
+                    guard let self else { throw MarmotKitError.DeviceLinkingClosed }
+                    if current() {
+                        try await self.accountStore.cancelDeviceLinking()
+                    } else {
+                        try await self.accountStore.retryDeviceLinkingCleanup(for: original)
+                    }
+                }, enrollmentSupported: client.deviceLinkingCapabilities().enrollmentSupported
+            )
             accountStore.installDeviceEnrollment(model)
             return model
         }

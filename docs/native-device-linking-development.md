@@ -314,3 +314,23 @@ existing entries/order. Exact evidence is native-first-device-setup-evidence.jso
 These are native model/factory controls, not full native enrollment acceptance or
 a full PR run. Original e6 bindings, advertised capability and consent boundaries
 are unchanged. No physical or production app action occurred.
+
+## A/C opaque enrollment transport (capability gated)
+
+The separate Settings pane uses only the already-held original enrollment model.
+Continue, bounded opaque export/receive and finalize retain the displayed revision
+and original SDK checks. No packet protocol is parsed. Account replacement or
+suspension cannot adopt a delayed result; explicit cancellation clears displayed
+bytes and retains exact failed cleanup for retry.
+
+The factory captures current client enrollmentSupported. It remainsfalse on e6,
+so the pane is unavailable and no advertised capability is enabled. B approval
+review needs matched authenticated metadata; native A/B/C acceptance is separate.
+
+Actual defaultdenyRED10 ran9pass/1fail, unchangedGREEN10/10, expanded13/13 and
+final affected63/63 pass. Strict scoped formatting, SwiftLint0.63.2 and diff checks
+pass. Apple stringsdata/XLIFF import added three keys×9translations preserving
+all1945 previous entries/order. Exact runs/source and runner-only preflight
+failure are recorded in native-enrollment-transport-evidence.json.
+These are native action/lifetime controls, not full PR or visual/native enrollment
+acceptance. No newSDK/manual app adoption/physical or production action occurred.

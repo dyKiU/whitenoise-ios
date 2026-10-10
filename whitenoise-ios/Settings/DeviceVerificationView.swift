@@ -14,6 +14,7 @@
     /// Only opaque transport and explicit comparison; original SDK ownership remains in Session.
     struct DeviceVerificationView: View {
         @State private var model: DeviceVerificationViewModel
+        @State private var enrollment: DeviceEnrollmentViewModel?
         @State private var incoming = ""
         @State private var setup = ""
         @State private var outgoing: [DeviceLinkingOutgoingPacketFfi] = []
@@ -48,7 +49,9 @@
                             }
                         }
                     } footer: {
-                        Text("Verification only. Device enrollment is not available in this build.")
+                        if !model.enrollmentSupported {
+                            Text("Verification only. Device enrollment is not available in this build.")
+                        }
                     }
                     if !setup.isEmpty {
                         Section {
@@ -139,7 +142,14 @@
                         }
                     }
                     if model.snapshot?.phase == .verificationCompleteEnrollmentPending {
-                        Text("Verification complete. Enrollment remains unavailable.")
+                        if model.enrollmentSupported {
+                            WNButton(title: "Device enrollment", size: .standard) {
+                                perform { enrollment = try model.enrollmentTransport() }
+                            }
+                            .disabled(isWorking || !model.isActive)
+                        } else {
+                            Text("Verification complete. Enrollment remains unavailable.")
+                        }
                     }
                     ForEach(Array(outgoing.enumerated()), id: \.offset) { _, packet in
                         Section {
@@ -170,6 +180,9 @@
             }
             .localizedNavigationTitle("Device verification")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: Binding(get: { enrollment != nil }, set: { if !$0 { enrollment = nil } })) {
+                NavigationStack { DeviceEnrollmentTransportView(model: enrollment) }
+            }
             .task {
                 guard model.verificationSupported, model.isActive else { return }
                 do { try await model.loadTargets() } catch {
@@ -183,6 +196,7 @@
         private func decodedPacket() throws -> Data { try DeviceVerificationPacketInput.decode(incoming) }
 
         private func clearPackets() {
+            enrollment = nil
             incoming = ""
             setup = ""
             outgoing = []

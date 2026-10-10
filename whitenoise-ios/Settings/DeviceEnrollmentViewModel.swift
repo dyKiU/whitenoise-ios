@@ -10,16 +10,22 @@
         @ObservationIgnored private let isCurrent: @MainActor () -> Bool
         @ObservationIgnored private let cancelOriginal: @MainActor () async throws -> Void
         private var retired = false
+        let enrollmentSupported: Bool
+        private(set) var outgoingPacket: String?
+        private(set) var isWorking = false
+        private(set) var transportError: Error?
+        enum TransportAction { case continueLinking, exportPacket, receivePacket, finalizeLinking }
         var isActive: Bool { !retired && isCurrent() }
         var snapshot: DeviceLinkingSnapshotFfi? { isActive ? original.latestSnapshot : nil }
 
         init(
             original: DeviceLinkingAccountScope, isCurrent: @escaping @MainActor () -> Bool,
-            cancel: @escaping @MainActor () async throws -> Void
+            cancel: @escaping @MainActor () async throws -> Void, enrollmentSupported: Bool = false
         ) {
             self.original = original
             self.isCurrent = isCurrent
             cancelOriginal = cancel
+            self.enrollmentSupported = enrollmentSupported
         }
         @ObservationIgnored private var cleanup: Task<Void, Error>?
         private(set) var cleanupError: Error?
@@ -68,7 +74,34 @@
                 throw error
             }
         }
-        func invalidate() { retired = true }
+        func performTransportAction(_ action: TransportAction, displayedRevision: UInt64, input: String = "")
+            async throws
+        {
+            try checkActive()
+            guard enrollmentSupported, !isWorking else { throw MarmotKitError.DeviceLinkingNotReady }
+            isWorking = true
+            transportError = nil
+            defer { isWorking = false }
+            do {
+                switch action {
+                case .continueLinking: try await continueLinking(displayedRevision: displayedRevision)
+                case .exportPacket:
+                    let packet = try await enrollmentPacket(displayedRevision: displayedRevision)
+                    outgoingPacket = packet.base64EncodedString()
+                case .receivePacket:
+                    let packet = try DeviceEnrollmentPacketInput.decode(input)
+                    try await receiveEnrollmentPacket(displayedRevision: displayedRevision, packet: packet)
+                case .finalizeLinking: try await finalizeLinking(displayedRevision: displayedRevision)
+                }
+            } catch {
+                if isActive { transportError = error }
+                throw error
+            }
+        }
+        func invalidate() {
+            retired = true
+            outgoingPacket = nil
+        }
     }
 
     nonisolated enum DeviceEnrollmentPacketInput {
