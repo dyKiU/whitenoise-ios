@@ -1,0 +1,71 @@
+{
+  "source_commit": "1daf8059168a4efae1a77e4565d548e62635700a",
+  "source_inputs": 884,
+  "input_manifest_sha256": "3a2b7ec2bbab25edb05a3665f5fd62e321d1401600d36dd80a7cb6d331b310fc",
+  "mdk_source": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+  "exit_code": 0,
+  "seconds": 141.83,
+  "log_sha256": "9e6f994c5f5b49f48871a7d25232c3c33971bd6262c779e452e8b7ee3d7b293b",
+  "disk_free_before": 13085511680,
+  "disk_free_after": 12372926464,
+  "rollback_app": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/rollback/ios-personal-signed-ready-b52184113-before-source987/whitenoise-ios.app",
+  "rollback_executable_sha256": "f2f10146d3eb9350c1587429be6f190c88abb277c4c60c4d4dcd532afd7499b1",
+  "profile": "matched987/experimental1/PersonalTeamStaging",
+  "physical_installation_deferred": true,
+  "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+  "executable_sha256": "a5e23a8c3c8ed1cae1f2d1b8b015743e748204c56f91f45411532bba75e91322",
+  "signed_bundles": [
+    {
+      "name": "whitenoise-ios.app",
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "executable_sha256": "a5e23a8c3c8ed1cae1f2d1b8b015743e748204c56f91f45411532bba75e91322",
+      "entitlements_sha256": "d7c961768c724fad457d83a4ddf29675804a4414b55f5c3550dba2f822b85fdc",
+      "entitlements_unchanged_from_prior_ready": true,
+      "strict_signature_verified": true,
+      "development_profile_with_provisioned_devices": true,
+      "profile_expiration": "2026-10-16T11:24:29",
+      "profile_sha256": "423162dbc20b2fbb4d44bbef2af684fb934440730a9cd5bf93e4ba040282a3ff"
+    },
+    {
+      "name": "NotificationServiceExtension.appex",
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal.NotificationService",
+      "executable_sha256": "988a70e4a7cceeba501c9b61af9bd90ad5ffa9233762f90bd7990012d0c7cb98",
+      "entitlements_sha256": "7c6ccce56de4253ca606c85e920b8d45e5b5046c9b33e55efc394d7c7ed2470a",
+      "entitlements_unchanged_from_prior_ready": true,
+      "strict_signature_verified": true,
+      "development_profile_with_provisioned_devices": true,
+      "profile_expiration": "2026-10-16T11:24:27",
+      "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
+    }
+  ],
+  "native_products": [
+    {
+      "name": "whitenoise-ios",
+      "sha256": "a5e23a8c3c8ed1cae1f2d1b8b015743e748204c56f91f45411532bba75e91322",
+      "architecture": "arm64"
+    },
+    {
+      "name": "whitenoise-ios.debug.dylib",
+      "sha256": "95d7abc2e0bf659e9c0ad4fa55d29273479a9698eabc00ea3d64277707253194",
+      "architecture": "arm64"
+    }
+  ],
+  "phone_installation": false,
+  "scope": "M1 PersonalTeam signed-ready build after full SDK987/published qualification. No device installation/launch, production or task-account data access.",
+  "ready_app": "build/iOSPersonalTeamDerivedData/Build/Products/Debug-Staging-iphoneos/whitenoise-ios.app",
+  "source_adoption": "Normal signed fast-forward b521481\u21921daf805; old SDK84113 four source overlays stash1ead9f2668b8c8395bd0064532aaad9b5a1ba8a8, original native outputsymlink+metadata/privacy preserved.",
+  "rollback_verified": "Exact current b521481/SDK84113 whole bundle matches captured prior_bundle_hashes and strictdeep signature; prior older rollback not substituted.",
+  "stage_proof_sha256": "04995b590368a8e706306d816bd0fd35c21045e8ac5b4ccc8270ca9cb94aa83f",
+  "native_sdk_hashes": {
+    "Info.plist": "13b3e9d0136bfc10184edbbe0f4d21c53917ebabfc12885d2d247a4e7b34b0a5",
+    "ios-arm64-simulator/libmarmot_uniffi.a": "9e8ae53635e4c13eb3e81dbf98304305d0180d3e7b23bf30023bd7bd8398074e",
+    "ios-arm64-simulator/Headers/marmot_uniffiFFI.h": "db774949553560b2b8070ca60f6b92a31e07ef800b11eb0242edfde30c114264",
+    "ios-arm64-simulator/Headers/module.modulemap": "f08ed742371741da4ba33db63af56b72cb8c6a64bec8cc8fb389626de04ed685",
+    "ios-arm64/libmarmot_uniffi.a": "3b9473d0d4954bc6c7473ca1382d552f13e631000d310c023af8264601dc37c4",
+    "ios-arm64/Headers/marmot_uniffiFFI.h": "db774949553560b2b8070ca60f6b92a31e07ef800b11eb0242edfde30c114264",
+    "ios-arm64/Headers/module.modulemap": "f08ed742371741da4ba33db63af56b72cb8c6a64bec8cc8fb389626de04ed685"
+  },
+  "evidence": "build/results/ios-native-personal-history-source987-v1-{input,results}.json and .log retain full source/bundle/SDK proof; stage.json captures packaging-only adoption. No Rust build or new cache.",
+  "profiles": "Development profiles with provisioned devices, TeamIdentifier/applicationidentifier match and unexpired; all effective entitlements exactly match prior ready app/NSE."
+}
