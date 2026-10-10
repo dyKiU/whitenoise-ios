@@ -63,6 +63,17 @@ final class AccountStore {
             (id: UUID, task: Task<[any DeviceLinkingApprovalProtocol], Error>)?
         @ObservationIgnored private var approvalRetirement: Task<Void, Error>?
 
+        private(set) var deviceEnrollmentModel: DeviceEnrollmentViewModel?
+        private(set) var deviceEnrollmentApprovalModel: DeviceEnrollmentApprovalViewModel?
+        func installDeviceEnrollment(_ model: DeviceEnrollmentViewModel) {
+            deviceEnrollmentModel?.invalidate()
+            deviceEnrollmentModel = model
+        }
+        func installDeviceEnrollmentApproval(_ model: DeviceEnrollmentApprovalViewModel) {
+            deviceEnrollmentApprovalModel?.invalidate()
+            deviceEnrollmentApprovalModel = model
+        }
+
         func adoptDeviceLinkingApprovalFactory(
             accountRef: String,
             isRuntimeCurrent: @MainActor () -> Bool,
@@ -228,6 +239,10 @@ final class AccountStore {
         private func retireDeviceLinkingScope() {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
+            deviceEnrollmentModel?.invalidate()
+            deviceEnrollmentModel = nil
+            deviceEnrollmentApprovalModel?.invalidate()
+            deviceEnrollmentApprovalModel = nil
             pendingDeviceLinkingFactory?.task.cancel()
             retireDeviceLinkingApprovalScopes()
             guard let scope = deviceLinkingScope else { return }
@@ -239,6 +254,18 @@ final class AccountStore {
 
         func cancelDeviceLinking() async throws {
             retireDeviceLinkingScope()
+            try await retryDeviceLinkingCleanup()
+        }
+
+        func retryDeviceLinkingCleanup(for original: DeviceLinkingAccountScope) async throws {
+            guard retiringDeviceLinkingScope === original else { throw MarmotKitError.DeviceLinkingClosed }
+            try await retryDeviceLinkingCleanup()
+        }
+
+        func retryDeviceLinkingCleanup(for original: DeviceLinkingApprovalScope) async throws {
+            guard retiringApprovalScopes.contains(where: { $0 === original }) else {
+                throw MarmotKitError.DeviceLinkingClosed
+            }
             try await retryDeviceLinkingCleanup()
         }
 

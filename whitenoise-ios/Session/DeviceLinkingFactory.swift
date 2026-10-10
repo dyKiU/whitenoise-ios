@@ -40,6 +40,61 @@
             )
         }
 
+        func makeDeviceEnrollmentModel() throws -> DeviceEnrollmentViewModel {
+            guard let client, let accountRef = activeAccountRef, let generation = runtimeEventsGeneration,
+                isAppSceneActive, !isAccountExitInProgress, !isErasingAppData,
+                let original = accountStore.deviceLinkingScope
+            else { throw MarmotKitError.DeviceLinkingNotReady }
+            let ticket = accountStore.deviceLinkingOwnershipIdentity
+            let current: @MainActor () -> Bool = { [weak self, weak client, weak original] in
+                guard let self, let client, let original else { return false }
+                return self.client === client && self.runtimeEventsGeneration == generation
+                    && self.activeAccountRef == accountRef && self.isAppSceneActive
+                    && !self.isAccountExitInProgress && !self.isErasingAppData
+                    && self.accountStore.deviceLinkingOwnershipIdentity == ticket
+                    && self.accountStore.deviceLinkingScope === original
+            }
+            if let held = accountStore.deviceEnrollmentModel, held.isActive { return held }
+            let model = DeviceEnrollmentViewModel(original: original, isCurrent: current) { [weak self] in
+                guard let self else { throw MarmotKitError.DeviceLinkingClosed }
+                if current() {
+                    try await self.accountStore.cancelDeviceLinking()
+                } else {
+                    try await self.accountStore.retryDeviceLinkingCleanup(for: original)
+                }
+            }
+            accountStore.installDeviceEnrollment(model)
+            return model
+        }
+
+        func makeDeviceEnrollmentApprovalModel() async throws -> DeviceEnrollmentApprovalViewModel {
+            guard let client, let accountRef = activeAccountRef, let generation = runtimeEventsGeneration,
+                isAppSceneActive, !isAccountExitInProgress, !isErasingAppData
+            else { throw MarmotKitError.DeviceLinkingClosed }
+            let ticket = accountStore.deviceLinkingOwnershipIdentity
+            let original = try await pendingOwnedDeviceLinkingApproval()
+            let current: @MainActor () -> Bool = { [weak self, weak client, weak original] in
+                guard let self, let client, let original else { return false }
+                return self.client === client && self.runtimeEventsGeneration == generation
+                    && self.activeAccountRef == accountRef && self.isAppSceneActive
+                    && !self.isAccountExitInProgress && !self.isErasingAppData
+                    && self.accountStore.deviceLinkingOwnershipIdentity == ticket
+                    && self.accountStore.deviceLinkingApprovalScope === original
+            }
+            guard current(), !Task.isCancelled else { throw MarmotKitError.DeviceLinkingClosed }
+            if let held = accountStore.deviceEnrollmentApprovalModel, held.isActive { return held }
+            let model = DeviceEnrollmentApprovalViewModel(original: original, isCurrent: current) { [weak self] in
+                guard let self else { throw MarmotKitError.DeviceLinkingClosed }
+                if current() {
+                    try await self.accountStore.cancelDeviceLinking()
+                } else {
+                    try await self.accountStore.retryDeviceLinkingCleanup(for: original)
+                }
+            }
+            accountStore.installDeviceEnrollmentApproval(model)
+            return model
+        }
+
         func beginOwnedDeviceLinkingSession() async throws -> DeviceLinkingAccountScope {
             try await adoptDeviceLinkingFactory { client, accountRef in
                 try await client.beginDeviceLinkingSession(accountRef: accountRef)

@@ -205,7 +205,7 @@ was added. The persistent input label, cancellation/error state and explicit ACK
 remain separate from copying bytes.
 
 Initial and final affected30/30 passed; the final source uses strict scoped
-SwiftLint0.63.2 and Swiftformat6.2.3. Apple compiler stringsdata extraction and
+SwiftLint 0.63.2 and Swiftformat6.2.3. Apple compiler stringsdata extraction and
 XLIFF export/import added18 strings in nine existing target languages while
 preserving all1,926 old entries. The first import was an accurately preserved
 feature-off/e6 configuration failure; only its own newly-created idle output was
@@ -262,7 +262,7 @@ both original owner types independently and blocks either factory on failure.
 Final approval controls passed10/10 and affected enrollment/action/transport,
 account lifetime and runtime controls passed40/40. One incorrect function selector
 ran zero tests and is preserved without behavioral qualification. Strict scoped
-SwiftLint0.63.2, Swiftformat6.2.3 and diff checks pass. See
+SwiftLint 0.63.2, Swiftformat6.2.3 and diff checks pass. See
 native-device-linking-approval-scope-verification.json for exact798-input manifests,
 source stashes and terminal hashes.
 
@@ -271,3 +271,28 @@ actual account/runtime lifecycle. It does not prove actual SDK approval,
 enrollment, chat delivery or a full PR suite. Verification UI/protocol and advertised
 capability are unchanged. No manual simulator adoption or physical/production app
 operation occurred; hosted Staging tests use their own application test host.
+
+## Enrollment models on original e6 handles
+
+The separate session and approval models are created by AppState from the
+already-owned concrete scopes. AccountStore retains them and invalidates them
+synchronously with its owner epoch before cancellation awaits. Factories bind the
+exact client, runtime generation, active account and original scope. Account
+A→B→A, suspension, same-account runtime restart and account exit cannot adopt a
+late packet or snapshot.
+
+Actions forward the displayed revision and bounded opaque bytes to that original
+handle with before/after lifetime checks. Refresh and decode never approve.
+Explicit cancellation hides the model immediately and retains exact failed
+cleanup for retry; that retry cannot cancel a replacement scope.
+
+The unchanged default-denying regression ran 8 tests (2 passed/6 failed), then 8/8
+passed; the affected lifecycle/verification selection passed 53/53. Scoped strict
+formatting, SwiftLint 0.63.2 and diff checks passed. Exact sources, original RED
+Git stash and terminal log hashes are in `native-enrollment-models-evidence.json`.
+Earlier zero-test transfer and fixture-compile failures are preserved separately.
+
+This adds no UI or capability advertising. e6 approval snapshots expose only
+revision/phase; authenticated B review metadata and actual native A/B/C enrollment
+acceptance remain required before general approval UI. No snapshot, decoded packet
+or model factory reconstructs consent. These checks are not a full PR run.
