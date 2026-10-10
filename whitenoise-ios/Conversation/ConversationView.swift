@@ -865,6 +865,15 @@ struct ConversationView: View {
                 VStack(spacing: 0) {
                     if viewModel?.search.isActive != true {
                         conversationHeaderBar
+                        #if WN_EXPERIMENTAL_DEVICE_SYNC
+                            SynchronizedHistoryConversationEntry(
+                                makeModel: { try appState.makeSynchronizedHistoryModel(groupIdHex: chat.groupIdHex) },
+                                releaseModel: { appState.releaseSynchronizedHistoryModel($0, groupIdHex: chat.groupIdHex) }
+                            )
+                            .id(SynchronizedHistoryConversationOwner(
+                                accountEpoch: appState.accountStore.deviceLinkingOwnershipIdentity,
+                                runtimeGeneration: appState.runtimeGeneration, groupIdHex: chat.groupIdHex))
+                        #endif
                     }
                     searchBarInset
                     if let viewModel {
@@ -4081,3 +4090,11 @@ final class TimelineKeyboardDismissAttachmentView: UIView {
         return nil
     }
 }
+
+#if WN_EXPERIMENTAL_DEVICE_SYNC
+    private struct SynchronizedHistoryConversationOwner: Hashable {
+        let accountEpoch: UUID
+        let runtimeGeneration: Int
+        let groupIdHex: String
+    }
+#endif
