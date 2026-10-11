@@ -82,3 +82,40 @@ wrong summary assumption remain diagnosed in the compact qualification record.
 
 The proxy uses the official [websockets asyncio server/client APIs](https://websockets.readthedocs.io/en/15.0/reference/asyncio/server.html).
 No production SDK wire format or published binding pin changes in these tests.
+
+## Explicit companion onboarding
+
+The additive worker commands let controllers exercise supported sign-in without
+silently acknowledging a notice in `import`:
+
+- `onboarding-begin` takes the synthetic identity's secret over private IPC.
+- `onboarding-run` and `onboarding-status` return the actual native revision,
+  offered steps/actions, readiness and aggregate single-device notice.
+- `onboarding-ack` forwards the displayed `revision` to the native original.
+- `onboarding-continue-without` requires the displayed revision and an offered
+  `step`; it calls the public native continuation rather than modifying storage.
+- `package-observation` returns counts and a digest of sorted public slot IDs.
+- `invitation-observation` returns group/pending counts and booleans for the
+  supplied group. Existing `invitations` and `accept` remain unchanged.
+
+Never print worker IPC secrets, account IDs, group IDs or message bodies in
+public evidence. Package observations are discovery facts, not device authority.
+Published0.12 may publish a new companion slot; preservation of an experimental
+receiver must be checked against that separate candidate, not assumed here.
+
+For native Mac worker operation controls, use the workspace
+`tools/build-mac-public-chat-worker.sh` with matching published Swift/header/static
+archive, then run:
+
+```sh
+python3 scripts/public-chat-acceptance/onboarding_controls.py \
+  --worker /absolute/published-native-worker \
+  --relay-binary /absolute/white-noise-sync-test-relay \
+  --port 18249 --output /absolute/fresh-private-output
+```
+
+This performs actual notice/revision/readiness/reopen controls with independent
+synthetic stores on a real loopback relay. It does not establish cross-version
+ordinary delivery or an installed TestFlight journey. Use the existing
+`controller.py` invitation/accept/send/offline checks with separately linked
+published and final experimental workers for that qualification.

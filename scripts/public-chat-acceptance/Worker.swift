@@ -80,6 +80,8 @@ struct Request: Decodable {
   let message: String?
   let sender: String?
   let secret: String?
+  let revision: UInt64?
+  let step: String?
 }
 
 @main
@@ -101,6 +103,28 @@ struct PublicChatWorker {
   }
   static func required(_ value: String?) throws -> String {
     guard let value, !value.isEmpty, value.utf8.count < 4096 else { throw WorkerFailure.refused }
+    return value
+  }
+  static func onboardingValue(_ state: OnboardingSnapshotFfi) -> [String: Any] {
+    var value: [String: Any] = [
+      "account": state.accountIdHex, "revision": state.revision, "ready": state.ready,
+      "cancellation_pending": state.cancellationPending,
+      "steps": state.steps.map {
+        [
+          "step": String(describing: $0.step),
+          "status": String(describing: $0.status),
+          "actions": $0.actions.map { String(describing: $0) },
+        ]
+      },
+    ]
+    if let notice = state.singleDeviceNotice {
+      value["notice"] = [
+        "discovery": String(describing: notice.discovery),
+        "discovery_complete": notice.discoveryComplete,
+        "other_package_count": notice.otherPackages.count,
+        "acknowledged": notice.acknowledgedAt != nil,
+      ]
+    }
     return value
   }
   static func main() async {
@@ -145,6 +169,56 @@ struct PublicChatWorker {
             value = ["account": identity.accountIdHex]
           case "secret":
             value = ["secret": try client.revealNsec(accountRef: required(account))]
+          case "onboarding-begin":
+            guard account == nil else { throw WorkerFailure.refused }
+            let state = try await client.beginOnboarding(
+              nsec: required(request.secret),
+              options: OnboardingOptionsFfi(
+                defaultRelays: [relay], discoveryRelays: [relay], inboxRelays: [relay]))
+            account = state.accountIdHex
+            value = onboardingValue(state)
+          case "onboarding-status":
+            guard let state = try client.onboardingSnapshot(accountRef: required(account)) else {
+              throw WorkerFailure.refused
+            }
+            value = onboardingValue(state)
+          case "onboarding-run":
+            value = onboardingValue(try await client.runOnboarding(accountRef: required(account)))
+          case "onboarding-ack":
+            guard let revision = request.revision else { throw WorkerFailure.refused }
+            value = onboardingValue(
+              try await client.acknowledgeOnboardingSingleDevice(
+                accountRef: required(account), revision: revision))
+          case "onboarding-continue-without":
+            guard let state = try client.onboardingSnapshot(accountRef: required(account)),
+              let revision = request.revision, revision == state.revision,
+              let step = state.steps.first(where: { String(describing: $0.step) == request.step }),
+              step.actions.contains(.continueWithout)
+            else { throw WorkerFailure.refused }
+            value = onboardingValue(
+              try await client.continueOnboardingWithout(
+                accountRef: required(account), step: step.step))
+          case "package-observation":
+            let rows = try await client.accountKeyPackages(
+              accountRef: required(account), bootstrapRelays: [relay])
+            value = [
+              "count": rows.count, "locally_owned": rows.filter(\.local).count,
+              "relay_observed": rows.filter(\.relay).count,
+              "slot_set_digest": SHA256.hash(
+                data: Data(rows.map(\.keyPackageId).sorted().joined(separator: "\n").utf8)
+              )
+              .map { String(format: "%02x", $0) }.joined(),
+            ]
+          case "invitation-observation":
+            let rows = try client.chatList(accountRef: required(account), includeArchived: true)
+            value = [
+              "group_count": rows.count,
+              "pending_count": rows.filter(\.pendingConfirmation).count,
+              "requested_group_present": rows.contains { $0.groupIdHex == request.group },
+              "requested_group_pending": rows.contains {
+                $0.groupIdHex == request.group && $0.pendingConfirmation
+              },
+            ]
           case "import":
             guard account == nil else { throw WorkerFailure.refused }
             var state = try await client.beginOnboarding(

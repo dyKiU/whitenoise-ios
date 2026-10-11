@@ -1,0 +1,49 @@
+{
+  "scope": "Additive isolated native public worker explicit supported onboarding and safe ordinary invitation/package observations. No app runtime or generatedSDK changes.",
+  "base": "3efa1e3bd30c217ec58c444d23fb9f23af980d50",
+  "prior_worker_commit": "a92a0a534822779b9c7920db6e872ca44526fb1c",
+  "published_sdk": {
+    "source": "122bd90ffac60bb6311346e228d0f609a18521ee",
+    "version": "MarmotKit0.12.0",
+    "swift_sha256": "14546a0a018b423457ab23df43819bdf8d876069a6866ffe9052a3cce628036b",
+    "static_archive_sha256": "aa975dc6c745e66728dffc68a92e9ef502e89cdf5d770543d785c7e2130b0367",
+    "header_sha256": "90dabd5cea94303fb8ee0de9f8b00094d651886c8042c57701faf662cb4c45cb",
+    "archive_path": "/Users/pj/project/build/MacTestIsolationM5/SourcePackages/artifacts/marmotkit/MarmotKitFFI/MarmotKit.xcframework/macos-arm64",
+    "published_package_checksum": "5dba446f174fffb6c035d4fa65f2a88f7e63ea5b64a51f3b1a7ddfb89b39bbfc"
+  },
+  "source_sha256": {
+    "Worker.swift": "41579f2b39f0e1fd5d4c11a3bc12419a4445d71d5968de53ca4f842efabec532",
+    "onboarding_controls.py": "577af1026eb625819bae7bd7250baeef0113783898c6d6a4ee395d01b0b0ef8d"
+  },
+  "build": {
+    "exit": 0,
+    "log": "/Users/pj/project/build/results/public-chat-onboarding-published-build-v1.log",
+    "log_sha256": "ad1e1006e2763b0c1d6db911ba897571c17e25f11138876f34df06d859efe5e2",
+    "binary": "/Users/pj/project/build/public-chat-acceptance/published-onboarding-worker-v1",
+    "binary_sha256": "c759a686f0426bcebeaf51967cc294488b8d85de65d8d0853b2fbb8b17761dc4",
+    "module_cache": "/Users/pj/project/build/MacTestIsolationM5/ModuleCache.noindex",
+    "target": "arm64-apple-macos15.0",
+    "swift_language": 5
+  },
+  "controls": {
+    "passed": 3,
+    "failed": 0,
+    "result": "/Users/pj/project/build/public-chat-acceptance/explicit-onboarding-published-v1/result.json",
+    "checks": [
+      "actual companion notice and stale revision refusal with unchanged snapshot",
+      "actual offered displayed action reaches ready",
+      "same encrypted store reopened with exact durable snapshot and pending observation"
+    ],
+    "published_slot_set_unchanged": false,
+    "result_sha256": "24c6d3b3859f40c44a46f1a57a27475136a423ad23cd24872d74b1bbfb82fc34",
+    "log": "/Users/pj/project/build/results/public-chat-onboarding-published-controls-v1.log",
+    "log_sha256": "fbf2bb9106a4380ba428f0d9cc02904c860f738fe24fafb86e9cd81d3bdef3cd"
+  },
+  "limits": [
+    "Published companion slot changes are observed, not treated as preserved-receiver qualification.",
+    "Experimental worker must be compiled/tested with final matchedSDK; existing shippingSDK unchanged.",
+    "Cross-version invitation explicit acceptance, bidirectional ordinary delivery, offline invitation/message replay and installed clients remain separate.",
+    "No Cargo or Collection usage; no account databases/keys copied; only fresh synthetic stores."
+  ],
+  "evidence_copy": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/public-chat-worker-onboarding"
+}
