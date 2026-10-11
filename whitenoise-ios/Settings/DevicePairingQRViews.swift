@@ -61,13 +61,13 @@
 
         var body: some View {
             VStack {
-                Button("Scan pairing QR") {
+                WNButton(title: "Scan pairing QR", emphasis: .secondary, size: .standard) {
                     guard scenePhase == .active, isCurrent() else { return }
                     if transport == nil { transport = DevicePairingQRImport(isCurrent: isCurrent) }
                     scanning = true
                 }.disabled(transport?.terminal == true)
                 if transport != nil {
-                    Button("Start over") {
+                    WNButton(title: "Start over", emphasis: .secondary, size: .standard) {
                         transport?.retire()
                         transport = nil
                     }
@@ -147,6 +147,7 @@
                 }
                 .alert("Can’t Use This QR Code", isPresented: $invalid) {
                     Button("Try Again") { attempt += 1 }.disabled(transport.terminal)
+                    Button("Cancel", role: .cancel) { dismiss() }
                 } message: {
                     Text("Scan a device pairing QR from White Noise. Private keys and profile codes are not accepted.")
                 }
