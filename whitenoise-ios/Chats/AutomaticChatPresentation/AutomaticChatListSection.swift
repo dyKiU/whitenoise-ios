@@ -28,7 +28,7 @@ import SwiftUI
                         VStack(alignment: .leading) {
                             Text(ContentSanitizer.groupName(row.name) ?? L10n.string("Unnamed group"))
                                 .lineLimit(1)
-                            Text(L10n.string("Shared from a linked device"))
+                            Text("Shared from a linked device")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

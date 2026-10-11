@@ -133,14 +133,14 @@ import Testing
                 sourceDigestHex: String(repeating: "d", count: 64))
             let header = PairedChatSummaryFfi(groupIdHex: group, name: "Synthetic", description: "", source: source)
             let rows: [AccountConversationRowFfi] = eventId.map { id in
-                [.pairedSource(PairedChatMessageFfi(
+                [.pairedSource(row: PairedChatMessageFfi(
                     kind: 9, canonicalChat: true, messageIdHex: id, authorHex: String(repeating: "e", count: 64),
                     createdAt: 1, expiresAt: nil, deleted: false, content: "Synthetic message",
                     contentTokens: MarkdownDocumentFfi(blocks: [], truncated: false, blankLinesBefore: Data()),
                     tags: [], mediaAttachments: [], source: source))]
             } ?? []
             return AccountConversationWindowSnapshotFfi(
-                generation: "synthetic-generation", sequence: sequence, header: .pairedSource(header),
+                generation: "synthetic-generation", sequence: sequence, header: .pairedSource(header: header),
                 rows: rows, nextBefore: nil)
         }
         private func waitFor(_ predicate: () -> Bool) async -> Bool {

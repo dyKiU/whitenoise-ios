@@ -1,0 +1,70 @@
+{
+  "scope": "Original-owned automatic observation/sharing adapters with scoped lifecycle/union/paging/send controls; no installed automatic UI acceptance",
+  "sdk_source": "de38be1295618728ef541e43bfc00ffb6cdb6a86",
+  "sdk_manifest_sha256": "0b5b3d3bb93b47ebc74065e735504ffc928fd06d0424a3ccb5d07fe58ca18bd4",
+  "cohorts": [
+    {
+      "prefix": "build/results/automatic-host-ios-de38-focused-v1",
+      "exit": 65,
+      "frozen_inputs": 936,
+      "log_sha256": "57745a08d3a18ad09fb6f3148d9cbef14dc3cbcea8f3a05f18534c7d60861076",
+      "inputs_sha256": "994d182b29550e6b14d48412bb6a68f40c9895dc5740c4392c0c976582495e75",
+      "passed": 15,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "prefix": "build/results/automatic-host-ios-de38-focused-v2",
+      "exit": 0,
+      "frozen_inputs": 936,
+      "log_sha256": "1f19436e58f4976fc7052f577f885f2ed6c2405195677113c9a857bd145127b2",
+      "inputs_sha256": "9080d1f6f4ddbd590492ba997543a5066dce8ec481b331b52dba90a061c922ad",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "prefix": "build/results/automatic-host-ios-de38-affected-v1",
+      "exit": 0,
+      "frozen_inputs": 936,
+      "log_sha256": "aea642997af0ae738ee2d6ab040fe7bb6a4550166265367a7fab5bafde3ab2ab",
+      "inputs_sha256": "9080d1f6f4ddbd590492ba997543a5066dce8ec481b331b52dba90a061c922ad",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "frozen_refs": {
+    "RED": "9e4a33957105d2bc3c0df500fde090a094e9de36",
+    "GREEN_and_affected": "eb404faa27025bbb800200d3c5ad552a87dd1df2"
+  },
+  "behavioral_RED": "17 total15passed2failed0skipped; pending admission-observation ordering and rejected status freshness",
+  "secondary_RED_diagnostic": "After genuine runtime failures, IDE diagnostic collection could not find simctl; preserved separately, not substituted for behavioral result",
+  "GREEN": "17/0/0; unchanged fixtures",
+  "affected": "148/0/0 in19 suites; sharing+enrollment+actual account/runtime lifetime and ordinary list/conversation behavior",
+  "source_fix": "Reconcile latest observed canonical IDs after admission/install and refresh pending status on original window updates",
+  "source_api_corrections": "Generated enum constructor row/header labels and self.error in catch blocks",
+  "static": {
+    "pinned_SwiftLint": "0.63.2",
+    "scoped_swift_files": 43,
+    "exit": 0,
+    "diff_check_exit": 0
+  },
+  "files": {
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AccountChatListViewModel.swift": "e3622cf12f7a3d27db543a353cdb99d1d8392801c05eeef585f799d026d36c18",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AccountConversationViewModel.swift": "889935e550005e65533add5d0e9234ae33b60c134e38a4d0969d41feeb33f4d9",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AutomaticChatListSection.swift": "e60a1b832097d63e9a37c924ca3974b366b435f8f164186c8b32975a7e0d15d1",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AutomaticConversationView.swift": "9ce94f0b571960d946b1ab8e4ebc80b414517e2a6a49dc30aa034956303420cc",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/PairedChatMessageRow.swift": "2a945ccdf33a4b30a6bb74d41b1a53c03ba17095d82f85aeeafb8b435813c3b3",
+    "whitenoise-iosTests/AutomaticPendingSendTests.swift": "fa44b5dcc24d3a512924ba946d3e6c3a84c1d8cf88588873bf304005639a7253",
+    "whitenoise-iosTests/AutomaticPairedListPagingTests.swift": "0e8ae98e71aac0728ef3b5f4c67dc3a477f1d3ca20fee6f6b0d9a6bb602085d8"
+  },
+  "limits": [
+    "Catalog Apple extraction/import pending",
+    "Multipart QR/native3device UI acceptance pending",
+    "Final full experimental/published PR suites pending",
+    "Real installed automatic app journey pending",
+    "Mirrored attachments/edit/persisted drafts not qualified; ordinary lane unchanged"
+  ],
+  "SDK_overrides_committed": false
+}

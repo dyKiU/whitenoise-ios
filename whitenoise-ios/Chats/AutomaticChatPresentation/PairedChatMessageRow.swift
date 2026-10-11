@@ -11,7 +11,7 @@ import SwiftUI
                 TimelineView(.periodic(from: .now, by: 1)) { clock in
                     if message.expiresAt.map({ Double($0) > clock.date.timeIntervalSince1970 }) ?? true {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(L10n.string("Shared from a linked device"))
+                            Text("Shared from a linked device")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             if message.deleted {
@@ -22,13 +22,13 @@ import SwiftUI
                                     Text(verbatim: message.content)
                                         .textSelection(.enabled)
                                 } else {
-                                    Text(L10n.string("Unsupported message"))
+                                    Text("Unsupported message")
                                         .foregroundStyle(.secondary)
                                 }
                                 ForEach(Array(message.mediaAttachments.enumerated()), id: \.offset) { _, outcome in
                                     switch outcome {
                                     case .accepted:
-                                        Text(L10n.string("Attachment not downloaded"))
+                                        Text("Attachment not downloaded")
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     case .rejected:
@@ -43,7 +43,7 @@ import SwiftUI
                     }
                 }
             } else {
-                Text(L10n.string("Shared from a linked device"))
+                Text("Shared from a linked device")
             }
         }
     }

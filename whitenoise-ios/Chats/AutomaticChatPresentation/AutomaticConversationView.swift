@@ -16,12 +16,12 @@ import SwiftUI
             } ?? []
         }
 
-        private func statusLabel(_ status: LocalSendStatusFfi?) -> String {
+        private func statusLabel(_ status: LocalSendStatusFfi?) -> LocalizedStringKey {
             switch status {
-            case .completed: L10n.string("Sent")
-            case .rejected: L10n.string("Send failed")
-            case .engineOwned: L10n.string("Sending…")
-            case .queued, nil: L10n.string("Pending")
+            case .completed: "Sent"
+            case .rejected: "Send failed"
+            case .engineOwned: "Sending…"
+            case .queued, nil: "Pending"
             }
         }
 
@@ -29,7 +29,7 @@ import SwiftUI
             VStack(alignment: .leading) {
                 Text(ContentSanitizer.groupName(model?.pairedHeader?.name) ?? L10n.string("Unnamed group"))
                     .font(.headline)
-                Text(L10n.string("Shared from a linked device"))
+                Text("Shared from a linked device")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Divider()
@@ -42,7 +42,7 @@ import SwiftUI
                 ScrollView {
                     LazyVStack(alignment: .leading) {
                         if model?.snapshot?.nextBefore != nil {
-                            Button(L10n.string("Load older messages")) { Task { await model?.loadOlder() } }
+                            Button("Load older messages") { Task { await model?.loadOlder() } }
                         }
                         ForEach(messages, id: \.messageIdHex) { message in
                             PairedChatMessageRow(message: message)
