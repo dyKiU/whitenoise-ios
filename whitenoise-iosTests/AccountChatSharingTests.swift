@@ -1,24 +1,27 @@
 import Foundation
 import MarmotKit
+import Synchronization
 import Testing
 
 @testable import whitenoise_ios
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     // These controls exercise native presentation/lifetime only, never SDK permission.
-    nonisolated private final class SharingOriginal: AccountSharingOriginal, @unchecked Sendable {
-        private let lock = NSLock()
-        private var value = sharingSnapshot()
-        private var approvals: [UInt64] = []
-        private var cancellations = 0
-        var approved: [UInt64] { lock.withLock { approvals } }
-        var cancelCount: Int { lock.withLock { cancellations } }
-        func snapshot() throws -> AccountSharingSnapshotFfi { lock.withLock { value } }
-        func setSnapshot(_ value: AccountSharingSnapshotFfi) { lock.withLock { self.value = value } }
-        func approve(displayedRevision: UInt64) async throws {
-            lock.withLock { approvals.append(displayedRevision) }
+    nonisolated private final class SharingOriginal: AccountSharingOriginal, Sendable {
+        nonisolated private struct State: Sendable {
+            var value = sharingSnapshot()
+            var approvals: [UInt64] = []
+            var cancellations = 0
         }
-        func cancel() { lock.withLock { cancellations += 1 } }
+        private let state = Mutex(State())
+        var approved: [UInt64] { state.withLock { $0.approvals } }
+        var cancelCount: Int { state.withLock { $0.cancellations } }
+        func snapshot() throws -> AccountSharingSnapshotFfi { state.withLock { $0.value } }
+        func setSnapshot(_ value: AccountSharingSnapshotFfi) { state.withLock { $0.value = value } }
+        func approve(displayedRevision: UInt64) async throws {
+            state.withLock { $0.approvals.append(displayedRevision) }
+        }
+        func cancel() { state.withLock { $0.cancellations += 1 } }
     }
     nonisolated private func sharingSnapshot(group: String = "0102", revision: UInt64 = 7) -> AccountSharingSnapshotFfi
     {

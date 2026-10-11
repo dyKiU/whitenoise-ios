@@ -1,21 +1,20 @@
 import Foundation
 import MarmotKit
+import Synchronization
 import Testing
 
 @testable import whitenoise_ios
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     nonisolated private final class DelayedAccountChatFactory: AccountChatObserving, Sendable {
-        private let state = State()
-        nonisolated private final class State: @unchecked Sendable {
-            // Only this test gate is mutable; every access is serialized by its lock.
-            let lock = NSLock()
+        private let state = Mutex(State())
+        nonisolated private struct State: Sendable {
             var pending: CheckedContinuation<any AccountChatListObserving, Error>?
         }
-        var isWaiting: Bool { state.lock.withLock { state.pending != nil } }
+        var isWaiting: Bool { state.withLock { $0.pending != nil } }
         func openAccountChatList(accountRef: String, initialRows: UInt32) async throws -> any AccountChatListObserving {
             try await withCheckedThrowingContinuation { continuation in
-                state.lock.withLock { state.pending = continuation }
+                state.withLock { $0.pending = continuation }
             }
         }
         func openAccountConversation(accountRef: String, groupIdHex: String, initialRows: UInt32) async throws
@@ -24,7 +23,7 @@ import Testing
             throw CancellationError()
         }
         func finish(_ original: any AccountChatListObserving) {
-            let pending = state.lock.withLock {
+            let pending = state.withLock { state in
                 let value = state.pending
                 state.pending = nil
                 return value
@@ -34,18 +33,17 @@ import Testing
     }
 
     nonisolated private final class HeldAccountChatList: AccountChatListObserving, Sendable {
-        private let state = State()
-        nonisolated private final class State: @unchecked Sendable {
-            let lock = NSLock()
+        private let state = Mutex(State())
+        nonisolated private struct State: Sendable {
             var cancels = 0
         }
-        var cancelCount: Int { state.lock.withLock { state.cancels } }
+        var cancelCount: Int { state.withLock { $0.cancels } }
         func snapshot() -> AccountChatListWindowSnapshotFfi? { nil }
         func next() async throws -> AccountChatListWindowSnapshotFfi? { nil }
         func pairedPage(sequence: UInt64, afterGroupIdHex: String?) async throws -> AccountChatListWindowSnapshotFfi {
             throw CancellationError()
         }
-        func cancel() { state.lock.withLock { state.cancels += 1 } }
+        func cancel() { state.withLock { $0.cancels += 1 } }
     }
 
     @MainActor @Suite struct AutomaticChatOwnershipTests {

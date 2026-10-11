@@ -1,67 +1,77 @@
 import Foundation
 import MarmotKit
+import Synchronization
 import Testing
 
 @testable import whitenoise_ios
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
-    nonisolated private final class PendingSendState: @unchecked Sendable {
-        // This bounded test gate and observations are serialized by one lock.
-        private let lock = NSLock()
-        private var value: LocalSendStatusFfi = .queued
-        private var calls = 0
-        private var blocked = false
-        private var entered = false
+    nonisolated private final class PendingSendState: Sendable {
+        nonisolated private struct State: Sendable {
+            var value: LocalSendStatusFfi = .queued
+            var calls = 0
+            var blocked = false
+            var entered = false
+        }
+        private let state = Mutex(State())
         private let release = DispatchSemaphore(value: 0)
         let eventId = String(repeating: "a", count: 64)
-        var callCount: Int { lock.withLock { calls } }
-        var isWaiting: Bool { lock.withLock { entered } }
-        func reject() { lock.withLock { value = .rejected } }
-        func holdNextStatus() { lock.withLock { blocked = true } }
+        var callCount: Int { state.withLock { $0.calls } }
+        var isWaiting: Bool { state.withLock { $0.entered } }
+        func reject() { state.withLock { $0.value = .rejected } }
+        func holdNextStatus() { state.withLock { $0.blocked = true } }
         func finishStatus() { release.signal() }
         func status() throws -> LocalSendStatusFfi {
-            let held = lock.withLock {
-                calls += 1
-                entered = blocked
-                return blocked
+            let held = state.withLock { state in
+                state.calls += 1
+                state.entered = state.blocked
+                return state.blocked
             }
             if held, release.wait(timeout: .now() + 5) != .success { throw CancellationError() }
-            return lock.withLock { value }
+            return state.withLock { $0.value }
         }
     }
 
-    nonisolated private final class PendingConversation: AccountConversationObserving, @unchecked Sendable {
-        private let lock = NSLock()
-        private var pending: CheckedContinuation<AccountConversationWindowSnapshotFfi?, Error>?
-        private var queue: [AccountConversationWindowSnapshotFfi] = []
-        private var cancelled = false
+    nonisolated private final class PendingConversation: AccountConversationObserving, Sendable {
+        nonisolated private struct State: Sendable {
+            var pending: CheckedContinuation<AccountConversationWindowSnapshotFfi?, Error>?
+            var queue: [AccountConversationWindowSnapshotFfi] = []
+            var cancelled = false
+        }
+        private let state = Mutex(State())
         private let initial: AccountConversationWindowSnapshotFfi
         init(_ initial: AccountConversationWindowSnapshotFfi) { self.initial = initial }
         func snapshot() -> AccountConversationWindowSnapshotFfi? { initial }
         func next() async throws -> AccountConversationWindowSnapshotFfi? {
             try await withCheckedThrowingContinuation { reply in
-                lock.lock()
-                if cancelled { lock.unlock(); reply.resume(returning: nil) }
-                else if !queue.isEmpty {
-                    let value = queue.removeFirst()
-                    lock.unlock()
-                    reply.resume(returning: value)
-                } else { pending = reply; lock.unlock() }
+                let ready = state.withLock { state -> (Bool, AccountConversationWindowSnapshotFfi?) in
+                    if state.cancelled { return (true, nil) }
+                    if !state.queue.isEmpty { return (true, state.queue.removeFirst()) }
+                    state.pending = reply
+                    return (false, nil)
+                }
+                if ready.0 { reply.resume(returning: ready.1) }
             }
         }
         func emit(_ value: AccountConversationWindowSnapshotFfi) {
-            let reply = lock.withLock {
-                let reply = pending
-                pending = nil
-                if reply == nil { queue.append(value) }
+            let reply = state.withLock { state in
+                let reply = state.pending
+                state.pending = nil
+                if reply == nil { state.queue.append(value) }
                 return reply
             }
             reply?.resume(returning: value)
         }
         func olderPage(sequence: UInt64, before: PairedChatMessageCursorFfi?) async throws
-            -> AccountConversationWindowSnapshotFfi { throw CancellationError() }
+            -> AccountConversationWindowSnapshotFfi
+        { throw CancellationError() }
         func cancel() {
-            let reply = lock.withLock { cancelled = true; let reply = pending; pending = nil; return reply }
+            let reply = state.withLock { state in
+                state.cancelled = true
+                let reply = state.pending
+                state.pending = nil
+                return reply
+            }
             reply?.resume(returning: nil)
         }
     }
