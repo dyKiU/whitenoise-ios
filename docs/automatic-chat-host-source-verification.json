@@ -178,6 +178,26 @@
       "Native fixture/codecs/rendered images qualify transport, not installed camera or physical pairing journey.",
       "Final full published/experimental PR and backend/integration promotion pending.",
       "Main M1 ready/installed accounts, current SDK987 artifacts and previous SDKs unchanged."
-    ]
+    ],
+    "form_controls": {
+      "source_commit": "a493c81",
+      "source_file": "whitenoise-ios/Settings/DevicePairingQRViews.swift",
+      "source_sha256": "ebfe81b69dd04a3f893cd161b04b7a41681dee665ba3b927fd3eef7ebee534be",
+      "behavior": "Existing WNButton standard44pt/Form-safe action controls; alert Cancel stays available when expired import disables retry. No original/model/codec changes.",
+      "prefix": "build/results/ios-pairing-qr-buttons-focused-v1",
+      "actual_counts": {
+        "passedTests": 30,
+        "failedTests": 0,
+        "skippedTests": 1,
+        "totalTestCount": 31
+      },
+      "raw_log_sha256": "75830b2205a71d4549b2147d2f14da048a05f9e3b1150b81a7d1fedd42913d76",
+      "source_unchanged": true,
+      "other939_product_test_sdk_inputs_match_prior_focused": true,
+      "prior_compact_proof_postgate_delta": true,
+      "reused_native": "native1/0/0 unchanged codec/fixture/SDK; buttons do not perform native actions",
+      "strict_swiftlint_exit": 0,
+      "diff_check_exit": 0
+    }
   }
 }
