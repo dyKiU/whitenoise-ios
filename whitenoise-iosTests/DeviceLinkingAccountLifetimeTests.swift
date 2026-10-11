@@ -5,6 +5,8 @@ import Testing
 @testable import whitenoise_ios
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
+    // UniFFI test subclass; NSLock guards every mutable field.
+    // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class LifetimeSubscription: DeviceLinkingSubscription, @unchecked Sendable {
         private let lock = NSLock()
         private var pending: CheckedContinuation<DeviceLinkingSnapshotFfi, Error>?
@@ -41,6 +43,8 @@ import Testing
                     revision: 7, phase: .comparisonAvailable, decimals: nil))
         }
     }
+    // UniFFI test subclass; NSLock guards mutable state and stream is immutable.
+    // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class LifetimeSession: DeviceLinkingSession, @unchecked Sendable {
         let stream = LifetimeSubscription(noPointer: .init())
         private let lock = NSLock()
