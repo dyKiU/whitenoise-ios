@@ -25,13 +25,19 @@
       "negative_observation_seconds": 5
     }
   ],
-  "published_sha256": "c3154712bb2a88fe5042036e977d5b1d73a5c88b45626d9789dafa3d9800b507",
-  "experimental_sha256": "51dc449ca0aabfa24738bc41f4889e34360130e226e24181bcd2335d65ee027c",
+  "published_sha256": "80ec7f20ec48d729f98ec3307c95175725b1398dfe81a789f66b312999f220f2",
+  "experimental_sha256": "15bbf40b162a4c2a88db02bd9cc294b71249981b97173390ba91711675b5f29c",
   "scope": "Real iOS native SDKs on isolated simulators and loopback relay; no TestFlight UI/APNS claim",
   "published_sdk": "122bd90ffac60bb6311346e228d0f609a18521ee (MarmotKit 0.12.0)",
   "experimental_sdk": "98707713a2cc02828c2d66ed858588991896b9b0 (experimental-device-sync, otlp-export, product-analytics-export)",
   "app_source": "ebb813c6a12ed54e2bc6ee15a262ac495dd19b03",
-  "source_note": "Worker formatted after native execution; formatting-only changes. Native inputs and artifact hashes above identify the executed cohort.",
   "evidence_host": "macbook.m5",
-  "evidence_path": "/Users/pj/project/build/public-chat-acceptance/unpaired-v1/result.json"
+  "evidence_path": "/Users/pj/project/build/public-chat-acceptance/unpaired-v2/result.json",
+  "source_inputs_sha256": {
+    "Worker.swift": "4e1ed53bbc4eef0a364684e391bea9bc12e536059f81ae69664fd1cef9d1524a",
+    "controller.py": "0b579097d5f6612fabe7ac22e320b38d08d361ce08263314114bc42630d8257b",
+    "fault_proxy.py": "b94e1a49e88d1a05c0aa2ca4453ccebb776014b6b764b1c1fcc4c2a0bcb08d11",
+    "build.sh": "6cafb218a5713b397a19da09d5cbed14682ebd89b9494345bf98ccb8b9249d25",
+    "requirements.txt": "9ec828179a682425537349fb41440b48a47b1ef006b7b3e1d1542566d3ec6943"
+  }
 }

@@ -212,6 +212,13 @@ struct PublicChatWorker {
               accountRef: required(account), groupIdHex: required(request.group),
               text: required(request.text))
             value = ["messages": sent.messageIds, "published": sent.published]
+          case "find-own-message":
+            let matches = try client.messages(
+              accountRef: required(account), groupIdHex: required(request.group),
+              limit: 100, kinds: [9]
+            )
+            .filter { $0.plaintext == request.text && $0.sender == account }
+            value = ["messages": matches.map(\.messageIdHex)]
           case "has-message":
             let matches = try client.messages(
               accountRef: required(account), groupIdHex: required(request.group), limit: 100,

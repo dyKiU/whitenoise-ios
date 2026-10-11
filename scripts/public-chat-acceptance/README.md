@@ -45,8 +45,7 @@ production credential-store design. Normal output contains counts, booleans,
 stage names and worker artifact hashes only.
 
 `qualification.json` records the first passing matrix: two sponsor directions,
-no failures or skips. It does not establish sender publication-failure recovery, private sync, or
-TestFlight UI parity.
+no failures or skips. It does not establish private sync or TestFlight UI parity.
 
 Run `--scenario unpaired-installations` with a fresh output directory to reproduce
 two independently stored installations of one fresh recipient identity. Both
@@ -57,3 +56,29 @@ request on reopening, while the original stays online. `unpaired-qualification.j
 records both sponsor directions passing. This proves the ownership hazard in these
 cohorts, not the cause of an unobserved TestFlight incident. The synthetic nsec
 travels only through private worker pipes; no database is transferred.
+
+Run `--scenario publication-rejection` with a fresh output directory to reject
+Welcome and group-message publications temporarily, restore acknowledgements,
+and reopen the sender's original state. This checks the same group and exact
+retained message; it never masks failed recovery with another create/send call.
+Both sponsor directions pass in `publication-qualification.json`.
+
+This scenario requires the pinned small Python dependency in an isolated venv:
+
+```sh
+python3 -m venv /absolute/test-venv
+/absolute/test-venv/bin/python -m pip install -r scripts/public-chat-acceptance/requirements.txt
+# Run controller.py with that interpreter and --scenario publication-rejection.
+```
+
+The controller creates a bounded WebSocket proxy on `--port + 1`, using only
+loopback sockets. It returns temporary NIP-20 `error:` ACKs for selected outer
+event kinds and forwards all other traffic to the same real relay. Neither
+proxy nor controller logs frames. Both processes are drained before their
+owned relay stops. The custom policy hook in `nostr-relay-builder` always
+prefixes rejection with `blocked:`; permanent rejection is deliberately a
+different test. The initial permanent-rejection observation and the harness's
+wrong summary assumption remain diagnosed in the compact qualification record.
+
+The proxy uses the official [websockets asyncio server/client APIs](https://websockets.readthedocs.io/en/15.0/reference/asyncio/server.html).
+No production SDK wire format or published binding pin changes in these tests.
