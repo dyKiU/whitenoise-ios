@@ -1,0 +1,66 @@
+{
+  "base": "f1e03df2bb6c7c9146e99602157c130fc25aa566",
+  "scope": "New executable supported companion cross-version controller; published-to-published operation controls only. Final experimental cross-version qualification pending matching SDK.",
+  "source_sha256": {
+    "companion_controller.py": "bf9851bba24aae37b691f723ad7c5aa6a9c79f7e1dbf39477f5aa5fae618b97d",
+    "controller.py": "0b579097d5f6612fabe7ac22e320b38d08d361ce08263314114bc42630d8257b",
+    "Worker.swift": "41579f2b39f0e1fd5d4c11a3bc12419a4445d71d5968de53ca4f842efabec532"
+  },
+  "published_native_worker": "c759a686f0426bcebeaf51967cc294488b8d85de65d8d0853b2fbb8b17761dc4",
+  "published_sdk_source": "122bd90ffac60bb6311346e228d0f609a18521ee",
+  "published_link_proof": "onboarding-qualification.json",
+  "actual_control_result": {
+    "passed": 2,
+    "failed": 0,
+    "failure": null,
+    "checks": [
+      {
+        "creator": "published",
+        "explicit_companion_revision_controls": true,
+        "companion_encrypted_reopen": true,
+        "slot_set_unchanged_after_approval": false,
+        "experimental_slot_hold_qualified": false,
+        "published_control_primary_republication": true,
+        "ordinary_explicit_accept": true,
+        "exact_bidirectional_delivery": true,
+        "both_primaries_offline_message_replay": true,
+        "both_primaries_offline_invitation_accept_replay": true
+      },
+      {
+        "creator": "candidate",
+        "explicit_companion_revision_controls": true,
+        "companion_encrypted_reopen": true,
+        "slot_set_unchanged_after_approval": false,
+        "experimental_slot_hold_qualified": false,
+        "published_control_primary_republication": true,
+        "ordinary_explicit_accept": true,
+        "exact_bidirectional_delivery": true,
+        "both_primaries_offline_message_replay": true,
+        "both_primaries_offline_invitation_accept_replay": true
+      }
+    ],
+    "published_control": true,
+    "published_sha256": "c759a686f0426bcebeaf51967cc294488b8d85de65d8d0853b2fbb8b17761dc4",
+    "experimental_sha256": "c759a686f0426bcebeaf51967cc294488b8d85de65d8d0853b2fbb8b17761dc4",
+    "published_sdk_source": "122bd90ffac60bb6311346e228d0f609a18521ee",
+    "experimental_sdk_source": "122bd90ffac60bb6311346e228d0f609a18521ee",
+    "controller_sha256": "bf9851bba24aae37b691f723ad7c5aa6a9c79f7e1dbf39477f5aa5fae618b97d",
+    "scope": "Real native separate stores and local relay; no installed app/TestFlight/APNS claim"
+  },
+  "result_path": "/Users/pj/project/build/public-chat-acceptance/companion-controller-published-control-v2/result.json",
+  "result_sha256": "fe6d7de066846dfcd550414ee5ac89fa9cee3c6433dd050996b93783e31f815c",
+  "raw_log": "/Users/pj/project/build/results/companion-controller-published-control-v2.log",
+  "raw_log_sha256": "2a1c7c19ac6cb8fc543feb45a1f93362cfa25833fe8b9be50f2f5b2f8115c90f",
+  "same_linked_refusal": {
+    "same_linked_crossversion_refusal": true,
+    "exit": 1,
+    "no_state_or_relay_started": true
+  },
+  "limits": [
+    "Actual2/0 creator directions are both linked to published0.12, explicitly control-only.",
+    "Experimental mode requires distinct SDK source/executable hashes and unchanged candidate slot set through actual companion approval/reopen; matching generated/native provenance must be supplied externally.",
+    "Published0.12 slot-set change and explicit primary fresh publication are reported; experimental mode never uses this repair.",
+    "No Cargo, Swift rebuild, Collection use, account-store copies or installed app actions.",
+    "Installed client/TestFlight/APNS acceptance remains separate."
+  ]
+}

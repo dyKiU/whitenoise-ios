@@ -119,3 +119,34 @@ synthetic stores on a real loopback relay. It does not establish cross-version
 ordinary delivery or an installed TestFlight journey. Use the existing
 `controller.py` invitation/accept/send/offline checks with separately linked
 published and final experimental workers for that qualification.
+
+## Supported companion cross-version controller
+
+`companion_controller.py` accepts the same worker protocol with either dedicated
+simulators (`--published-device` / `--experimental-device`) or `native-mac`.
+It performs explicit companion onboarding against the candidate's real primary,
+checks the experimental public slot-set stays unchanged after approval and
+companion reopen, then tests both creator directions, explicit invitations,
+exact bidirectional messages, and offline message/invitation replay for both
+primary stores. Stores and secrets remain isolated and are never copied.
+
+```sh
+python3 scripts/public-chat-acceptance/companion_controller.py \
+  --published /absolute/published-worker \
+  --experimental /absolute/final-experimental-worker \
+  --published-sdk-source FULL_PUBLISHED_SOURCE_SHA \
+  --experimental-sdk-source FULL_EXPERIMENTAL_SOURCE_SHA \
+  --relay-binary /absolute/white-noise-sync-test-relay \
+  --port 18250 --output /absolute/fresh-private-output
+```
+
+Cross-version mode requires different source pins and executable hashes. Record
+matching generated Swift/header/archive provenance for each worker separately;
+a source label alone does not authenticate the linked SDK.
+
+`--published-control` permits two retained published executables solely to test
+controller operation. Published0.12 creates a companion public slot, so this
+mode explicitly republishes the primary's genuine public package before chat
+creation. It reports that repair and never qualifies the experimental receiver
+hold. Experimental mode performs no such repair. Installed TestFlight/UI/APNS
+acceptance remains separate.
