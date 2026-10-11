@@ -599,6 +599,15 @@ struct ChatsListView: View {
                 }
             }
             .onScrollPhaseChange { _, phase in
+                #if WN_EXPERIMENTAL_DEVICE_SYNC
+                    if scope == .active, !selectionMode {
+                        if phase == .interacting {
+                            Task { await appState.accountStore.automaticChats?.list.pairedUserScrollChanged(true) }
+                        } else if phase == .idle {
+                            Task { await appState.accountStore.automaticChats?.list.pairedUserScrollChanged(false) }
+                        }
+                    }
+                #endif
                 if phase == .idle, let id = listViewport.visibleAnchor() {
                     viewModel.setVisibleWindowAnchor(id)
                 }

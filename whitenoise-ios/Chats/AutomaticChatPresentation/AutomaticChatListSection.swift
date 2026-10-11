@@ -40,6 +40,27 @@ import SwiftUI
                 }
                 .buttonStyle(.plain)
             }
+            if model?.hasPreviousPairedPage == true || model?.snapshot?.nextPairedGroupIdHex != nil {
+                HStack {
+                    if model?.hasPreviousPairedPage == true {
+                        Button(L10n.string("Back")) { Task { await model?.loadPreviousPaired() } }
+                    }
+                    Spacer()
+                    if model?.snapshot?.nextPairedGroupIdHex != nil {
+                        Button(L10n.string("Next")) { Task { await model?.loadMorePaired() } }
+                    }
+                }
+            }
+            if model?.snapshot?.nextPairedGroupIdHex != nil {
+                Color.clear
+                    .frame(height: 1)
+                    .onScrollVisibilityChange(threshold: 1) { visible in
+                        Task { await model?.pairedBoundaryVisibilityChanged(visible) }
+                    }
+                    .onDisappear {
+                        Task { await model?.pairedBoundaryVisibilityChanged(false) }
+                    }
+            }
         }
     }
 
