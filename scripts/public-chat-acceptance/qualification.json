@@ -1,0 +1,33 @@
+{
+  "gate": "mixed-version-ios-public-chat",
+  "passed": 2,
+  "failed": 0,
+  "failure": null,
+  "checks": [
+    {
+      "sponsor": "published",
+      "invitation": true,
+      "bidirectional_authenticated_messages": true,
+      "receiver_restart": true,
+      "offline_message": true,
+      "offline_invitation": true
+    },
+    {
+      "sponsor": "experimental",
+      "invitation": true,
+      "bidirectional_authenticated_messages": true,
+      "receiver_restart": true,
+      "offline_message": true,
+      "offline_invitation": true
+    }
+  ],
+  "published_sha256": "c3154712bb2a88fe5042036e977d5b1d73a5c88b45626d9789dafa3d9800b507",
+  "experimental_sha256": "51dc449ca0aabfa24738bc41f4889e34360130e226e24181bcd2335d65ee027c",
+  "scope": "Real iOS native SDKs on isolated simulators and loopback relay; no TestFlight UI/APNS claim",
+  "published_sdk": "122bd90ffac60bb6311346e228d0f609a18521ee (MarmotKit 0.12.0)",
+  "experimental_sdk": "98707713a2cc02828c2d66ed858588991896b9b0 (experimental-device-sync, otlp-export, product-analytics-export)",
+  "app_source": "ebb813c6a12ed54e2bc6ee15a262ac495dd19b03",
+  "evidence_host": "macbook.m5",
+  "evidence_path": "/Users/pj/project/build/public-chat-acceptance/run-v1/result.json",
+  "source_note": "Worker formatted after native execution; formatting-only changes. Native inputs and artifact hashes above identify the executed cohort."
+}
