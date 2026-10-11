@@ -463,6 +463,11 @@ final class AppState {
 
     func handleRuntimeEvent(_ event: MarmotEventFfi, generation: Int) {
         guard runtimeEventsGeneration == generation else { return }
+        if case .welcomeDeliveryPending(let accountID, _, _, _, _) = event,
+           activeAccount?.accountIdHex == accountID,
+           let notice = InvitationDeliveryNotice.toast(for: event) {
+            present(notice)
+        }
         pollVotesInvalidation.observe(event)
         if case .projectionUpdated(let update) = event,
            activeAccount?.accountIdHex == update.accountIdHex,
