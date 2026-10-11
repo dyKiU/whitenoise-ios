@@ -1366,8 +1366,6 @@ struct ConversationView: View {
                     hasAttachments: !mediaDrafts.isEmpty,
                     audioDraft: inlineAudioDraft,
                     preparedAttachments: stripAttachments,
-                    preparedAttachmentUploadStates: viewModel?.draftMediaUploadStates ?? [:],
-                    showsPreparedAttachmentUploadDiagnostics: appState.developerMode,
                     replyPreview: editSession == nil
                         ? viewModel.flatMap(composerReplyPreview(viewModel:))
                         : nil,
