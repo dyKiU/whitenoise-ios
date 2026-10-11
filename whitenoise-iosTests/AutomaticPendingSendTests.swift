@@ -12,12 +12,35 @@ import Testing
             var calls = 0
             var blocked = false
             var entered = false
+            var admission: CheckedContinuation<Void, Never>?
+            var holdAdmission = false
         }
         private let state = Mutex(State())
         private let release = DispatchSemaphore(value: 0)
         let eventId = String(repeating: "a", count: 64)
         var callCount: Int { state.withLock { $0.calls } }
         var isWaiting: Bool { state.withLock { $0.entered } }
+        var admissionIsWaiting: Bool { state.withLock { $0.admission != nil } }
+        func holdNextAdmission() { state.withLock { $0.holdAdmission = true } }
+        func releaseAdmission() {
+            let continuation = state.withLock { state in
+                state.holdAdmission = false
+                let continuation = state.admission
+                state.admission = nil
+                return continuation
+            }
+            continuation?.resume()
+        }
+        func waitForAdmission() async {
+            await withCheckedContinuation { continuation in
+                let held = state.withLock { state in
+                    if !state.holdAdmission { return false }
+                    state.admission = continuation
+                    return true
+                }
+                if !held { continuation.resume() }
+            }
+        }
         func reject() { state.withLock { $0.value = .rejected } }
         func holdNextStatus() { state.withLock { $0.blocked = true } }
         func finishStatus() { release.signal() }
@@ -88,7 +111,11 @@ import Testing
     nonisolated private struct PendingSender: AccountChatSending {
         let state: PendingSendState
         func sendTextWithClientToken(accountRef: String, groupIdHex: String, text: String, clientToken: String)
-            async throws -> LocalSendAcceptanceFfi { .init(clientToken: clientToken, messageIdHex: state.eventId) }
+            async throws -> LocalSendAcceptanceFfi {
+            let acceptance = LocalSendAcceptanceFfi(clientToken: clientToken, messageIdHex: state.eventId)
+            await state.waitForAdmission()
+            return acceptance
+        }
         func replyWithClientToken(accountRef: String, groupIdHex: String, targetMessageId: String,
                                   text: String, clientToken: String) async throws -> LocalSendAcceptanceFfi {
             .init(clientToken: clientToken, messageIdHex: state.eventId)
@@ -134,6 +161,35 @@ import Testing
             model.start()
             #expect(await waitFor { model.snapshot != nil })
             return (model, original, state)
+        }
+
+        @Test func observedCanonicalRowBeforeAdmissionReturnsDoesNotLeaveDuplicatePendingBubble() async throws {
+            let original = PendingConversation(snapshot(sequence: 1))
+            let state = PendingSendState()
+            state.holdNextAdmission()
+            let model = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: PendingSender(state: state),
+                observations: PendingFactory(original: original), isCurrent: { true })
+            model.start()
+            defer {
+                state.releaseAdmission()
+                model.invalidate()
+            }
+            #expect(await waitFor { model.snapshot != nil })
+            let sending = Task { try await model.sendText("Synthetic message") }
+            #expect(await waitFor { state.admissionIsWaiting })
+            let token = try #require(model.pendingTexts.keys.first)
+            #expect(model.pendingTexts[token]?.acceptedMessageIdHex == nil)
+            original.emit(snapshot(sequence: 2, eventId: state.eventId))
+            #expect(await waitFor { model.snapshot?.sequence == 2 })
+            #expect(model.pairedMessages.map(\.messageIdHex) == [state.eventId])
+            state.releaseAdmission()
+            let acceptance = try await sending.value
+            #expect(acceptance.clientToken == token)
+            #expect(acceptance.messageIdHex == state.eventId)
+            await model.refreshPendingStatus()
+            #expect(model.pendingTexts.isEmpty)
+            #expect(model.pairedMessages.map(\.messageIdHex) == [acceptance.messageIdHex])
         }
 
         @Test func knownCanonicalImportReplacesQueuedBubbleWithoutClaimingSentBeforeReceipt() async throws {
