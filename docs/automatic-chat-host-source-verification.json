@@ -66,5 +66,16 @@
     "Real installed automatic app journey pending",
     "Mirrored attachments/edit/persisted drafts not qualified; ordinary lane unchanged"
   ],
-  "SDK_overrides_committed": false
+  "SDK_overrides_committed": false,
+  "localization": {
+    "apple_report": "build/results/automatic-ios-localization-v2.json",
+    "original_catalog_sha256": "4993eefa1f9e441bd7dd7e0660bbe404939a4d0748d4228c78b8a88659799457",
+    "catalog_sha256": "41bab68d14fb6710e61d753c032bce1bcd2733447bd93236b6aaa88e93b26116",
+    "original_entries_preserved": 2003,
+    "added_keys": 15,
+    "translated_cells": 135,
+    "actual_apple_imports": 9,
+    "all_prior_values_and_order_preserved": true,
+    "product_test_result_reuse": "17 focused and148 affected unchanged Swift/SDK inputs; final full matrix pending multipart QR"
+  }
 }
