@@ -45,5 +45,15 @@ production credential-store design. Normal output contains counts, booleans,
 stage names and worker artifact hashes only.
 
 `qualification.json` records the first passing matrix: two sponsor directions,
-no failures or skips. It does not establish sender publication-failure recovery,
-same-account unpaired-installation behavior, private sync, or TestFlight UI parity.
+no failures or skips. It does not establish sender publication-failure recovery, private sync, or
+TestFlight UI parity.
+
+Run `--scenario unpaired-installations` with a fresh output directory to reproduce
+two independently stored installations of one fresh recipient identity. Both
+remain online; the newer installation receives and decrypts the invitation while
+the original shows no request during a bounded five-second observation. The same
+behavior occurs when the selected newer installation is offline: it receives the
+request on reopening, while the original stays online. `unpaired-qualification.json`
+records both sponsor directions passing. This proves the ownership hazard in these
+cohorts, not the cause of an unobserved TestFlight incident. The synthetic nsec
+travels only through private worker pipes; no database is transferred.

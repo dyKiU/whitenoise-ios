@@ -79,6 +79,64 @@ def check_message(peer, group, sent, text, sender, stage):
                              text=text, sender=sender)['matches'] == 1, stage)
 
 
+def unpaired_installations(versions, sponsor, cohort, endpoint, peers):
+    def open_peer(index, installation, suffix):
+        binary, device, name = versions[index]
+        peer = Peer(binary, device, cohort / installation, endpoint,
+                    cohort / (installation + suffix + '.stderr'))
+        peers.append(peer)
+        return peer
+    a = open_peer(sponsor, 'sponsor', '-initial')
+    b = open_peer(1 - sponsor, 'original-recipient', '-initial')
+    a_id = a.ask('create')['account']
+    b_id = b.ask('create')['account']
+    require(a_id != b_id, 'independent-identities')
+    b.ask('publish')
+    wait_for(lambda: b.ask('packages')['count'] > 0, 'initial-package-publication')
+    # Deliberately import only a fresh synthetic identity, never MLS state.
+    # Wait past the original event timestamp before the new installation publishes.
+    time.sleep(2)
+    c = open_peer(1 - sponsor, 'second-recipient', '-initial')
+    secret = b.ask('secret')['secret']
+    require(c.ask('import', secret=secret)['account'] == b_id, 'same-synthetic-account')
+    del secret
+    c.ask('publish')
+    wait_for(lambda: c.ask('packages')['count'] >= 2, 'multiple-installation-packages')
+    group = a.ask('create-chat', member=b_id)['group']
+    wait_for(lambda: group in c.ask('invitations')['groups'], 'new-installation-invitation')
+    # Both installations are awake and polling, but only one owns this package.
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        require(group not in b.ask('invitations')['groups'], 'unexpected-original-invitation')
+        time.sleep(0.2)
+    c.ask('accept', group=group)
+    state = c.ask('state', group=group)
+    require(state['current'] and state['members'] == 2, 'ordinary-current-group')
+    text = 'synthetic-second-installation'
+    check_message(c, group, a.ask('send', group=group, text=text), text, a_id,
+                  'selected-installation-message')
+    c.close(); peers.remove(c)
+    offline_group = a.ask('create-chat', member=b_id)['group']
+    require(offline_group != group, 'independent-offline-invitation')
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        require(offline_group not in b.ask('invitations')['groups'], 'unexpected-online-original-invitation')
+        time.sleep(0.2)
+    c = open_peer(1 - sponsor, 'second-recipient', '-reopened')
+    require(c.ask('reopen')['account'] == b_id, 'original-second-installation-reopen')
+    wait_for(lambda: offline_group in c.ask('invitations')['groups'], 'selected-offline-installation-replay')
+    c.ask('accept', group=offline_group)
+    for peer in (c, b, a):
+        peer.close(); peers.remove(peer)
+    return {'sponsor': versions[sponsor][2], 'same_account_independent_stores': True,
+            'newer_installation_received_invitation': True,
+            'original_installation_received_no_invitation_during_observation': True,
+            'selected_installation_authenticated_message': True,
+            'selected_offline_installation_received_on_reopen': True,
+            'online_original_received_no_offline_invitation_during_observation': True,
+            'negative_observation_seconds': 5}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--published', required=True)
@@ -86,6 +144,7 @@ def main():
     parser.add_argument('--published-device', required=True)
     parser.add_argument('--experimental-device', required=True)
     parser.add_argument('--relay-binary', required=True)
+    parser.add_argument('--scenario', choices=['mixed-version', 'unpaired-installations'], default='mixed-version')
     parser.add_argument('--port', type=int, default=18182)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
@@ -106,6 +165,9 @@ def main():
         for sponsor in (0, 1):
             cohort = args.output / ('sponsor-' + versions[sponsor][2])
             cohort.mkdir(mode=0o700)
+            if args.scenario == 'unpaired-installations':
+                checks.append(unpaired_installations(versions, sponsor, cohort, endpoint, peers))
+                continue
             def open_peer(index, suffix):
                 binary, device, name = versions[index]
                 peer = Peer(binary, device, cohort / name, endpoint, cohort / (name + suffix + '.stderr'))
@@ -162,7 +224,7 @@ def main():
             except subprocess.TimeoutExpired:
                 relay.kill(); relay.wait()
         relay.stdout.close(); relay_log.close()
-    result = {'gate': 'mixed-version-ios-public-chat', 'passed': len(checks),
+    result = {'gate': 'ios-public-chat-' + args.scenario, 'passed': len(checks),
               'failed': int(failure is not None), 'failure': failure, 'checks': checks,
               'published_sha256': hashlib.sha256(Path(args.published).read_bytes()).hexdigest(),
               'experimental_sha256': hashlib.sha256(Path(args.experimental).read_bytes()).hexdigest(),
