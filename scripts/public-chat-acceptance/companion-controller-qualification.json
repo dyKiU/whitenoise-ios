@@ -62,5 +62,101 @@
     "Published0.12 slot-set change and explicit primary fresh publication are reported; experimental mode never uses this repair.",
     "No Cargo, Swift rebuild, Collection use, account-store copies or installed app actions.",
     "Installed client/TestFlight/APNS acceptance remains separate."
-  ]
+  ],
+  "actual_cross_version_de38be12": {
+    "sdk_source": "de38be1295618728ef541e43bfc00ffb6cdb6a86",
+    "published_sdk_source": "122bd90ffac60bb6311346e228d0f609a18521ee",
+    "published_binary_sha256": "c759a686f0426bcebeaf51967cc294488b8d85de65d8d0853b2fbb8b17761dc4",
+    "experimental_binary_sha256": "531568391ab69eaebe8e8b0bf1afd72c21b570a57dd6bb469685abda8fead3e0",
+    "worker_compile": {
+      "exit_code": 0,
+      "seconds": 8.83,
+      "sdk_source": "de38be1295618728ef541e43bfc00ffb6cdb6a86",
+      "command": [
+        "/bin/bash",
+        "/Users/pj/project/white-noise-invitation-acceptance/tools/build-mac-public-chat-worker.sh",
+        "/Users/pj/project/whitenoise-ios-public-chat-worker/scripts/public-chat-acceptance/Worker.swift",
+        "/Users/pj/project/mdk-automatic-apple-de38be12/crates/marmot-uniffi/output/macos/MarmotKit.swift",
+        "/Users/pj/project/mdk-automatic-apple-de38be12/crates/marmot-uniffi/output/macos/MarmotKit.xcframework/macos-arm64",
+        "/Users/pj/project/build/public-chat-acceptance/automatic-final-experimental-worker-v1",
+        "/Users/pj/project/build/MacSyncProfileM5/ModuleCache.noindex"
+      ],
+      "log": "/Users/pj/project/build/results/automatic-de38-experimental-worker-build-v1.log",
+      "log_sha256": "cae5db09609e6a2a70e2e97e936677015a2a0e862a1555a2bea6cb09c9bc34db",
+      "inputs_unchanged": true,
+      "binary": "/Users/pj/project/build/public-chat-acceptance/automatic-final-experimental-worker-v1",
+      "binary_sha256": "531568391ab69eaebe8e8b0bf1afd72c21b570a57dd6bb469685abda8fead3e0"
+    },
+    "controller_run": {
+      "exit_code": 0,
+      "seconds": 15.59,
+      "command": [
+        "/opt/homebrew/bin/python3",
+        "/Users/pj/project/whitenoise-ios-public-chat-worker/scripts/public-chat-acceptance/companion_controller.py",
+        "--published",
+        "/Users/pj/project/build/public-chat-acceptance/published-onboarding-worker-v1",
+        "--experimental",
+        "/Users/pj/project/build/public-chat-acceptance/automatic-final-experimental-worker-v1",
+        "--published-sdk-source",
+        "122bd90ffac60bb6311346e228d0f609a18521ee",
+        "--experimental-sdk-source",
+        "de38be1295618728ef541e43bfc00ffb6cdb6a86",
+        "--relay-binary",
+        "/Users/pj/project/build/public-chat-acceptance/fault-relay-v3",
+        "--port",
+        "18250",
+        "--output",
+        "/Users/pj/project/build/public-chat-acceptance/automatic-final-cross-version-v1"
+      ],
+      "log": "/Users/pj/project/build/results/automatic-de38-cross-version-v1.log",
+      "log_sha256": "9b15f89422c59b52494b0505493438978d4b6534b35c1aea2fa80ac41c056656",
+      "inputs_unchanged": true,
+      "controller_result": "/Users/pj/project/build/public-chat-acceptance/automatic-final-cross-version-v1/result.json"
+    },
+    "actual_result": {
+      "passed": 2,
+      "failed": 0,
+      "failure": null,
+      "checks": [
+        {
+          "creator": "published",
+          "explicit_companion_revision_controls": true,
+          "companion_encrypted_reopen": true,
+          "slot_set_unchanged_after_approval": true,
+          "experimental_slot_hold_qualified": true,
+          "published_control_primary_republication": false,
+          "ordinary_explicit_accept": true,
+          "exact_bidirectional_delivery": true,
+          "both_primaries_offline_message_replay": true,
+          "both_primaries_offline_invitation_accept_replay": true
+        },
+        {
+          "creator": "candidate",
+          "explicit_companion_revision_controls": true,
+          "companion_encrypted_reopen": true,
+          "slot_set_unchanged_after_approval": true,
+          "experimental_slot_hold_qualified": true,
+          "published_control_primary_republication": false,
+          "ordinary_explicit_accept": true,
+          "exact_bidirectional_delivery": true,
+          "both_primaries_offline_message_replay": true,
+          "both_primaries_offline_invitation_accept_replay": true
+        }
+      ],
+      "published_control": false,
+      "published_sha256": "c759a686f0426bcebeaf51967cc294488b8d85de65d8d0853b2fbb8b17761dc4",
+      "experimental_sha256": "531568391ab69eaebe8e8b0bf1afd72c21b570a57dd6bb469685abda8fead3e0",
+      "published_sdk_source": "122bd90ffac60bb6311346e228d0f609a18521ee",
+      "experimental_sdk_source": "de38be1295618728ef541e43bfc00ffb6cdb6a86",
+      "controller_sha256": "bf9851bba24aae37b691f723ad7c5aa6a9c79f7e1dbf39477f5aa5fae618b97d",
+      "scope": "Real native separate stores and local relay; no installed app/TestFlight/APNS claim"
+    },
+    "evidence_root_m1": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/automatic-de38-cross-version",
+    "evidence_root_m5": "/Users/pj/project/build/results",
+    "sdk_artifact_manifest_sha256": "0b5b3d3bb93b47ebc74065e735504ffc928fd06d0424a3ccb5d07fe58ca18bd4",
+    "limits": [
+      "Full backend qualification remains pending; no SDK/app promotion.",
+      "Native separate linked clients and isolated relay, not installed TestFlight/UI/APNS."
+    ]
+  }
 }
