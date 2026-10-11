@@ -126943,6 +126943,50 @@
           }
         }
       }
+    },
+    "Device pairing QR code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device pairing QR code"
+          }
+        }
+      }
+    },
+    "Scan pairing QR" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan pairing QR"
+          }
+        }
+      }
+    },
+    "This packet is too large for a QR code. Use Copy instead." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This packet is too large for a QR code. Use Copy instead."
+          }
+        }
+      }
+    },
+    "Scan a device pairing QR from White Noise. Private keys and profile codes are not accepted." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan a device pairing QR from White Noise. Private keys and profile codes are not accepted."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

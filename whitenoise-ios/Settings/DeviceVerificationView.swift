@@ -13,6 +13,7 @@
 
     /// Only opaque transport and explicit comparison; original SDK ownership remains in Session.
     struct DeviceVerificationView: View {
+        @Environment(\.scenePhase) private var scenePhase
         @State private var model: DeviceVerificationViewModel
         @State private var enrollment: DeviceEnrollmentViewModel?
         @State private var approval: DeviceEnrollmentApprovalViewModel?
@@ -23,6 +24,7 @@
         @State private var actionFailed = false
         @State private var isWorking = false
         @State private var actionTask: Task<Void, Never>?
+        @State private var scanning = false
 
         init(model: DeviceVerificationViewModel) { _model = State(initialValue: model) }
 
@@ -63,6 +65,7 @@
                     }
                     if !setup.isEmpty {
                         Section {
+                            DevicePairingQRCard(packet: setup)
                             CopyableValueRow(title: "Setup packet", value: setup)
                         }
                     }
@@ -74,6 +77,11 @@
                             kind: .multiline(2...4), surface: .filled
                         )
                         .disabled(isWorking || !model.isActive)
+                        WNButton(title: "Scan pairing QR", emphasis: .secondary, size: .standard) {
+                            incoming = ""
+                            scanning = true
+                        }
+                        .disabled(isWorking || !model.isActive || model.cleanupRequired)
                         if model.owner == nil {
                             if model.offersFirstDeviceSetupAttempt {
                                 WNButton(
@@ -161,6 +169,7 @@
                     }
                     ForEach(Array(outgoing.enumerated()), id: \.offset) { _, packet in
                         Section {
+                            DevicePairingQRCard(packet: packet.bytes.base64EncodedString())
                             WNCopyButton(
                                 value: packet.bytes.base64EncodedString(), accessibilityTitle: L10n.string("Copy")
                             ) { copied in
@@ -188,6 +197,13 @@
             }
             .localizedNavigationTitle("Device verification")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $scanning) {
+                DevicePairingScannerSheet { packet in
+                    guard scanning, scenePhase == .active, model.isActive, !model.cleanupRequired else { return }
+                    incoming = packet
+                    scanning = false
+                }
+            }
             .sheet(isPresented: Binding(get: { enrollment != nil }, set: { if !$0 { enrollment = nil } })) {
                 NavigationStack { DeviceEnrollmentTransportView(model: enrollment) }
             }
@@ -202,11 +218,13 @@
             }
             .onDisappear { actionTask?.cancel() }
             .onChange(of: model.isActive) { _, active in if !active { clearPackets() } }
+            .onChange(of: scenePhase) { _, phase in if phase != .active { scanning = false } }
         }
 
         private func decodedPacket() throws -> Data { try DeviceVerificationPacketInput.decode(incoming) }
 
         private func clearPackets() {
+            scanning = false
             enrollment = nil
             approval = nil
             incoming = ""

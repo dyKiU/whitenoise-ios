@@ -1,0 +1,54 @@
+{
+  "base": "00837b43dde1b92d1cd35785629f2592168f015a",
+  "sdk_source": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "transport_format": "whitenoise-pairing:v1: + canonical base64; total UTF8 <=2200",
+  "source_paths": {
+    "Shared/Localizable.xcstrings": "1e81119d21cdc49ca0b57a9803e0c4e300c6415a427ba7ab3325ba8202e4827a",
+    "whitenoise-ios/InfoPlist.xcstrings": "21d92378a8f0f49a4477399d9dd0a0bd02c38fb03981422b09a54cc5c27589be",
+    "whitenoise-ios/Settings/DeviceVerificationView.swift": "2fa81827c94c6bf747e712fa16834c6bdb551fff059db13665fdac4134f91068",
+    "whitenoise-ios/Core/DevicePairingQRCode.swift": "0626f4cfe1d1285092a1d09d59720c058061fcc3b5e45b9020ca4fc0e5d23ce7",
+    "whitenoise-ios/Settings/DevicePairingQRViews.swift": "4d00eeb565e7904f7893f941621c3ed910aeeac52b18391c6be50608ebb5dbff",
+    "whitenoise-iosTests/DevicePairingQRCodeTests.swift": "9da5b3e1fe9068419cd55e8add578fcc1bd10c4511baf3f9109dacc180d72073"
+  },
+  "affected_result": {
+    "exit_code": 0,
+    "seconds": 26.480030791833997,
+    "command": [
+      "bash",
+      "scripts/test.sh",
+      "-only-testing:whitenoise-iosTests/DevicePairingQRCodeTests",
+      "-only-testing:whitenoise-iosTests/QRCodeTests",
+      "-only-testing:whitenoise-iosTests/OnboardingQRScannerTests",
+      "-only-testing:whitenoise-iosTests/QRScannerFailureTests",
+      "-only-testing:whitenoise-iosTests/DeviceVerificationViewModelTests",
+      "-only-testing:whitenoise-iosTests/DeviceLinkingOwnedActionTests",
+      "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests",
+      "-only-testing:whitenoise-iosTests/DeviceEnrollmentViewModelTests"
+    ],
+    "log": "/Users/pj/project/build/results/ios-pairing-qr-affected-v2.log",
+    "log_sha256": "5ebb6d11409069bc4b772ba111e2c1a2ffff4a7305dc7c6212306536fbf9ef7f",
+    "inputs": 893,
+    "sdk_source": "98707713a2cc02828c2d66ed858588991896b9b0"
+  },
+  "actual_xcresult_summary": {
+    "passed": 57,
+    "failed": 0,
+    "skipped": 0,
+    "total": 57
+  },
+  "raw_artifacts": "parent build/results/ios-pairing-qr-affected-v2*",
+  "scope": [
+    "Real CoreImage maximum-supported image encode/decode, packet byte equality, foreign/noncanonical/oversize rejection and existing camera coordinator explicit retry/one scan.",
+    "Affected verification, original ownership, account lifetime and enrollment view-model controls.",
+    "Existing scan receives into packet field only, same explicit native Receive/Approve and SAS/enrollment controls.",
+    "Scanner dismissed on scene/account retirement, prior input cleared before scan; QR hidden outside active scene.",
+    "Existing QR camera/component reuse; camera-purpose strings updated in all ten existing locales."
+  ],
+  "limits": [
+    "New feature acceptance; no fabricated failing baseline.",
+    "Full final compatibility suites and signed physical development build follow this passing commit.",
+    "Actual physical camera scan and installed Mac/iPhone pairing remain unverified.",
+    "This transports pairing packets, not account private keys; both devices still require account sign-in.",
+    "Packets larger than one QR show Copy fallback; never truncated, no multipart claimed."
+  ]
+}
