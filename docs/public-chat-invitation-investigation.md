@@ -50,8 +50,16 @@ storage are separate. No existing identities or databases are copied.
 
 Focused baseline checks cover `DirectChatStarterTests`,
 `ChatListPreviewCacheTests`, and `AccountUnreadSummaryProjectionTests`.
-Results are pending; these checks do not establish relay delivery or installed
-TestFlight interoperability.
+This published MarmotKit 0.12 baseline passes **50 tests / 56 parameterized
+executions, zero failures or skips**. A separate `test-without-building` run of
+`PresentedChatListTests`, `NotificationSubscriptionRetryTests`,
+`AppStateBootstrapTests` and `ConversationInvitePresentationTests` passes
+**106 tests / 119 parameterized executions, zero failures or skips**.
+Both use the same unmodified product/test source and published SDK. Results:
+`/Users/pj/project/build/results/ios-public-chat-published-focused-v1.xcresult`
+and `ios-public-chat-published-lifecycle-v1.xcresult`, with matching `.log` files.
+These checks do not establish real relay delivery, mixed-version SDK delivery,
+or installed TestFlight interoperability. No product fix has been applied.
 
 ## Next regression boundary
 
