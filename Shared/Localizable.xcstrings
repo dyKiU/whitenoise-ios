@@ -126952,6 +126952,60 @@
             "state" : "translated",
             "value" : "Device pairing QR code"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code zur Gerätekopplung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR de vinculación de dispositivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code QR d’association d’appareils"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codice QR per associare dispositivi"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR de emparelhamento de dispositivos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-код для сопряжения устройств"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cihaz eşleştirme QR kodu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备配对二维码"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "裝置配對 QR 碼"
+          }
         }
       }
     },
@@ -126962,6 +127016,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scan pairing QR"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopplungs-QR-Code scannen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escanear QR de vinculación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanner le QR d’association"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansiona QR di associazione"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ler QR de emparelhamento"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сканировать QR-код сопряжения"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme QR kodunu tara"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扫描配对二维码"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "掃描配對 QR 碼"
           }
         }
       }
@@ -126974,6 +127082,60 @@
             "state" : "translated",
             "value" : "This packet is too large for a QR code. Use Copy instead."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Paket ist für einen QR-Code zu groß. Verwende stattdessen „Kopieren“."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este paquete es demasiado grande para un código QR. Usa Copiar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce paquet est trop volumineux pour un code QR. Utilisez Copier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo pacchetto è troppo grande per un codice QR. Usa Copia."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pacote é demasiado grande para um código QR. Usa Copiar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этот пакет слишком велик для QR-кода. Используйте «Копировать»."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu paket bir QR kodu için çok büyük. Bunun yerine Kopyala’yı kullanın."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此数据包过大，无法生成二维码。请改用“复制”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此封包過大，無法產生 QR 碼。請改用「複製」。"
+          }
         }
       }
     },
@@ -126984,6 +127146,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scan a device pairing QR from White Noise. Private keys and profile codes are not accepted."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanne einen QR-Code zur Gerätekopplung von White Noise. Private Schlüssel und Profilcodes werden nicht akzeptiert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escanea un código QR de vinculación de dispositivos de White Noise. No se aceptan claves privadas ni códigos de perfil."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scannez un code QR d’association d’appareils de White Noise. Les clés privées et les codes de profil ne sont pas acceptés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansiona un codice QR di White Noise per associare dispositivi. Le chiavi private e i codici profilo non sono accettati."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lê um código QR de emparelhamento de dispositivos do White Noise. Não são aceites chaves privadas nem códigos de perfil."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сканируйте QR-код White Noise для сопряжения устройств. Закрытые ключи и коды профилей не принимаются."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "White Noise cihaz eşleştirme QR kodunu tarayın. Özel anahtarlar ve profil kodları kabul edilmez."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请扫描 White Noise 的设备配对二维码。不接受私钥或个人资料二维码。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請掃描 White Noise 的裝置配對 QR 碼。不接受私鑰或個人資料 QR 碼。"
           }
         }
       }

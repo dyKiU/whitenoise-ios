@@ -46,9 +46,71 @@
   ],
   "limits": [
     "New feature acceptance; no fabricated failing baseline.",
-    "Full final compatibility suites and signed physical development build follow this passing commit.",
     "Actual physical camera scan and installed Mac/iPhone pairing remain unverified.",
     "This transports pairing packets, not account private keys; both devices still require account sign-in.",
-    "Packets larger than one QR show Copy fallback; never truncated, no multipart claimed."
-  ]
+    "Packets larger than one QR show Copy fallback; never truncated, no multipart claimed.",
+    "Final full compatibility suites follow the signed localization correction; no physical scan or installed pairing acceptance yet."
+  ],
+  "localization_correction": {
+    "source": {
+      "Shared/Localizable.xcstrings": "c15fbec1c2600c4b064b4eede2abdbbf56f1d177dd6beb95d721fbb2633f9988",
+      "whitenoise-ios.xcodeproj/project.pbxproj": "28dc8ad1ae1dd80b233c33f9619fa399f1a20ed6339b33b92ce2fd1cc07e4e25",
+      "whitenoise-iosTests/whitenoise_iosTests.swift": "e5ce32070b08d815781f26dcde46e4478fa560317d7debd4357c0e6d2d57880f"
+    },
+    "changes": "Four QR labels translated in all ten locales; four project camera descriptions and canonical permission expectation aligned with camera catalog. No QR/native behavior changed.",
+    "actual_gates": {
+      "ios-pairing-qr-localization-affected-v1": {
+        "exit_code": 0,
+        "seconds": 50.11264262511395,
+        "command": [
+          "bash",
+          "scripts/test.sh",
+          "-only-testing:whitenoise-iosTests/DevicePairingQRCodeTests",
+          "-only-testing:whitenoise-iosTests/QRCodeTests",
+          "-only-testing:whitenoise-iosTests/OnboardingQRScannerTests",
+          "-only-testing:whitenoise-iosTests/QRScannerFailureTests",
+          "-only-testing:whitenoise-iosTests/DeviceVerificationViewModelTests",
+          "-only-testing:whitenoise-iosTests/DeviceLinkingOwnedActionTests",
+          "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests",
+          "-only-testing:whitenoise-iosTests/DeviceEnrollmentViewModelTests"
+        ],
+        "log": "/Users/pj/project/build/results/ios-pairing-qr-localization-affected-v1.log",
+        "log_sha256": "fc5e63858250b0414cbb1969818d1d121356b6785875fbf0e7f7784576f0543d",
+        "input_manifest_sha256": "3e4e689d02745bc4dd97196e3a9636a4bb709356857d025296e89a7c5ddfc0f7",
+        "actual_summary": {
+          "passedTests": 57,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 57
+        }
+      },
+      "ios-pairing-qr-catalog-v1": {
+        "exit_code": 0,
+        "seconds": 8.205586584052071,
+        "command": [
+          "bash",
+          "scripts/test.sh",
+          "-only-testing:whitenoise-iosTests/LocalizationCatalogTests"
+        ],
+        "log": "/Users/pj/project/build/results/ios-pairing-qr-catalog-v1.log",
+        "log_sha256": "ea766744932e841779f23826bbaf25cf29ea8e5e571b62459cf6bfe690192d17",
+        "input_manifest_sha256": "3e4e689d02745bc4dd97196e3a9636a4bb709356857d025296e89a7c5ddfc0f7",
+        "actual_summary": {
+          "passedTests": 14,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 14
+        }
+      }
+    },
+    "prior_full_experimental": {
+      "source": "2849fa78a117174885eb1d1aac651f6cefeecb64",
+      "exit_code": 65,
+      "passed": 2877,
+      "failed": 4,
+      "skipped": 9,
+      "log_sha256": "6a7fda219206df437aeac341ac56293444ce9caa6bdf1de1aa38d0a66d011d71",
+      "failure_scope": "Four localization/permission controls; original terminal failure retained."
+    }
+  }
 }

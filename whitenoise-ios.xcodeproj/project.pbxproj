@@ -503,7 +503,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "White Noise";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile and device pairing QR codes and take photos and videos for encrypted chats.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "White Noise uses Face ID to unlock the app.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "White Noise uses your location only when you choose to share it in an encrypted chat.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "White Noise uses the microphone to record encrypted voice messages and chat videos.";
@@ -557,7 +557,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "White Noise";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile and device pairing QR codes and take photos and videos for encrypted chats.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "White Noise uses Face ID to unlock the app.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "White Noise uses your location only when you choose to share it in an encrypted chat.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "White Noise uses the microphone to record encrypted voice messages and chat videos.";
@@ -823,7 +823,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(WN_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile and device pairing QR codes and take photos and videos for encrypted chats.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "White Noise uses Face ID to unlock the app.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "White Noise uses your location only when you choose to share it in an encrypted chat.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "White Noise uses the microphone to record encrypted voice messages and chat videos.";
@@ -877,7 +877,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "White Noise";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "White Noise uses the camera to scan profile and device pairing QR codes and take photos and videos for encrypted chats.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "White Noise uses Face ID to unlock the app.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "White Noise uses your location only when you choose to share it in an encrypted chat.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "White Noise uses the microphone to record encrypted voice messages and chat videos.";

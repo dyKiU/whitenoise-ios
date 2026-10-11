@@ -3920,7 +3920,7 @@ struct LocalizationCatalogTests {
 
         let english = try localizedValue("NSCameraUsageDescription", locale: "en", in: strings)
         #expect(english != "NSCameraUsageDescription")
-        #expect(english == "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats.")
+        #expect(english == "White Noise uses the camera to scan profile and device pairing QR codes and take photos and videos for encrypted chats.")
         #expect(localizations["fr"] != nil)
         #expect(localizations["zh-Hant"] != nil)
     }
