@@ -82,10 +82,17 @@ The message distinguishes an unconfirmed invitation from the locally created
 chat. No retry, delivery acknowledgment, private-key transfer or protocol change
 is synthesized. All ten supported languages have the two warning strings.
 
-Affected published-core qualification is recorded in
+Affected published-core qualification passes 113/0/0, recorded in
 `ios-invitation-warning-green-v2.xcresult` on M5. An initial compile failure from
 a missing Foundation import is preserved separately as `green-v1`; it is not a
 runtime failure. Changed-file strict lint passes. Full lint retains the two
 existing unchecked-Sendable violations in `DeviceLinkingAccountLifetimeTests`.
-Full integration qualification and merge are pending. Physical visibility and
-the original missing-request exchange remain unverified.
+Full published-core qualification passes 2718/0/3 and full experimental SDK987
+qualification passes 2884/0/9 (passed/failed/skipped), with existing opt-in skips.
+Results are `ios-invitation-warning-full-published-v1.xcresult` and
+`ios-invitation-warning-full-experimental-v1.xcresult` under the same M5 results
+directory. Both qualify product/test source `313f657`; four changed input hashes
+match M1 and both isolated M5 worktrees. SDK987 uses a separate worktree,
+DerivedData and simulator `78B7D41F-B87C-4597-91DE-55477D008938`; history work is
+unchanged. The user authorized merging this warning fix into `develop_dy`.
+Physical visibility and the original missing-request exchange remain unverified.
