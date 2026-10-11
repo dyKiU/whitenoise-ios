@@ -1,6 +1,136 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Invitation delivery pending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invitation delivery pending"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einladungszustellung ausstehend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrega de invitación pendiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi de l’invitation en attente"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consegna dell’invito in sospeso"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrega do convite pendente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доставка приглашения ожидается"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Davet teslimi beklemede"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邀请发送待确认"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邀請傳送待確認"
+          }
+        }
+      }
+    },
+    "The chat was created, but invitation delivery is not confirmed. The recipient may not see a chat request yet." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The chat was created, but invitation delivery is not confirmed. The recipient may not see a chat request yet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Chat wurde erstellt, aber die Zustellung der Einladung ist nicht bestätigt. Der Empfänger sieht möglicherweise noch keine Chatanfrage."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se creó el chat, pero no se ha confirmado la entrega de la invitación. Es posible que el destinatario aún no vea una solicitud de chat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le chat a été créé, mais l’envoi de l’invitation n’est pas confirmé. Le destinataire ne voit peut-être pas encore de demande de chat."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La chat è stata creata, ma la consegna dell’invito non è confermata. Il destinatario potrebbe non vedere ancora una richiesta di chat."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O chat foi criado, mas a entrega do convite não foi confirmada. O destinatário pode ainda não ver um pedido de chat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чат создан, но доставка приглашения не подтверждена. Получатель может пока не видеть запрос на чат."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sohbet oluşturuldu ancak davetin teslimi doğrulanmadı. Alıcı henüz bir sohbet isteği görmeyebilir."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天已创建，但邀请发送尚未确认。接收方可能暂时看不到聊天请求。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天已建立，但邀請傳送尚未確認。接收方可能暫時看不到聊天請求。"
+          }
+        }
+      }
+    },
     "" : {
       "extractionState" : "manual",
       "localizations" : {

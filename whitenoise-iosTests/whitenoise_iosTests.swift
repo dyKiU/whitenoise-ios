@@ -1889,6 +1889,36 @@ struct AppStateBootstrapTests {
         await stopReadyRuntime(appState)
     }
 
+    @Test func pendingInvitationDeliveryWarnsOnlyForCurrentAccountAndRuntime() async throws {
+        let seeded = try await readyAppStateWithCreatedIdentities()
+        let appState = seeded.appState
+        let account = try #require(appState.activeAccount)
+        let generation = try #require(appState.runtimeEventsGeneration)
+        let event = MarmotEventFfi.welcomeDeliveryPending(
+            accountIdHex: account.accountIdHex, accountLabel: "private profile",
+            groupIdHex: "private group", messageIdHex: "private message", recipientHex: "private recipient"
+        )
+        appState.dismissToast()
+        appState.handleRuntimeEvent(event, generation: generation - 1)
+        #expect(appState.activeToast == nil)
+        appState.handleRuntimeEvent(.welcomeDeliveryPending(
+            accountIdHex: "other-account", accountLabel: "private profile",
+            groupIdHex: "private group", messageIdHex: "private message", recipientHex: "private recipient"
+        ), generation: generation)
+        #expect(appState.activeToast == nil)
+        appState.handleRuntimeEvent(event, generation: generation)
+        let toast = try #require(appState.activeToast)
+        #expect(toast.style == .warning)
+        #expect(toast.title == L10n.string("Invitation delivery pending"))
+        #expect(toast.message == L10n.string("The chat was created, but invitation delivery is not confirmed. The recipient may not see a chat request yet."))
+        #expect(toast.diagnostic == nil)
+        appState.dismissToast()
+        await appState.startRuntimeSuspension().value
+        appState.handleRuntimeEvent(event, generation: generation)
+        #expect(appState.activeToast == nil)
+        await stopReadyRuntime(appState)
+    }
+
     @Test func groupRecoveryNoticesRespectAccountAndRuntimeOwnership() async throws {
         let seeded = try await readyAppStateWithCreatedIdentities()
         let appState = seeded.appState

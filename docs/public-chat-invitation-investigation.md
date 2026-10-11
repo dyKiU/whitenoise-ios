@@ -68,5 +68,24 @@ failure while retaining the sender's canonical group; assert the pending native
 record/event, no recipient invitation, and recovery by re-delivering the same
 Welcome without creating a second group. Repeat with separately pinned published
 and experimental SDK workers, in both sponsor directions, then receiver restart.
-Only after reproducing a behavioral failure should a focused fix be selected.
 Preserve authentication and ordinary public protocol compatibility throughout.
+
+## Pending-delivery warning fix
+
+The missing normal-UI warning reproduces through the actual runtime event route:
+the new test fails 0/1 because `activeToast` is nil before the fix. The first
+method-filter attempt executed zero tests and is excluded from that evidence.
+The fixed event route presents an eight-second localized warning for the active
+account only. Stale runtime, unrelated-account and suspended-runtime events are
+ignored; no identifiers or peer-provided labels appear in the banner.
+The message distinguishes an unconfirmed invitation from the locally created
+chat. No retry, delivery acknowledgment, private-key transfer or protocol change
+is synthesized. All ten supported languages have the two warning strings.
+
+Affected published-core qualification is recorded in
+`ios-invitation-warning-green-v2.xcresult` on M5. An initial compile failure from
+a missing Foundation import is preserved separately as `green-v1`; it is not a
+runtime failure. Changed-file strict lint passes. Full lint retains the two
+existing unchecked-Sendable violations in `DeviceLinkingAccountLifetimeTests`.
+Full integration qualification and merge are pending. Physical visibility and
+the original missing-request exchange remain unverified.
