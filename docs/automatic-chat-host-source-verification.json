@@ -199,5 +199,92 @@
       "strict_swiftlint_exit": 0,
       "diff_check_exit": 0
     }
+  },
+  "approval_retirement_fixture": {
+    "capture": "ed32b57f72f6358c755da0aa21d829305955f133",
+    "source_files": {
+      "whitenoise-iosTests/DeviceEnrollmentApprovalReviewTests.swift": "0df75b7f0c2206841881e5eda4d5193109a92ac527750d70438f168b2cfee0e1",
+      "whitenoise-ios.xcodeproj/project.pbxproj": "6008cbd3d30ef4f5e31d5fb1e0f6180c8c1e33d54d1258f25506599b75d6e6a4"
+    },
+    "cohorts": [
+      {
+        "prefix": "build/results/automatic-host-ios-final-experimental-v1",
+        "exit_code": 65,
+        "seconds": 189.79,
+        "raw_log_sha256": "eb4adeced1a38d853e6887aabe8005c285a7439fdd6331d1813f9619f16eda05",
+        "input_manifest_sha256": "b67eb48683f465181d15b40acc2b86f2b0b3a40bb99faed90be50b71a12f43e1",
+        "actual_counts": {
+          "passedTests": 2915,
+          "failedTests": 1,
+          "skippedTests": 10,
+          "totalTestCount": 2926
+        },
+        "source_unchanged": true
+      },
+      {
+        "prefix": "build/results/ios-approval-retirement-unchanged-v1",
+        "exit_code": 0,
+        "seconds": 9.32,
+        "raw_log_sha256": "8c02fddf52d3f056969f73884cf4956fd8e3a3b7094a3d656295749bb0536b27",
+        "input_manifest_sha256": "b67eb48683f465181d15b40acc2b86f2b0b3a40bb99faed90be50b71a12f43e1",
+        "actual_counts": {
+          "passedTests": 14,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 14
+        },
+        "source_unchanged": true
+      },
+      {
+        "prefix": "build/results/ios-approval-retirement-completion-v1",
+        "exit_code": 0,
+        "seconds": 18.58,
+        "raw_log_sha256": "8256dbbb79f42c372cb454434c917d9335d3d714de80f57cd224039f962c9f26",
+        "input_manifest_sha256": "568b029857d843ac35359f6aadbba4db2d613cf510fdc9a3c88a4465591601bf",
+        "actual_counts": {
+          "passedTests": 14,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 14
+        },
+        "source_unchanged": true
+      },
+      {
+        "prefix": "build/results/ios-approval-retirement-affected-v1",
+        "exit_code": 0,
+        "seconds": 8.89,
+        "raw_log_sha256": "c57f898a98f7e841a0846c2c7540f6bbe0d266daafe036bc5682a361bbcdee6d",
+        "input_manifest_sha256": "568b029857d843ac35359f6aadbba4db2d613cf510fdc9a3c88a4465591601bf",
+        "actual_counts": {
+          "passedTests": 50,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 50
+        },
+        "source_unchanged": true
+      }
+    ],
+    "finding": "Fullsuite retirement0 expected completedcancel immediately afterreviewcompletion, but actualAccountStore invalidates synchronously and schedules independentcleanup. Unchanged focused14pass doesnot reproducefullfailure; no productiondefect asserted.",
+    "change": "Observe actual successfuloriginalcancel completion via cancellableAsyncStream with30s failclosedwatch. Original retired/no-review/no-approval assertions staybeforewait; exactcancelCount1 staysaftercompletion. No extra cancelcall, fixedyield or sleepusedasoracle.",
+    "production_delta": false,
+    "apple_project_serialization": {
+      "base": "5db840f5a4831edd5e2cdb092a489344d574824d",
+      "signed_project_sha256": "28dc8ad1ae1dd80b233c33f9619fa399f1a20ed6339b33b92ce2fd1cc07e4e25",
+      "tested_project_sha256": "6008cbd3d30ef4f5e31d5fb1e0f6180c8c1e33d54d1258f25506599b75d6e6a4",
+      "canonical_json_semantic_equality": true,
+      "origin": "Actual xcodebuild -importLocalizations v2 nine imports serialized existing UI automation target entries; no project patch in test runner",
+      "live_inputs_not_mutated": true
+    },
+    "static": {
+      "pinned_swiftlint": "0.63.2",
+      "strict_exit": 0,
+      "parse_exit": 0,
+      "diff_check_exit": 0
+    },
+    "limits": [
+      "Fullv1 failed2915/1/10 is preserved, not fullqualification.",
+      "No additionalfullmatrix until matchedSDK incorporatesgenuine nativewithdrawalfix; Rootholdsdevelopmentpromotion.",
+      "OriginalnativeABC QR1/0/0 remains separatelyqualified onunchangedcodec/SDK inputs."
+    ]
   }
 }
