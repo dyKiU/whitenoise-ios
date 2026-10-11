@@ -77,5 +77,107 @@
     "actual_apple_imports": 9,
     "all_prior_values_and_order_preserved": true,
     "product_test_result_reuse": "17 focused and148 affected unchanged Swift/SDK inputs; final full matrix pending multipart QR"
+  },
+  "multipart_pairing_qr": {
+    "source_capture": "ac940050d53acaaaeb717aeff3e62059adfc6635",
+    "source_files": {
+      "whitenoise-ios/Core/DevicePairingQRCode.swift": "b8dbc97a8d465f09b381b459413612d1ec9aca4754da3b392a1527cc0c40e61e",
+      "whitenoise-ios/Settings/DeviceEnrollmentApprovalView.swift": "184fdda678ae0c25e220428eac4b63632727ead556cc9f7f00ed3737edab8711",
+      "whitenoise-ios/Settings/DeviceEnrollmentTransportView.swift": "88206e87600e9bff549309555351ddd0260a19fc3adfd849a4b7e434b769d58e",
+      "whitenoise-ios/Settings/DevicePairingQRImport.swift": "c6f6c3b7acbcdea03f72d9f2f25883973df90c22fdd107f3d40c659d4876a1c6",
+      "whitenoise-ios/Settings/DevicePairingQRViews.swift": "ffaa2f69ca543d8c8cc12ae369d35bc54e8516bdc43bb6d380ff7de85297ab9f",
+      "whitenoise-ios/Settings/DeviceVerificationView.swift": "278a62edf205a23d267fc253d9abbaa660b187e3f13adfc0cda9cc3dc35c4680",
+      "whitenoise-iosTests/NativePairingQRCodeTests.swift": "54b3a3184cd0ba84b0b31942f48e249af0698ddddacc78a74cd52700c85d8da4",
+      "whitenoise-iosTests/PairingMultipartQRCodeTests.swift": "4f890077e8d5dd5769aaf82bcb042b03c759c173f5a28f587eba19ac3d0343ed",
+      "whitenoise-iosTests/PairingQRImportMultipartTests.swift": "db52b4fcc388abccdcef9b1d7cd22c8afec6f99eb8b60b0b3cf1c109a7d21418"
+    },
+    "wire_contract_reference": "Mac pure codec1ecb9e8e5916da48e375f27d2929f894f74d52c2",
+    "native_fixture_reference": "signed23da643acc59884b016c00093b3e7349126778d1 original ABC acceptance; only actual iOS codec adapter and checked task-only memory store",
+    "bounds": {
+      "frame_utf8": 2200,
+      "packet_bytes": 49152,
+      "frames": 32,
+      "raw_fragment_bytes": 1536,
+      "fixed_import_deadline_seconds": 120
+    },
+    "transport": "Verification, A/C enrollment export+scan and B approved enrollment scan; packet staging only, original explicit Receive/comparison/approve preserved. Same unfinished import across camera retry/sheet reopen; explicit Start over retires old ticket; account/original/phase/scene retirement refuses late callbacks. No SDK authority or600s deadline renewal.",
+    "cohorts": [
+      {
+        "prefix": "build/results/ios-pairing-multipart-focused-v1",
+        "exit_code": 65,
+        "seconds": 54.09,
+        "raw_log_sha256": "a0d94a9ed7bf793cff619eef5d11580a8f1f757c855ede6d495595f2eb8eb7e1",
+        "input_manifest_sha256": "1cd13cf5b88f22620dadd68b10be61e9d1e0eac042b058d7b241a9b82f750c2e",
+        "unchanged_inputs": true,
+        "runtime_tests": 0,
+        "classification": "compile-only missing UIKit import in new CIImage test; preserved"
+      },
+      {
+        "prefix": "build/results/ios-pairing-multipart-focused-v2",
+        "exit_code": 0,
+        "seconds": 160.0,
+        "raw_log_sha256": "aaf4c71d478997dca476881ade2643d2576c23d79e0d2bffcd44de3fbf6134bf",
+        "input_manifest_sha256": "5dcc2ea7105752e3b15a753a7d2296c4fcdb571699490a6bcdb8121419659e63",
+        "unchanged_inputs": true,
+        "actual_counts": {
+          "passedTests": 13,
+          "failedTests": 0,
+          "skippedTests": 1,
+          "totalTestCount": 14
+        }
+      },
+      {
+        "prefix": "build/results/ios-native-pairing-multipart-v1",
+        "exit_code": 0,
+        "seconds": 19.1,
+        "raw_log_sha256": "5a45b5c52c77ad7c99bd5aae7db2b35c839d69665e56cb2ecf5dd8b02034f824",
+        "input_manifest_sha256": "475eeef9c7603e52322f7cd23875ce4b11bbc6f0da8aaacf7990782f062f3267",
+        "unchanged_inputs": true,
+        "actual_counts": {
+          "passedTests": 1,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 1
+        }
+      },
+      {
+        "prefix": "build/results/ios-pairing-multipart-affected-v1",
+        "exit_code": 0,
+        "seconds": 19.38,
+        "raw_log_sha256": "34842b611f8af46eff8bd7ab989549ad2794311fe3d3be495468d29924e01189",
+        "input_manifest_sha256": "5dcc2ea7105752e3b15a753a7d2296c4fcdb571699490a6bcdb8121419659e63",
+        "unchanged_inputs": true,
+        "actual_counts": {
+          "passedTests": 144,
+          "failedTests": 0,
+          "skippedTests": 1,
+          "totalTestCount": 145
+        }
+      }
+    ],
+    "native_actual": {
+      "c_challenge_bytes": 4729,
+      "c_challenge_frames": 4,
+      "approved_enrollment_bytes": 8244,
+      "enrollment_frames": 6,
+      "max_frame_utf8": 2149,
+      "sdk_authenticated_all_packets": true,
+      "actual_original_b_approval": true,
+      "all_three_settled": true,
+      "actual_storage_closes": 3
+    },
+    "scoped_static": {
+      "pinned_swiftlint_version": "0.63.2",
+      "changed_swift_files": 50,
+      "strict_exit": 0,
+      "diff_check_exit": 0
+    },
+    "localization": "Reuses existing translated Scan pairing QR,Start over,Back,Next,%@ of %@; c39 Apple import proof retained.",
+    "limits": [
+      "Native fixture explicitly opted in via generated slim Staging xctestrun; ordinary focused/affected native skip remains honestly recorded.",
+      "Native fixture/codecs/rendered images qualify transport, not installed camera or physical pairing journey.",
+      "Final full published/experimental PR and backend/integration promotion pending.",
+      "Main M1 ready/installed accounts, current SDK987 artifacts and previous SDKs unchanged."
+    ]
   }
 }

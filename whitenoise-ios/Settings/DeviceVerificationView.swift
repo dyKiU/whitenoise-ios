@@ -24,7 +24,6 @@
         @State private var actionFailed = false
         @State private var isWorking = false
         @State private var actionTask: Task<Void, Never>?
-        @State private var scanning = false
 
         init(model: DeviceVerificationViewModel) { _model = State(initialValue: model) }
 
@@ -77,11 +76,8 @@
                             kind: .multiline(2...4), surface: .filled
                         )
                         .disabled(isWorking || !model.isActive)
-                        WNButton(title: "Scan pairing QR", emphasis: .secondary, size: .standard) {
-                            incoming = ""
-                            scanning = true
-                        }
-                        .disabled(isWorking || !model.isActive || model.cleanupRequired)
+                        qrImportButton
+                            .disabled(isWorking || !model.isActive || model.cleanupRequired)
                         if model.owner == nil {
                             if model.offersFirstDeviceSetupAttempt {
                                 WNButton(
@@ -197,13 +193,6 @@
             }
             .localizedNavigationTitle("Device verification")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $scanning) {
-                DevicePairingScannerSheet { packet in
-                    guard scanning, scenePhase == .active, model.isActive, !model.cleanupRequired else { return }
-                    incoming = packet
-                    scanning = false
-                }
-            }
             .sheet(isPresented: Binding(get: { enrollment != nil }, set: { if !$0 { enrollment = nil } })) {
                 NavigationStack { DeviceEnrollmentTransportView(model: enrollment) }
             }
@@ -218,13 +207,22 @@
             }
             .onDisappear { actionTask?.cancel() }
             .onChange(of: model.isActive) { _, active in if !active { clearPackets() } }
-            .onChange(of: scenePhase) { _, phase in if phase != .active { scanning = false } }
+        }
+
+        private var qrImportIdentity: String {
+            let owner = model.owner.map { String(describing: ObjectIdentifier($0)) } ?? "setup"
+            return "\(owner):\(String(describing: model.snapshot?.phase)):\(model.snapshot?.revision ?? 0)"
+        }
+        private var qrImportButton: some View {
+            let identity = qrImportIdentity
+            return DevicePairingQRImportButton(isCurrent: {
+                model.isActive && !model.cleanupRequired && qrImportIdentity == identity
+            }, onScan: { incoming = $0 }).id(identity)
         }
 
         private func decodedPacket() throws -> Data { try DeviceVerificationPacketInput.decode(incoming) }
 
         private func clearPackets() {
-            scanning = false
             enrollment = nil
             approval = nil
             incoming = ""
