@@ -10,7 +10,7 @@ import Testing
     nonisolated private final class EnrollmentSubscription: DeviceLinkingSubscription, @unchecked Sendable {
         private let lock = NSLock()
         private var emitted = false
-        override func close() {}
+        override func closeStream() {}
         override func next() async throws -> DeviceLinkingSnapshotFfi {
             let first = lock.withLock {
                 let first = !emitted

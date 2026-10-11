@@ -43,12 +43,25 @@ final class AccountStore {
     }
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private(set) var automaticChats: AutomaticChatAccountOwner?
+
+        func holdAutomaticChats(_ owner: AutomaticChatAccountOwner) {
+            automaticChats?.invalidate()
+            automaticChats = owner
+        }
+
         private(set) var historyConsentReviewModel: HistoryConsentReviewModel?
         func holdHistoryConsentReview(_ model: HistoryConsentReviewModel) {
             historyConsentReviewModel?.invalidate()
             historyConsentReviewModel = model
         }
         let historyConsentLifetime = HistoryConsentAccountLifetime()
+        let accountSharingLifetime = AccountSharingAccountLifetime()
+        private(set) var accountChatSharingModel: AccountChatSharingViewModel?
+        func holdAccountChatSharing(_ model: AccountChatSharingViewModel) {
+            accountChatSharingModel?.invalidate()
+            accountChatSharingModel = model
+        }
         private(set) var synchronizedHistoryModels: [String: SynchronizedHistoryViewModel] = [:]
 
         func holdSynchronizedHistory(_ model: SynchronizedHistoryViewModel, groupIdHex: String) {
@@ -261,11 +274,16 @@ final class AccountStore {
         private func retireDeviceLinkingScope() {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
+            automaticChats?.invalidate()
+            automaticChats = nil
             for reader in synchronizedHistoryModels.values { reader.invalidate() }
             synchronizedHistoryModels.removeAll()
             historyConsentReviewModel?.invalidate()
             historyConsentReviewModel = nil
             historyConsentLifetime.invalidate()
+            accountSharingLifetime.invalidate()
+            accountChatSharingModel?.invalidate()
+            accountChatSharingModel = nil
             selectedChatLifetime.invalidate()
             selectedChatTransferModel?.invalidate()
             selectedChatTransferModel = nil
@@ -310,6 +328,9 @@ final class AccountStore {
                 if firstError == nil { firstError = error }
             }
             do { try historyConsentLifetime.retryCleanup() } catch {
+                if firstError == nil { firstError = error }
+            }
+            do { try accountSharingLifetime.retryCleanup() } catch {
                 if firstError == nil { firstError = error }
             }
             if let firstError { throw firstError }

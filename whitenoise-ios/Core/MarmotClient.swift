@@ -66,6 +66,15 @@ nonisolated final class MarmotClient: Sendable {
                 accountRef: accountRef, groupIdHex: groupIdHex, recipientDevice: recipientDevice)
         }
 
+        func accountChatSharingTargets(accountRef: String) async throws -> AccountSharingTargetsFfi {
+            try await marmot.accountChatSharingTargets(accountRef: accountRef)
+        }
+        func beginAccountChatSharing(accountRef: String, recipientDevice: Data) async throws -> AccountSharingApproval {
+            try await marmot.beginAccountChatSharing(accountRef: accountRef, recipientDevice: recipientDevice)
+        }
+        func pendingAccountChatSharing(accountRef: String) async throws -> [AccountSharingApproval] {
+            try await marmot.pendingAccountChatSharing(accountRef: accountRef)
+        }
         func pendingHistoryRequests(accountRef: String) async throws -> [HistoryConsent] {
             try await marmot.pendingHistoryRequests(accountRef: accountRef)
         }

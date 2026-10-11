@@ -15,8 +15,11 @@
                         let snapshot = model.snapshot, snapshot.phase == .verificationCompleteEnrollmentPending
                     {
                         Section {
-                            WNButton(title: "Continue", size: .standard, isLoading: model.isWorking) {
-                                perform(.continueLinking, revision: snapshot.revision)
+                            Text(
+                                "Pairing shares all existing and future chats, chat history, and messaging between these devices."
+                            )
+                            WNButton(title: "Pair and share all chats", size: .standard, isLoading: model.isWorking) {
+                                perform(.shareChats, revision: snapshot.revision)
                             }.disabled(model.isWorking)
                             WNButton(title: "Read outgoing packets", emphasis: .secondary, size: .standard) {
                                 perform(.exportPacket, revision: snapshot.revision)

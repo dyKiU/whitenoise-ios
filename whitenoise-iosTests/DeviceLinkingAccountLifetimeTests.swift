@@ -13,7 +13,7 @@ import Testing
         var readCount: Int { lock.withLock { reads } }
         var closeCount: Int { lock.withLock { closes } }
         var isWaiting: Bool { lock.withLock { pending != nil } }
-        override func close() { lock.withLock { closes += 1 } }
+        override func closeStream() { lock.withLock { closes += 1 } }
         override func next() async throws -> DeviceLinkingSnapshotFfi {
             try await withCheckedThrowingContinuation { continuation in
                 lock.withLock {

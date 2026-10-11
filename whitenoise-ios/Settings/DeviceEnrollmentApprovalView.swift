@@ -17,8 +17,14 @@
                             CopyableValueRow(title: "Source device key", value: review.sourceKey)
                             CopyableValueRow(title: "Joining device key", value: review.joiningKey)
                             LabeledContent("Existing devices", value: String(review.existingDeviceCount))
-                            WNButton(title: "Approve", size: .standard, isLoading: model.isWorking) {
-                                perform(.approve, revision: review.revision)
+                            Text(
+                                "Pairing shares all existing and future chats, chat history, and messaging between these devices."
+                            )
+                            WNButton(
+                                title: "Approve pairing and share all chats", size: .standard,
+                                isLoading: model.isWorking
+                            ) {
+                                perform(.approveAndShareChats, revision: review.revision)
                             }.disabled(model.isWorking)
                         }
                     } else if model.isActive, let snapshot = model.snapshot,
