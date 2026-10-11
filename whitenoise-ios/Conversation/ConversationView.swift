@@ -865,22 +865,6 @@ struct ConversationView: View {
                 VStack(spacing: 0) {
                     if viewModel?.search.isActive != true {
                         conversationHeaderBar
-                        #if WN_EXPERIMENTAL_DEVICE_SYNC
-                            HistorySourceConversationEntry(
-                                acquire: { try await appState.makeHistorySourcePickerModel(groupIdHex: chat.groupIdHex) },
-                                release: { appState.releaseHistorySourcePickerModel($0) }
-                            )
-                            .id(SynchronizedHistoryConversationOwner(
-                                accountEpoch: appState.accountStore.deviceLinkingOwnershipIdentity,
-                                runtimeGeneration: appState.runtimeGeneration, groupIdHex: chat.groupIdHex))
-                            SynchronizedHistoryConversationEntry(
-                                makeModel: { try appState.makeSynchronizedHistoryModel(groupIdHex: chat.groupIdHex) },
-                                releaseModel: { appState.releaseSynchronizedHistoryModel($0, groupIdHex: chat.groupIdHex) }
-                            )
-                            .id(SynchronizedHistoryConversationOwner(
-                                accountEpoch: appState.accountStore.deviceLinkingOwnershipIdentity,
-                                runtimeGeneration: appState.runtimeGeneration, groupIdHex: chat.groupIdHex))
-                        #endif
                     }
                     searchBarInset
                     if let viewModel {
