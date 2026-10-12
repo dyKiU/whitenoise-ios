@@ -20,6 +20,10 @@ struct AccountSetupActions: View {
             AccountSetupProfileView(model: model)
         } else if selectedStep == .relays || selectedStep == .inboxRelays {
             AccountSetupRelayStepView(model: model, selectedStep: selectedStep)
+        } else if selectedStep == .singleDevice {
+            AccountSetupDeviceView(model: model)
+        } else if selectedStep == .keyPackage {
+            AccountSetupSecureMessagingView(model: model)
         } else {
             decisionContent
         }
@@ -30,7 +34,7 @@ struct AccountSetupActions: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     explanation
-                    if let step, selectedStep != .singleDevice {
+                    if let step {
                         ForEach(AccountSetupPresentation.findingMessages(step.findings), id: \.self) { message in
                             Text(verbatim: message)
                                 .foregroundStyle(.secondary)
@@ -68,13 +72,6 @@ struct AccountSetupActions: View {
             Text("Your previous update hasn’t finished. Try again to finish publishing it.")
         } else {
             switch selectedStep {
-            case .singleDevice:
-                Text("White Noise does not yet sync conversations across devices. We recommend using this profile on one device.")
-                if let notice = model.snapshot.singleDeviceNotice {
-                    Text(AccountSetupPresentation.deviceNotice(notice.discovery)).foregroundStyle(.secondary)
-                }
-            case .keyPackage:
-                Text("Secure messaging must be ready before you can open Chats. Try this check again.")
             case .follows:
                 Text("You can continue without changing the people you follow.")
             default:
@@ -87,9 +84,6 @@ struct AccountSetupActions: View {
         if let step {
             if proposal != nil, !step.actions.contains(.approveRepair), !step.actions.contains(.cancelRepair) {
                 if step.actions.contains(.retry) { action("Try Again", .retry(selectedStep)) }
-            } else if step.actions.contains(.continueAnyway) {
-                action(LocalizedStringKey(AccountSetupPresentation.deviceAction(model.snapshot.singleDeviceNotice?.discovery)),
-                       .acknowledge(model.snapshot.revision, recoveryEpoch: model.snapshot.recoveryEpoch))
             } else if step.actions.contains(.retry) { action("Try Again", .retry(selectedStep)) }
             if step.actions.contains(.cancelRepair) { action("Back", .cancelRepair, secondary: true) }
             if selectedStep == .follows, step.actions.contains(.continueWithout) { action("Continue", .skip(.follows)) }
