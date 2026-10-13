@@ -462,6 +462,7 @@ struct IdentityProfileSetupView: View {
                 }
             }
         }
+        .scrollIndicatorsFlash(onAppear: true)
         .safeAreaPadding(.bottom, isKeyboardVisible ? BottomInputChromeLayout.keyboardInset : 0)
     }
 

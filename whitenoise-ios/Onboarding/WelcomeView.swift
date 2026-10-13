@@ -126,6 +126,7 @@ struct WelcomeView: View {
             )
             .presentationDragIndicator(.visible)
             .presentationContentInteraction(.resizes)
+            .presentationSizing(WelcomeSheetSizing(isSignUp: route == .signUp))
         }
         .productScreen(.onboarding)
         .onChange(of: showSignIn) {
@@ -175,6 +176,17 @@ struct WelcomeView: View {
     private func updateSignInExpansion(_ isExpanded: Bool) {
         selectedSheetDetent = isExpanded ? .large : .medium
         onSignInExpansionChange(isExpanded)
+    }
+}
+
+/// iPad form sheets are too short to show the whole sign-up form.
+private struct WelcomeSheetSizing: PresentationSizing {
+    let isSignUp: Bool
+
+    func proposedSize(for root: PresentationSizingRoot, context: PresentationSizingContext) -> ProposedViewSize {
+        isSignUp
+            ? PagePresentationSizing.page.proposedSize(for: root, context: context)
+            : FormPresentationSizing.form.proposedSize(for: root, context: context)
     }
 }
 

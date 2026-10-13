@@ -60,6 +60,7 @@ struct RootView: View {
                 .appAppearance()
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+                .presentationSizing(.page)
         }
         .task(id: appState.runtimeEventsGeneration) {
             await appState.observeRuntimeEvents()

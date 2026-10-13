@@ -8,6 +8,7 @@ struct AccountSetupProfileView: View {
         NavigationStack { IdentityProfileSetupView(accountSetup: model) }
             .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
+            .presentationSizing(.page)
     }
 }
 
