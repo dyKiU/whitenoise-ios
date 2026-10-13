@@ -191,9 +191,10 @@ private struct WelcomeTermsCheckboxStyle: ToggleStyle {
             configuration.label
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity)
         .contentShape(.rect)
         .onTapGesture { configuration.isOn.toggle() }
     }
