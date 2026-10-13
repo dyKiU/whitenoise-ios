@@ -23,6 +23,51 @@ nonisolated enum ReportPresentation {
         case .completionUnknown: L10n.string("Saved; delivery confirmation is pending.")
         }
     }
+
+    /// A retained or unacknowledged send is still on its way, never "sent".
+    static func developerOutcome(_ disposition: SendAcceptDispositionFfi) -> String {
+        switch disposition {
+        case .published: L10n.string("Sent to the White Noise team.")
+        case .acceptedPending: L10n.string("Saved and waiting to send to the White Noise team.")
+        case .completionUnknown: L10n.string("Saved; delivery to the White Noise team is pending confirmation.")
+        }
+    }
+
+    /// Keeps the group report's real status (it may only be queued) beside the
+    /// failed White Noise copy, so the retry copy never claims more than happened.
+    static func developerFailure(groupOutcome: String?, failure: String) -> String {
+        guard let groupOutcome else { return failure }
+        return groupOutcome + " " + L10n.string("The copy to White Noise couldn't be sent. Try again.")
+    }
+
+    static func outcome(groupOutcome: String?, developerDisposition: SendAcceptDispositionFfi?) -> String? {
+        let developer = developerDisposition.map(developerOutcome)
+        let parts = [groupOutcome, developer].compactMap { $0 }
+        return parts.isEmpty ? nil : parts.joined(separator: " ")
+    }
+}
+
+/// Which destinations a Report Message submit sends to. Live eligibility
+/// decides a fresh submit. Once the group has the report, a retry finishes
+/// exactly what the first submit committed to, even if the message was
+/// deleted meanwhile, and never reports to the group twice.
+nonisolated struct ReportSubmissionPlan: Equatable {
+    let toGroup: Bool
+    let toDeveloper: Bool
+
+    static func plan(
+        reportsToGroup: Bool,
+        reportsToDeveloper: Bool,
+        groupOutcomeRecorded: Bool,
+        committedToDeveloper: Bool?
+    ) -> ReportSubmissionPlan? {
+        if groupOutcomeRecorded {
+            guard committedToDeveloper == true else { return nil }
+            return ReportSubmissionPlan(toGroup: false, toDeveloper: true)
+        }
+        guard reportsToGroup || reportsToDeveloper else { return nil }
+        return ReportSubmissionPlan(toGroup: reportsToGroup, toDeveloper: reportsToDeveloper)
+    }
 }
 
 struct ReportMessageSheet: View {
@@ -32,9 +77,30 @@ struct ReportMessageSheet: View {
     let message: AppMessageRecordFfi
     @State private var reason: ReportReasonFfi = .spam
     @State private var explanation = ""
+    @State private var sendsToDeveloper = true
     @State private var sending = false
     @State private var error: String?
+    /// A retry after a failed White Noise copy must not report to the group twice.
+    @State private var groupOutcome: String?
+    /// What the first submit committed to; a retry finishes exactly that.
+    @State private var committedToDeveloper: Bool?
     @State private var operation: Task<Void, Never>?
+
+    private var reportsToGroup: Bool { conversation.canReportToGroup(message) }
+    private var canReportToDeveloper: Bool { conversation.canReportToDeveloper(message) }
+    private var reportsToDeveloper: Bool {
+        canReportToDeveloper && (sendsToDeveloper || !reportsToGroup)
+    }
+    /// Once the group has the report, a retried White Noise copy must say the same thing.
+    private var reportIsLocked: Bool { sending || groupOutcome != nil }
+    private var plan: ReportSubmissionPlan? {
+        ReportSubmissionPlan.plan(
+            reportsToGroup: reportsToGroup,
+            reportsToDeveloper: reportsToDeveloper,
+            groupOutcomeRecorded: groupOutcome != nil,
+            committedToDeveloper: committedToDeveloper
+        )
+    }
 
     var body: some View {
         NavigationStack {
@@ -45,16 +111,32 @@ struct ReportMessageSheet: View {
                             Text(ReportPresentation.title(reason)).tag(reason)
                         }
                     }
+                    .disabled(reportIsLocked)
                     TextField("Explanation (optional)", text: $explanation, axis: .vertical)
                         .lineLimit(3...6)
                         .onChange(of: explanation) { _, value in explanation = String(value.prefix(1000)) }
+                        .disabled(reportIsLocked)
                 } footer: {
-                    Text("Reports are shared inside this encrypted group. Group members can read your report and explanation.")
+                    if reportsToGroup {
+                        Text("Reports are shared inside this encrypted group. Group members can read your report and explanation.")
+                    }
+                }
+                if canReportToDeveloper {
+                    Section {
+                        if reportsToGroup {
+                            Toggle("Send to White Noise", isOn: $sendsToDeveloper)
+                                .disabled(reportIsLocked)
+                        }
+                    } footer: {
+                        if reportsToDeveloper {
+                            Text("Your report and the sender’s public key are sent to the White Noise team through your support chat. The message itself isn’t shared, and the sender isn’t notified.")
+                        }
+                    }
                 }
                 if let error { Section { Text(error).foregroundStyle(.red) } }
                 Section {
                     Button("Report Message") { operation = Task { await submit() } }
-                        .disabled(sending || !conversation.canReport(message))
+                        .disabled(sending || plan == nil)
                     if sending { ProgressView() }
                 }
             }
@@ -67,24 +149,58 @@ struct ReportMessageSheet: View {
     }
 
     private func submit() async {
-        guard !sending, conversation.canReport(message), let account = appState.activeAccountRef else { return }
+        guard !sending, let plan, let account = appState.activeAccountRef else { return }
         let generation = appState.runtimeGeneration
+        let toGroup = plan.toGroup
+        let toDeveloper = plan.toDeveloper
+        if groupOutcome == nil { committedToDeveloper = toDeveloper }
+        let reason = reason
+        let explanation = explanation
         sending = true
         error = nil
         defer { sending = false }
         do {
-            let client = try appState.currentMarmotClient()
-            let result = try await client.reportMessage(accountRef: account, groupID: conversation.group.groupIdHex,
-                messageID: message.messageIdHex, reason: reason, explanation: explanation)
-            try Task.checkCancellation()
-            guard appState.activeAccountRef == account, appState.runtimeGeneration == generation else { return }
-            appState.present(.success(L10n.string("Report submitted"), message: ReportPresentation.outcome(result)))
-            dismiss()
+            if toGroup {
+                let client = try appState.currentMarmotClient()
+                let result = try await client.reportMessage(accountRef: account, groupID: conversation.group.groupIdHex,
+                    messageID: message.messageIdHex, reason: reason, explanation: explanation)
+                try Task.checkCancellation()
+                guard appState.activeAccountRef == account, appState.runtimeGeneration == generation else { return }
+                groupOutcome = ReportPresentation.outcome(result)
+            }
         } catch is CancellationError {
+            return
         } catch {
             guard appState.activeAccountRef == account, appState.runtimeGeneration == generation else { return }
             self.error = UserFacingError.message(for: error)
+            return
         }
+        var developerDisposition: SendAcceptDispositionFfi?
+        if toDeveloper {
+            do {
+                guard let text = DeveloperReportContent.text(
+                    kind: .message(reason: reason, explanation: explanation),
+                    reportedAccountIdHex: message.sender
+                ) else { throw DeveloperReportDelivery.Failure.supportUnavailable }
+                developerDisposition = try await DeveloperReportSender.send(text, using: appState).acceptDisposition
+                try Task.checkCancellation()
+            } catch is CancellationError {
+                return
+            } catch {
+                guard appState.activeAccountRef == account, appState.runtimeGeneration == generation else { return }
+                self.error = ReportPresentation.developerFailure(
+                    groupOutcome: groupOutcome,
+                    failure: DeveloperReportSender.failureMessage(for: error)
+                )
+                return
+            }
+        }
+        guard appState.activeAccountRef == account, appState.runtimeGeneration == generation else { return }
+        appState.present(.success(
+            L10n.string("Report submitted"),
+            message: ReportPresentation.outcome(groupOutcome: groupOutcome, developerDisposition: developerDisposition)
+        ))
+        dismiss()
     }
 }
 
