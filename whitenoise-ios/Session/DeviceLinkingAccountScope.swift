@@ -40,7 +40,7 @@
             guard active else { return }
             active = false
             latestSnapshot = nil
-            subscription.close()
+            subscription.closeStream()
             observation?.cancel()
             observation = nil
         }
@@ -55,6 +55,13 @@
         func continueLinking(displayedRevision: UInt64) async throws {
             try requireActive()
             try await session.continueLinking(displayedRevision: displayedRevision)
+            try requireActive()
+        }
+
+        // Broad chat sharing is a distinct explicit action; ordinary linking remains separate.
+        func continueLinkingAndShareChats(displayedRevision: UInt64) async throws {
+            try requireActive()
+            try await session.continueLinkingAndShareChats(displayedRevision: displayedRevision)
             try requireActive()
         }
 

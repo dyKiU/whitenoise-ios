@@ -15,13 +15,17 @@
                         let snapshot = model.snapshot, snapshot.phase == .verificationCompleteEnrollmentPending
                     {
                         Section {
-                            WNButton(title: "Continue", size: .standard, isLoading: model.isWorking) {
-                                perform(.continueLinking, revision: snapshot.revision)
+                            Text(
+                                "Pairing shares all existing and future chats, chat history, and messaging between these devices."
+                            )
+                            WNButton(title: "Pair and share all chats", size: .standard, isLoading: model.isWorking) {
+                                perform(.shareChats, revision: snapshot.revision)
                             }.disabled(model.isWorking)
                             WNButton(title: "Read outgoing packets", emphasis: .secondary, size: .standard) {
                                 perform(.exportPacket, revision: snapshot.revision)
                             }.disabled(model.isWorking)
                             if let outgoing = model.outgoingPacket {
+                                DevicePairingQRCard(packet: outgoing)
                                 WNCopyButton(value: outgoing, accessibilityTitle: L10n.string("Copy")) { copied in
                                     Label(
                                         copied ? L10n.string("Copied") : L10n.string("Copy"),
@@ -34,6 +38,8 @@
                                 kind: .multiline(2...4), surface: .filled
                             )
                             .disabled(model.isWorking)
+                            qrImportButton(model)
+                                .disabled(model.isWorking || model.cleanupError != nil)
                             WNButton(title: "Receive packet", emphasis: .secondary, size: .standard) {
                                 perform(.receivePacket, revision: snapshot.revision)
                             }.disabled(model.isWorking)
@@ -62,6 +68,15 @@
                 incoming = ""
             }
             .onChange(of: model?.isActive) { _, active in if active != true { incoming = "" } }
+        }
+
+        private func qrImportButton(_ captured: DeviceEnrollmentViewModel) -> some View {
+            let revision = captured.snapshot?.revision
+            let identity = "\(ObjectIdentifier(captured)):\(revision ?? 0)"
+            return DevicePairingQRImportButton(isCurrent: {
+                model === captured && captured.isActive && captured.cleanupError == nil
+                    && captured.snapshot?.phase == .verificationCompleteEnrollmentPending && captured.snapshot?.revision == revision
+            }, onScan: { incoming = $0 }).id(identity)
         }
 
         private func perform(_ operation: DeviceEnrollmentViewModel.TransportAction, revision: UInt64) {

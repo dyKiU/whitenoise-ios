@@ -1,6 +1,6 @@
+import MarmotKit
 import SwiftUI
 import UIKit
-import MarmotKit
 
 struct ChatsListView: View {
     private struct ConsentRuntimeState: Equatable {
@@ -175,10 +175,13 @@ struct ChatsListView: View {
             .toolbar {
                 if selectionMode {
                     ToolbarItem(placement: .topBarLeading) {
-                        Button(ChatListSelection.allSelected(selectedChatIds, visibleIds: visibleRowIds)
-                               ? L10n.string("Deselect All") : L10n.string("Select All")) {
+                        Button(
+                            ChatListSelection.allSelected(selectedChatIds, visibleIds: visibleRowIds)
+                                ? L10n.string("Deselect All") : L10n.string("Select All")
+                        ) {
                             withAnimation(selectionAnimation) {
-                                selectedChatIds = ChatListSelection.togglingAll(selectedChatIds, visibleIds: visibleRowIds)
+                                selectedChatIds = ChatListSelection.togglingAll(
+                                    selectedChatIds, visibleIds: visibleRowIds)
                             }
                         }
                         .tint(.primary)
@@ -246,7 +249,10 @@ struct ChatsListView: View {
                     }
                 }
             }
-            .task(id: "\(appState.activeAccountRef ?? "")/\(appState.runtimeGeneration)/\(appState.canUseRuntimeForForegroundWork)") {
+            .task(
+                id:
+                    "\(appState.activeAccountRef ?? "")/\(appState.runtimeGeneration)/\(appState.canUseRuntimeForForegroundWork)"
+            ) {
                 await appState.historyNotices.refresh(using: appState)
             }
             .animation(.smooth(duration: 0.2), value: appState.isConnectivityCatchUpInProgress)
@@ -295,17 +301,21 @@ struct ChatsListView: View {
             .onChange(of: canPresentDiagnostics) {
                 if canPresentDiagnostics { showDiagnosticsPrompt = true }
             }
-            .modifier(ChatListIdentifierProfileRouting(
-                query: search.query,
-                identifierQuery: identifierQuery,
-                onOpenProfile: exitSearch
-            ))
+            .modifier(
+                ChatListIdentifierProfileRouting(
+                    query: search.query,
+                    identifierQuery: identifierQuery,
+                    onOpenProfile: exitSearch
+                )
+            )
             // Chats owns the consent read: bootstrap's own refresh runs while the
             // phase is still `.bootstrapping`, so it cannot see the runtime.
-            .task(id: ConsentRuntimeState(
-                generation: appState.runtimeGeneration,
-                isReady: appState.canUseRuntimeForLocalForegroundWork
-            )) {
+            .task(
+                id: ConsentRuntimeState(
+                    generation: appState.runtimeGeneration,
+                    isReady: appState.canUseRuntimeForLocalForegroundWork
+                )
+            ) {
                 guard appState.canUseRuntimeForLocalForegroundWork else { return }
                 await appState.diagnosticsConsent.reload(using: appState)
             }
@@ -328,10 +338,12 @@ struct ChatsListView: View {
                 // blocked peer can say so instead of previewing their message.
                 await blockedUsers.run(using: appState, target: nil)
             }
-            .task(id: BlockedAuthorsToken(
-                accountIdHexes: blockedUsers.blockedAccountIds,
-                isViewModelReady: viewModel != nil
-            )) {
+            .task(
+                id: BlockedAuthorsToken(
+                    accountIdHexes: blockedUsers.blockedAccountIds,
+                    isViewModelReady: viewModel != nil
+                )
+            ) {
                 viewModel?.applyBlockedAccounts(blockedUsers.blockedAccountIds)
             }
             .task(id: subscriptionScope) {
@@ -411,7 +423,8 @@ struct ChatsListView: View {
             for attempt in 0..<8 {
                 try? await Task.sleep(nanoseconds: attempt == 0 ? 350_000_000 : 450_000_000)
                 guard appState.pendingChatId == newId,
-                      appState.navigation.pendingChatPerformance === performance else { return }
+                    appState.navigation.pendingChatPerformance === performance
+                else { return }
                 // Re-read the anchor so a newer jump for the same chat wins.
                 let target = ChatNavigationTarget(
                     groupIdHex: newId,
@@ -421,7 +434,8 @@ struct ChatsListView: View {
                 path = [target]
                 try? await Task.sleep(nanoseconds: 300_000_000)
                 guard appState.pendingChatId == newId,
-                      appState.navigation.pendingChatPerformance === performance else { return }
+                    appState.navigation.pendingChatPerformance === performance
+                else { return }
                 if path == [target] {
                     appState.clearPendingChat()
                     return
@@ -544,6 +558,14 @@ struct ChatsListView: View {
             let otherRows = groupsPinnedRows ? rows.filter { !$0.isPinned } : []
 
             List {
+                #if WN_EXPERIMENTAL_DEVICE_SYNC
+                    if scope == .active, !selectionMode {
+                        AutomaticChatListSection(
+                            model: appState.accountStore.automaticChats?.list,
+                            searchText: search.query, excludedGroupIds: Set(rows.map(\.id)),
+                            select: { group in path.append(ChatNavigationTarget(groupIdHex: group)) })
+                    }
+                #endif
                 if viewModel.windowSnapshot?.hasMoreBefore == true {
                     windowPageButton(.backward, viewModel: viewModel)
                     Button("Return to newest chats") {
@@ -577,6 +599,15 @@ struct ChatsListView: View {
                 }
             }
             .onScrollPhaseChange { _, phase in
+                #if WN_EXPERIMENTAL_DEVICE_SYNC
+                    if scope == .active, !selectionMode {
+                        if phase == .interacting {
+                            Task { await appState.accountStore.automaticChats?.list.pairedUserScrollChanged(true) }
+                        } else if phase == .idle {
+                            Task { await appState.accountStore.automaticChats?.list.pairedUserScrollChanged(false) }
+                        }
+                    }
+                #endif
                 if phase == .idle, let id = listViewport.visibleAnchor() {
                     viewModel.setVisibleWindowAnchor(id)
                 }
@@ -585,7 +616,15 @@ struct ChatsListView: View {
             .listStyle(.plain)
             .compatibleBottomScrollEdgeEffect()
             .overlay {
-                if rows.isEmpty { emptyState }
+                #if WN_EXPERIMENTAL_DEVICE_SYNC
+                    if rows.isEmpty,
+                        scope != .active || appState.accountStore.automaticChats?.list.pairedRows.isEmpty != false
+                    {
+                        emptyState
+                    }
+                #else
+                    if rows.isEmpty { emptyState }
+                #endif
             }
             .refreshable {
                 if case .window = viewModel.listMode {
@@ -611,9 +650,10 @@ struct ChatsListView: View {
             .frame(maxWidth: .infinity)
         }
         .disabled(viewModel.isPaging)
-        .modifier(TimelinePaginationVisibility(isEnabled: !viewModel.isPaging) {
-            requestWindowPage(direction, viewModel: viewModel)
-        })
+        .modifier(
+            TimelinePaginationVisibility(isEnabled: !viewModel.isPaging) {
+                requestWindowPage(direction, viewModel: viewModel)
+            })
     }
 
     private func requestWindowPage(_ direction: ChatListPageDirectionFfi, viewModel: ChatsListViewModel) {
@@ -670,9 +710,11 @@ struct ChatsListView: View {
                 navigate(to: item)
             }
         }
-        .modifier(ChatListSelectionPress(isEnabled: !selectionMode && !rowActionInProgress) {
-            beginSelectionMode(id: item.id)
-        })
+        .modifier(
+            ChatListSelectionPress(isEnabled: !selectionMode && !rowActionInProgress) {
+                beginSelectionMode(id: item.id)
+            }
+        )
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityAddTraits(selectionMode && selectedChatIds.contains(item.id) ? .isSelected : [])
@@ -706,7 +748,9 @@ struct ChatsListView: View {
             }
             Button("Cancel", role: .cancel) { pendingSingleDelete = nil }
         } message: {
-            Text("This permanently removes the chat and its messages from this device. Signing in again won’t restore them.")
+            Text(
+                "This permanently removes the chat and its messages from this device. Signing in again won’t restore them."
+            )
         }
         .confirmationDialog(
             leaveConfirmationTitle,
@@ -863,10 +907,12 @@ struct ChatsListView: View {
                 }
                 endSelectionMode()
             }
-            .disabled(selectionMutationInProgress || items.contains {
-                guard let actions = $0.actions else { return false }
-                return archiveAction == .unarchive ? !actions.canRestore : !actions.canArchive
-            })
+            .disabled(
+                selectionMutationInProgress
+                    || items.contains {
+                        guard let actions = $0.actions else { return false }
+                        return archiveAction == .unarchive ? !actions.canRestore : !actions.canArchive
+                    })
         } trailing: {
             HStack(spacing: 12) {
                 selectionMoreMenu(items)
@@ -891,15 +937,20 @@ struct ChatsListView: View {
                         }
                         Button("Cancel", role: .cancel) {}
                     } message: {
-                        Text("This permanently removes these chats and their messages from this device. Signing in again won’t restore them.")
+                        Text(
+                            "This permanently removes these chats and their messages from this device. Signing in again won’t restore them."
+                        )
                     }
                 }
             }
         }
-        .sheet(isPresented: $showBulkLeaveConfirmation, onDismiss: {
-            bulkLeaveRequest = nil
-            bulkLeave.cancelConfirmation()
-        }) {
+        .sheet(
+            isPresented: $showBulkLeaveConfirmation,
+            onDismiss: {
+                bulkLeaveRequest = nil
+                bulkLeave.cancelConfirmation()
+            }
+        ) {
             if let request = bulkLeaveRequest {
                 ChatListLeaveConfirmationSheet(count: request.targets.count) {
                     await confirmBulkLeave(request)
@@ -910,48 +961,61 @@ struct ChatsListView: View {
 
     @ViewBuilder
     private func selectionMoreMenu(_ items: [ChatsListViewModel.Item]) -> some View {
-        let canMute = !items.isEmpty && !items.contains {
-            guard let actions = $0.actions else { return $0.departureAction == nil }
-            return !actions.canMute && !actions.canUnmute
-        }
+        let canMute =
+            !items.isEmpty
+            && !items.contains {
+                guard let actions = $0.actions else { return $0.departureAction == nil }
+                return !actions.canMute && !actions.canUnmute
+            }
         let targets = items.filter { $0.departureAction == .leave }.map {
             ChatListLeavePresentation.Target(groupIdHex: $0.id, title: $0.title)
         }
-        ChatSelectionButton(title: L10n.string("More"), systemImage: "ellipsis", menu: {
-            var actions: [UIMenuElement] = []
-            if canMute,
-               let target = muteTarget(groupIds: items.map(\.id), fromSelection: true) {
-                if ChatListSelection.bulkMuteMutes(mutedFlags: items.map(\.isMuted)) {
-                    actions.append(UIMenu(title: L10n.string("Mute"), image: UIImage(systemName: "bell.slash"), children:
-                        ChatMuteDuration.allCases.map { duration in
-                            UIAction(title: duration.title) { _ in
-                                updateMute(.mute(duration), target: target)
-                            }
-                        }
-                    ))
-                } else {
-                    actions.append(UIAction(title: L10n.string("Unmute"), image: UIImage(systemName: "bell")) { _ in
-                        updateMute(.unmute, target: target)
-                    })
+        ChatSelectionButton(
+            title: L10n.string("More"), systemImage: "ellipsis",
+            menu: {
+                var actions: [UIMenuElement] = []
+                if canMute,
+                    let target = muteTarget(groupIds: items.map(\.id), fromSelection: true)
+                {
+                    if ChatListSelection.bulkMuteMutes(mutedFlags: items.map(\.isMuted)) {
+                        actions.append(
+                            UIMenu(
+                                title: L10n.string("Mute"), image: UIImage(systemName: "bell.slash"),
+                                children:
+                                    ChatMuteDuration.allCases.map { duration in
+                                        UIAction(title: duration.title) { _ in
+                                            updateMute(.mute(duration), target: target)
+                                        }
+                                    }
+                            ))
+                    } else {
+                        actions.append(
+                            UIAction(title: L10n.string("Unmute"), image: UIImage(systemName: "bell")) { _ in
+                                updateMute(.unmute, target: target)
+                            })
+                    }
                 }
+                if !targets.isEmpty, let accountRef = appState.activeAccountRef {
+                    let context = ChatLeaveOperation.Context(
+                        accountRef: accountRef, runtimeGeneration: appState.runtimeGeneration)
+                    actions.append(
+                        UIAction(
+                            title: targets.count == 1 ? L10n.string("Leave Chat") : L10n.string("Leave Chats"),
+                            image: UIImage(systemName: "rectangle.portrait.and.arrow.right"),
+                            attributes: .destructive
+                        ) { _ in
+                            guard selectionMode, leaveContextIsCurrent(context) else { return }
+                            bulkLeaveRequest = BulkLeaveRequest(context: context, targets: targets)
+                            showBulkLeaveConfirmation = true
+                        })
+                }
+                return actions
             }
-            if !targets.isEmpty, let accountRef = appState.activeAccountRef {
-                let context = ChatLeaveOperation.Context(accountRef: accountRef, runtimeGeneration: appState.runtimeGeneration)
-                actions.append(UIAction(
-                    title: targets.count == 1 ? L10n.string("Leave Chat") : L10n.string("Leave Chats"),
-                    image: UIImage(systemName: "rectangle.portrait.and.arrow.right"),
-                    attributes: .destructive
-                ) { _ in
-                    guard selectionMode, leaveContextIsCurrent(context) else { return }
-                    bulkLeaveRequest = BulkLeaveRequest(context: context, targets: targets)
-                    showBulkLeaveConfirmation = true
-                })
-            }
-            return actions
-        })
+        )
         .id([appState.activeAccountRef ?? "", String(appState.runtimeGeneration)] + items.map(\.id).sorted())
-        .disabled((!canMute && targets.isEmpty) || selectionMutationInProgress
-                  || !appState.canUseRuntimeForLocalForegroundWork)
+        .disabled(
+            (!canMute && targets.isEmpty) || selectionMutationInProgress
+                || !appState.canUseRuntimeForLocalForegroundWork)
     }
 
     private func selectionAction(
@@ -980,14 +1044,18 @@ struct ChatsListView: View {
         case .archived:
             base = viewModel.archivedItems.filter { !$0.belongsToLeft }
         case .unread:
-            base = viewModel.items.filter { !$0.belongsToLeft && !$0.row.pendingConfirmation && ($0.hasUnread || $0.row.manuallyMarkedUnread) }
+            base = viewModel.items.filter {
+                !$0.belongsToLeft && !$0.row.pendingConfirmation && ($0.hasUnread || $0.row.manuallyMarkedUnread)
+            }
         case .left:
             base = (viewModel.items + viewModel.archivedItems).filter(\.belongsToLeft)
         }
         let baseIDs = Set(base.map(\.id))
-        let retained = selectionMode ? (viewModel.items + viewModel.archivedItems).filter {
-            bulkLeave.retainedIDs.contains($0.id) && !baseIDs.contains($0.id)
-        } : []
+        let retained =
+            selectionMode
+            ? (viewModel.items + viewModel.archivedItems).filter {
+                bulkLeave.retainedIDs.contains($0.id) && !baseIDs.contains($0.id)
+            } : []
         return (base + retained).filter {
             ChatListSearch.matches(query: search.query, in: $0.searchHaystack)
         }
@@ -1047,12 +1115,13 @@ struct ChatsListView: View {
 
     @ViewBuilder
     private func leadingSwipeActions(for item: ChatsListViewModel.Item) -> some View {
-        let actions = item.actions.map { ChatListSwipeActionsPresentation.leadingActions($0) }
+        let actions =
+            item.actions.map { ChatListSwipeActionsPresentation.leadingActions($0) }
             ?? ChatListSwipeActionsPresentation.leadingActions(
-            hasUnread: item.hasUnread,
-            isPinned: item.isPinned,
-            isArchived: item.isArchived
-        )
+                hasUnread: item.hasUnread,
+                isPinned: item.isPinned,
+                isArchived: item.isArchived
+            )
 
         ForEach(actions) { action in
             WNSwipeActionButton(
@@ -1067,13 +1136,14 @@ struct ChatsListView: View {
 
     @ViewBuilder
     private func swipeActions(for item: ChatsListViewModel.Item) -> some View {
-        let actions = item.actions.map { ChatListSwipeActionsPresentation.trailingActions($0, isMuted: item.isMuted) }
+        let actions =
+            item.actions.map { ChatListSwipeActionsPresentation.trailingActions($0, isMuted: item.isMuted) }
             ?? ChatListSwipeActionsPresentation.trailingActions(
-            isArchived: item.isArchived,
-            selfMembership: item.selfMembership,
-            leaveRequestPending: item.leaveRequestPending,
-            isMuted: item.isMuted
-        )
+                isArchived: item.isArchived,
+                selfMembership: item.selfMembership,
+                leaveRequestPending: item.leaveRequestPending,
+                isMuted: item.isMuted
+            )
 
         ForEach(actions) { action in
             WNSwipeActionButton(
@@ -1252,8 +1322,10 @@ struct ChatsListView: View {
         defer { isMarkingAllRead = false }
 
         let unreadItems: [ChatsListViewModel.Item]
-        do { unreadItems = try await viewModel.allUnreadItems() }
-        catch { presentMarkReadFailure(); return }
+        do { unreadItems = try await viewModel.allUnreadItems() } catch {
+            presentMarkReadFailure()
+            return
+        }
         var hadFailure = false
         for item in unreadItems {
             if let messageIdHex = item.lastMessage?.messageIdHex {
@@ -1278,11 +1350,13 @@ struct ChatsListView: View {
         guard let ref = appState.activeAccountRef else { return false }
         do {
             let client = try appState.currentMarmotClient()
-            guard let result = await client.markTimelineMessagesRead(
-                accountRef: ref,
-                groupIdHex: groupIdHex,
-                messageIdHexes: [messageIdHex]
-            ).first, result.succeeded else {
+            guard
+                let result = await client.markTimelineMessagesRead(
+                    accountRef: ref,
+                    groupIdHex: groupIdHex,
+                    messageIdHexes: [messageIdHex]
+                ).first, result.succeeded
+            else {
                 return false
             }
             if let row = result.row {
@@ -1307,10 +1381,11 @@ struct ChatsListView: View {
 
     private func presentChatMutationFailure(title: String) {
         Haptics.error()
-        appState.present(.error(
-            title,
-            message: L10n.string("Try again.")
-        ))
+        appState.present(
+            .error(
+                title,
+                message: L10n.string("Try again.")
+            ))
     }
 
     @MainActor
@@ -1331,10 +1406,11 @@ struct ChatsListView: View {
             }
             selectedChatIds = failedIds
             Haptics.error()
-            appState.present(.error(
-                L10n.string("Some chats couldn’t be deleted"),
-                message: L10n.plural("%lld chats remain. Try again.", Int64(failedIds.count))
-            ))
+            appState.present(
+                .error(
+                    L10n.string("Some chats couldn’t be deleted"),
+                    message: L10n.plural("%lld chats remain. Try again.", Int64(failedIds.count))
+                ))
         }
     }
 
@@ -1357,10 +1433,11 @@ struct ChatsListView: View {
         } catch {
             if presentsFailure {
                 Haptics.error()
-                appState.present(.error(
-                    L10n.string("Couldn't delete chat"),
-                    message: L10n.string("Try again.")
-                ))
+                appState.present(
+                    .error(
+                        L10n.string("Couldn't delete chat"),
+                        message: L10n.string("Try again.")
+                    ))
             }
             return false
         }
@@ -1381,9 +1458,12 @@ struct ChatsListView: View {
         let context = request.context
         guard !selectionMutationInProgress, leaveContextIsCurrent(context) else { return nil }
         do {
-            try await bulkLeave.prepare(context: context, targets: request.targets, isCurrent: {
-                leaveContextIsCurrent(context)
-            }) { target in
+            try await bulkLeave.prepare(
+                context: context, targets: request.targets,
+                isCurrent: {
+                    leaveContextIsCurrent(context)
+                }
+            ) { target in
                 let state = try await readLeaveState(groupIdHex: target.groupIdHex, context: context)
                 if state.settledResult != nil { return false }
                 guard state.canLeave else {
@@ -1403,16 +1483,20 @@ struct ChatsListView: View {
             return ChatListLeavePresentation.failureMessage
         }
         guard !Task.isCancelled,
-              let confirmation = bulkLeave.confirmation,
-              confirmation.context == context,
-              confirmation.targets == request.targets,
-              bulkLeave.approve(confirmation, isCurrent: leaveContextIsCurrent(context))
+            let confirmation = bulkLeave.confirmation,
+            confirmation.context == context,
+            confirmation.targets == request.targets,
+            bulkLeave.approve(confirmation, isCurrent: leaveContextIsCurrent(context))
         else { return nil }
-        guard let result = await bulkLeave.runApproved(isCurrent: {
-            leaveContextIsCurrent(context)
-        }, leave: { target in
-            await performChatLeave(groupIdHex: target.groupIdHex, context: context)
-        }) else { return nil }
+        guard
+            let result = await bulkLeave.runApproved(
+                isCurrent: {
+                    leaveContextIsCurrent(context)
+                },
+                leave: { target in
+                    await performChatLeave(groupIdHex: target.groupIdHex, context: context)
+                })
+        else { return nil }
         guard result.failedIDs.isEmpty else {
             Haptics.error()
             return L10n.plural("Couldn't leave %lld chats. Try again.", Int64(result.failedIDs.count))
@@ -1450,20 +1534,24 @@ struct ChatsListView: View {
         context: ChatLeaveOperation.Context
     ) async -> ChatLeaveOperation.Result {
         var didLeave = false
-        let result = await ChatLeaveOperation.perform(isCurrent: {
-            leaveContextIsCurrent(context)
-        }, readState: {
-            try await readLeaveState(groupIdHex: groupIdHex, context: context)
-        }, selfDemote: {
-            _ = try await appState.currentMarmotClient().selfDemoteAdminDetailed(
-                accountRef: context.accountRef, groupIdHex: groupIdHex
-            )
-        }, leave: {
-            _ = try await appState.currentMarmotClient().leaveGroup(
-                accountRef: context.accountRef, groupIdHex: groupIdHex
-            )
-            didLeave = true
-        })
+        let result = await ChatLeaveOperation.perform(
+            isCurrent: {
+                leaveContextIsCurrent(context)
+            },
+            readState: {
+                try await readLeaveState(groupIdHex: groupIdHex, context: context)
+            },
+            selfDemote: {
+                _ = try await appState.currentMarmotClient().selfDemoteAdminDetailed(
+                    accountRef: context.accountRef, groupIdHex: groupIdHex
+                )
+            },
+            leave: {
+                _ = try await appState.currentMarmotClient().leaveGroup(
+                    accountRef: context.accountRef, groupIdHex: groupIdHex
+                )
+                didLeave = true
+            })
         guard leaveContextIsCurrent(context), !Task.isCancelled else { return .cancelled }
         switch result {
         case .left:
@@ -1481,7 +1569,7 @@ struct ChatsListView: View {
     @MainActor
     private func prepareLeave(_ target: ChatListLeavePresentation.Target) async {
         guard let accountRef = appState.activeAccountRef,
-              leaveActionState.beginPreparation(for: target)
+            leaveActionState.beginPreparation(for: target)
         else { return }
         let context = ChatLeaveOperation.Context(accountRef: accountRef, runtimeGeneration: appState.runtimeGeneration)
         leaveConfirmationContext = nil
@@ -1535,10 +1623,11 @@ struct ChatsListView: View {
 
     private func presentLeaveFailure() {
         Haptics.error()
-        appState.present(.error(
-            ChatListLeavePresentation.failureTitle,
-            message: ChatListLeavePresentation.failureMessage
-        ))
+        appState.present(
+            .error(
+                ChatListLeavePresentation.failureTitle,
+                message: ChatListLeavePresentation.failureMessage
+            ))
     }
 
     private func mutePicker(target: MuteTarget, item: ChatsListViewModel.Item) -> some View {
@@ -1563,8 +1652,9 @@ struct ChatsListView: View {
 
     private func muteTarget(groupIds: [String], fromSelection: Bool) -> MuteTarget? {
         guard !groupIds.isEmpty,
-              let accountIdHex = appState.activeAccount?.accountIdHex,
-              let accountRef = appState.activeAccountRef else { return nil }
+            let accountIdHex = appState.activeAccount?.accountIdHex,
+            let accountRef = appState.activeAccountRef
+        else { return nil }
         return MuteTarget(
             accountIdHex: accountIdHex, accountRef: accountRef,
             groupIds: groupIds, fromSelection: fromSelection
@@ -1670,7 +1760,24 @@ private struct ChatDestination: View {
             .onAppear {
                 HostActionPerformance.conversationBecameVisible(groupIdHex: target.groupIdHex)
             }
-        } else if timedOut {
+        } else {
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                if let owner = appState.accountStore.automaticChats, owner.isLive,
+                    owner.list.pairedRows.contains(where: { $0.groupIdHex == target.groupIdHex })
+                {
+                    AutomaticConversationDestination(owner: owner, groupIdHex: target.groupIdHex)
+                } else {
+                    missingOrdinaryDestination()
+                }
+            #else
+                missingOrdinaryDestination()
+            #endif
+        }
+    }
+
+    @ViewBuilder
+    private func missingOrdinaryDestination() -> some View {
+        if timedOut {
             // A slow network can take longer than the spin-wait to deliver the
             // chat-list row. Offer Retry instead of a dead end so the user can
             // wait out another window rather than being told the chat is gone (#71).

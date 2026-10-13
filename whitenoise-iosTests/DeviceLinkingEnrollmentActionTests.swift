@@ -8,7 +8,7 @@ import Testing
     // Immutable control; the generated superclass requires restating its unchecked conformance.
     // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class EnrollmentSubscription: DeviceLinkingSubscription, @unchecked Sendable {
-        override func close() {}
+        override func closeStream() {}
         override func next() async throws -> DeviceLinkingSnapshotFfi {
             throw MarmotKitError.DeviceLinkingClosed
         }
@@ -24,13 +24,23 @@ import Testing
         private var rejected = false
         private var pause = false
         private var pending: CheckedContinuation<Data, Never>?
+        private var sharingPaused = false
+        private var sharingPending: CheckedContinuation<Void, Never>?
         var actions: [String] { lock.withLock { calls } }
         var packets: [Data] { lock.withLock { received } }
+        var isSharingWaiting: Bool { lock.withLock { sharingPending != nil } }
         var isWaiting: Bool { lock.withLock { pending != nil } }
         override func subscribe() -> DeviceLinkingSubscription { stream }
         override func cancel() async throws {}
         override func continueLinking(displayedRevision: UInt64) async throws {
             lock.withLock { calls.append("continue:\(displayedRevision)") }
+            if lock.withLock({ rejected }) { throw MarmotKitError.DeviceLinkingStaleRevision }
+        }
+        override func continueLinkingAndShareChats(displayedRevision: UInt64) async throws {
+            lock.withLock { calls.append("share:\(displayedRevision)") }
+            if lock.withLock({ sharingPaused }) {
+                await withCheckedContinuation { continuation in lock.withLock { sharingPending = continuation } }
+            }
             if lock.withLock({ rejected }) { throw MarmotKitError.DeviceLinkingStaleRevision }
         }
         override func enrollmentPacket(displayedRevision: UInt64) async throws -> Data {
@@ -50,6 +60,15 @@ import Testing
         }
         override func finalizeLinking(displayedRevision: UInt64) async throws {
             lock.withLock { calls.append("finalize:\(displayedRevision)") }
+        }
+        func pauseSharing() { lock.withLock { sharingPaused = true } }
+        func finishSharing() {
+            let continuation = lock.withLock {
+                let result = sharingPending
+                sharingPending = nil
+                return result
+            }
+            continuation?.resume()
         }
         func rejectRevision() { lock.withLock { rejected = true } }
         func pauseExport() { lock.withLock { pause = true } }
@@ -74,6 +93,23 @@ import Testing
             try await scope.finalizeLinking(displayedRevision: 10)
             #expect(session.actions == ["continue:7", "export:8", "receive:9", "finalize:10"])
             #expect(session.packets == [Data([4, 5])])
+        }
+
+        @Test func explicitSharingUsesOriginalRevisionAndRefusesRetiredOwner() async throws {
+            let session = EnrollmentSession(noPointer: .init())
+            let scope = DeviceLinkingAccountScope(accountRef: "account", session: session)
+            try await scope.continueLinkingAndShareChats(displayedRevision: 17)
+            #expect(session.actions == ["share:17"])
+            session.rejectRevision()
+            await #expect(throws: MarmotKitError.DeviceLinkingStaleRevision) {
+                try await scope.continueLinkingAndShareChats(displayedRevision: 18)
+            }
+            scope.invalidate()
+            do {
+                try await scope.continueLinkingAndShareChats(displayedRevision: 19)
+                Issue.record("Retired original sharing action unexpectedly succeeded")
+            } catch {}
+            #expect(session.actions == ["share:17", "share:18"])
         }
 
         @Test func originalSdkRevisionErrorRemainsAnError() async throws {
@@ -119,6 +155,33 @@ import Testing
             #expect(store.deviceLinkingScope == nil)
             await #expect(throws: CancellationError.self) { try await scope.finalizeLinking(displayedRevision: 7) }
             #expect(session.actions == ["export:7"])
+            try await store.cancelDeviceLinking()
+        }
+
+        @Test func delayedSharingCannotEscapeAccountReplacementAndReturn() async throws {
+            let session = EnrollmentSession(noPointer: .init())
+            session.pauseSharing()
+            let store = AccountStore(defaults: IsolatedAccountDefaults.make())
+            store.activeAccountRef = "A"
+            let scope = try await store.holdDeviceLinkingSession(session, accountRef: "A")
+            let sharing = Task {
+                do {
+                    try await scope.continueLinkingAndShareChats(displayedRevision: 7)
+                    return true
+                } catch { return false }
+            }
+            for _ in 0..<200 {
+                if session.isSharingWaiting { break }
+                await Task.yield()
+            }
+            try #require(session.isSharingWaiting)
+            store.activeAccountRef = "B"
+            store.activeAccountRef = "A"
+            session.finishSharing()
+            #expect(await sharing.value == false)
+            #expect(store.deviceLinkingScope == nil)
+            await #expect(throws: CancellationError.self) { try await scope.finalizeLinking(displayedRevision: 7) }
+            #expect(session.actions == ["share:7"])
             try await store.cancelDeviceLinking()
         }
 

@@ -11,6 +11,7 @@ import Testing
         private let lock = NSLock()
         private var reads: [UInt64] = []
         private var actions: [UInt64] = []
+        private var sharingActions: [UInt64] = []
         private var packets: [(UInt64, Data)] = []
         private var phase: DeviceLinkingApprovalPhaseFfi = .awaitingApproval
         private var invalid = 0
@@ -18,6 +19,23 @@ import Testing
         private var reject = false
         private var failedCleanup = false
         private var cancellations = 0
+        private let cancellationCompletion = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        private enum CompletionFailure: Error { case timedOut }
+        func waitForCancellationCompletion() async throws {
+            let completion = cancellationCompletion.stream
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    for await _ in completion { return }
+                    throw CompletionFailure.timedOut
+                }
+                group.addTask {
+                    try await Task.sleep(for: .seconds(30))
+                    throw CompletionFailure.timedOut
+                }
+                defer { group.cancelAll() }
+                try await group.next()
+            }
+        }
         private var pending: CheckedContinuation<Void, Never>?
         var isWaiting: Bool { lock.withLock { pending != nil } }
         var cancelCount: Int { lock.withLock { cancellations } }
@@ -40,6 +58,7 @@ import Testing
             continuation?.resume()
         }
         var reviewedRevisions: [UInt64] { lock.withLock { reads } }
+        var sharingRevisions: [UInt64] { lock.withLock { sharingActions } }
         var approvedRevisions: [UInt64] { lock.withLock { actions } }
         var receivedPackets: [(UInt64, Data)] { lock.withLock { packets } }
         override func receiveEnrollmentPacket(displayedRevision: UInt64, packet: Data) async throws {
@@ -63,9 +82,15 @@ import Testing
         override func approve(displayedRevision: UInt64) async throws {
             lock.withLock { actions.append(displayedRevision) }
         }
+        override func approveAndShareChats(displayedRevision: UInt64) async throws {
+            lock.withLock { sharingActions.append(displayedRevision) }
+            if lock.withLock({ reject }) { throw MarmotKitError.DeviceLinkingStaleRevision }
+        }
         override func cancel() async throws {
             lock.withLock { cancellations += 1 }
             if lock.withLock({ failedCleanup }) { throw MarmotKitError.DeviceLinkingRuntimeUnavailable }
+            cancellationCompletion.continuation.yield(())
+            cancellationCompletion.continuation.finish()
         }
     }
 
@@ -105,6 +130,40 @@ import Testing
             }
             try #require(original.isWaiting)
         }
+        @Test func sharingApprovalRequiresExactCurrentReviewAndDistinctOriginalAction() async throws {
+            try await withApp { app in
+                let original = ReviewApproval(noPointer: .init())
+                let model = try await heldModel(app, original: original)
+                try await model.refreshReview()
+                #expect(original.sharingRevisions.isEmpty)
+                await #expect(throws: MarmotKitError.DeviceLinkingStaleRevision) {
+                    try await model.approveReviewedAndShareChats(displayedRevision: 8)
+                }
+                #expect(original.sharingRevisions.isEmpty)
+                try await model.approveReviewedAndShareChats(displayedRevision: 7)
+                #expect(original.sharingRevisions == [7])
+                #expect(original.approvedRevisions.isEmpty)
+            }
+        }
+
+        @Test func sharingApprovalPreservesSdkRefusalAndRetiredOwnerFence() async throws {
+            try await withApp { app in
+                let original = ReviewApproval(noPointer: .init())
+                let model = try await heldModel(app, original: original)
+                try await model.refreshReview()
+                original.configure(reject: true)
+                await #expect(throws: MarmotKitError.DeviceLinkingStaleRevision) {
+                    try await model.approveReviewedAndShareChats(displayedRevision: 7)
+                }
+                #expect(original.sharingRevisions == [7])
+                model.invalidate()
+                await #expect(throws: MarmotKitError.DeviceLinkingClosed) {
+                    try await model.approveReviewedAndShareChats(displayedRevision: 7)
+                }
+                #expect(original.sharingRevisions == [7])
+            }
+        }
+
         @Test func staleDisplayedRevisionAndSdkFailureNeverApprove() async throws {
             try await withApp { app in
                 let original = ReviewApproval(noPointer: .init())
@@ -159,6 +218,8 @@ import Testing
                 #expect(model.review == nil)
                 #expect(!model.isActive)
                 #expect(original.approvedRevisions.isEmpty)
+                // Read completion fences display; actual asynchronous owner cleanup has its own completion.
+                try await original.waitForCancellationCompletion()
                 #expect(original.cancelCount == 1)
             }
         }
@@ -292,6 +353,8 @@ import Testing
                 await #expect(throws: MarmotKitError.DeviceLinkingClosed) { try await late.enrollmentApproval() }
                 #expect(calls == 1)
                 #expect(!held.isActive)
+                // Read completion fences display; actual asynchronous owner cleanup has its own completion.
+                try await original.waitForCancellationCompletion()
                 #expect(original.cancelCount == 1)
                 #expect(original.approvedRevisions.isEmpty)
             }

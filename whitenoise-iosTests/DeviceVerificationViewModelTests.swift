@@ -22,7 +22,7 @@ import Testing
                 lock.withLock { pending = continuation }
             }
         }
-        override func close() {
+        override func closeStream() {
             let continuation = lock.withLock {
                 let old = pending
                 pending = nil

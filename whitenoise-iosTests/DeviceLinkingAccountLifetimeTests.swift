@@ -5,7 +5,8 @@ import Testing
 @testable import whitenoise_ios
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
-    // UniFFI test subclass; NSLock guards every mutable field.
+    // Generated superclass requires unchecked conformance; NSLock protects every mutable control.
+    // Continuations are removed under the lock and resumed only after unlocking.
     // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class LifetimeSubscription: DeviceLinkingSubscription, @unchecked Sendable {
         private let lock = NSLock()
@@ -15,7 +16,7 @@ import Testing
         var readCount: Int { lock.withLock { reads } }
         var closeCount: Int { lock.withLock { closes } }
         var isWaiting: Bool { lock.withLock { pending != nil } }
-        override func close() { lock.withLock { closes += 1 } }
+        override func closeStream() { lock.withLock { closes += 1 } }
         override func next() async throws -> DeviceLinkingSnapshotFfi {
             try await withCheckedThrowingContinuation { continuation in
                 lock.withLock {
@@ -43,7 +44,8 @@ import Testing
                     revision: 7, phase: .comparisonAvailable, decimals: nil))
         }
     }
-    // UniFFI test subclass; NSLock guards mutable state and stream is immutable.
+    // Generated superclass requires unchecked conformance; NSLock protects every mutable control.
+    // Continuations are removed under the lock and resumed only after unlocking.
     // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class LifetimeSession: DeviceLinkingSession, @unchecked Sendable {
         let stream = LifetimeSubscription(noPointer: .init())

@@ -1,0 +1,290 @@
+{
+  "scope": "Original-owned automatic observation/sharing adapters with scoped lifecycle/union/paging/send controls; no installed automatic UI acceptance",
+  "sdk_source": "de38be1295618728ef541e43bfc00ffb6cdb6a86",
+  "sdk_manifest_sha256": "0b5b3d3bb93b47ebc74065e735504ffc928fd06d0424a3ccb5d07fe58ca18bd4",
+  "cohorts": [
+    {
+      "prefix": "build/results/automatic-host-ios-de38-focused-v1",
+      "exit": 65,
+      "frozen_inputs": 936,
+      "log_sha256": "57745a08d3a18ad09fb6f3148d9cbef14dc3cbcea8f3a05f18534c7d60861076",
+      "inputs_sha256": "994d182b29550e6b14d48412bb6a68f40c9895dc5740c4392c0c976582495e75",
+      "passed": 15,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "prefix": "build/results/automatic-host-ios-de38-focused-v2",
+      "exit": 0,
+      "frozen_inputs": 936,
+      "log_sha256": "1f19436e58f4976fc7052f577f885f2ed6c2405195677113c9a857bd145127b2",
+      "inputs_sha256": "9080d1f6f4ddbd590492ba997543a5066dce8ec481b331b52dba90a061c922ad",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "prefix": "build/results/automatic-host-ios-de38-affected-v1",
+      "exit": 0,
+      "frozen_inputs": 936,
+      "log_sha256": "aea642997af0ae738ee2d6ab040fe7bb6a4550166265367a7fab5bafde3ab2ab",
+      "inputs_sha256": "9080d1f6f4ddbd590492ba997543a5066dce8ec481b331b52dba90a061c922ad",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "frozen_refs": {
+    "RED": "9e4a33957105d2bc3c0df500fde090a094e9de36",
+    "GREEN_and_affected": "eb404faa27025bbb800200d3c5ad552a87dd1df2"
+  },
+  "behavioral_RED": "17 total15passed2failed0skipped; pending admission-observation ordering and rejected status freshness",
+  "secondary_RED_diagnostic": "After genuine runtime failures, IDE diagnostic collection could not find simctl; preserved separately, not substituted for behavioral result",
+  "GREEN": "17/0/0; unchanged fixtures",
+  "affected": "148/0/0 in19 suites; sharing+enrollment+actual account/runtime lifetime and ordinary list/conversation behavior",
+  "source_fix": "Reconcile latest observed canonical IDs after admission/install and refresh pending status on original window updates",
+  "source_api_corrections": "Generated enum constructor row/header labels and self.error in catch blocks",
+  "static": {
+    "pinned_SwiftLint": "0.63.2",
+    "scoped_swift_files": 43,
+    "exit": 0,
+    "diff_check_exit": 0
+  },
+  "files": {
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AccountChatListViewModel.swift": "e3622cf12f7a3d27db543a353cdb99d1d8392801c05eeef585f799d026d36c18",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AccountConversationViewModel.swift": "889935e550005e65533add5d0e9234ae33b60c134e38a4d0969d41feeb33f4d9",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AutomaticChatListSection.swift": "e60a1b832097d63e9a37c924ca3974b366b435f8f164186c8b32975a7e0d15d1",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/AutomaticConversationView.swift": "9ce94f0b571960d946b1ab8e4ebc80b414517e2a6a49dc30aa034956303420cc",
+    "whitenoise-ios/Chats/AutomaticChatPresentation/PairedChatMessageRow.swift": "2a945ccdf33a4b30a6bb74d41b1a53c03ba17095d82f85aeeafb8b435813c3b3",
+    "whitenoise-iosTests/AutomaticPendingSendTests.swift": "fa44b5dcc24d3a512924ba946d3e6c3a84c1d8cf88588873bf304005639a7253",
+    "whitenoise-iosTests/AutomaticPairedListPagingTests.swift": "0e8ae98e71aac0728ef3b5f4c67dc3a477f1d3ca20fee6f6b0d9a6bb602085d8"
+  },
+  "limits": [
+    "Catalog Apple extraction/import pending",
+    "Multipart QR/native3device UI acceptance pending",
+    "Final full experimental/published PR suites pending",
+    "Real installed automatic app journey pending",
+    "Mirrored attachments/edit/persisted drafts not qualified; ordinary lane unchanged"
+  ],
+  "SDK_overrides_committed": false,
+  "localization": {
+    "apple_report": "build/results/automatic-ios-localization-v2.json",
+    "original_catalog_sha256": "4993eefa1f9e441bd7dd7e0660bbe404939a4d0748d4228c78b8a88659799457",
+    "catalog_sha256": "41bab68d14fb6710e61d753c032bce1bcd2733447bd93236b6aaa88e93b26116",
+    "original_entries_preserved": 2003,
+    "added_keys": 15,
+    "translated_cells": 135,
+    "actual_apple_imports": 9,
+    "all_prior_values_and_order_preserved": true,
+    "product_test_result_reuse": "17 focused and148 affected unchanged Swift/SDK inputs; final full matrix pending multipart QR"
+  },
+  "multipart_pairing_qr": {
+    "source_capture": "ac940050d53acaaaeb717aeff3e62059adfc6635",
+    "source_files": {
+      "whitenoise-ios/Core/DevicePairingQRCode.swift": "b8dbc97a8d465f09b381b459413612d1ec9aca4754da3b392a1527cc0c40e61e",
+      "whitenoise-ios/Settings/DeviceEnrollmentApprovalView.swift": "184fdda678ae0c25e220428eac4b63632727ead556cc9f7f00ed3737edab8711",
+      "whitenoise-ios/Settings/DeviceEnrollmentTransportView.swift": "88206e87600e9bff549309555351ddd0260a19fc3adfd849a4b7e434b769d58e",
+      "whitenoise-ios/Settings/DevicePairingQRImport.swift": "c6f6c3b7acbcdea03f72d9f2f25883973df90c22fdd107f3d40c659d4876a1c6",
+      "whitenoise-ios/Settings/DevicePairingQRViews.swift": "ffaa2f69ca543d8c8cc12ae369d35bc54e8516bdc43bb6d380ff7de85297ab9f",
+      "whitenoise-ios/Settings/DeviceVerificationView.swift": "278a62edf205a23d267fc253d9abbaa660b187e3f13adfc0cda9cc3dc35c4680",
+      "whitenoise-iosTests/NativePairingQRCodeTests.swift": "54b3a3184cd0ba84b0b31942f48e249af0698ddddacc78a74cd52700c85d8da4",
+      "whitenoise-iosTests/PairingMultipartQRCodeTests.swift": "4f890077e8d5dd5769aaf82bcb042b03c759c173f5a28f587eba19ac3d0343ed",
+      "whitenoise-iosTests/PairingQRImportMultipartTests.swift": "db52b4fcc388abccdcef9b1d7cd22c8afec6f99eb8b60b0b3cf1c109a7d21418"
+    },
+    "wire_contract_reference": "Mac pure codec1ecb9e8e5916da48e375f27d2929f894f74d52c2",
+    "native_fixture_reference": "signed23da643acc59884b016c00093b3e7349126778d1 original ABC acceptance; only actual iOS codec adapter and checked task-only memory store",
+    "bounds": {
+      "frame_utf8": 2200,
+      "packet_bytes": 49152,
+      "frames": 32,
+      "raw_fragment_bytes": 1536,
+      "fixed_import_deadline_seconds": 120
+    },
+    "transport": "Verification, A/C enrollment export+scan and B approved enrollment scan; packet staging only, original explicit Receive/comparison/approve preserved. Same unfinished import across camera retry/sheet reopen; explicit Start over retires old ticket; account/original/phase/scene retirement refuses late callbacks. No SDK authority or600s deadline renewal.",
+    "cohorts": [
+      {
+        "prefix": "build/results/ios-pairing-multipart-focused-v1",
+        "exit_code": 65,
+        "seconds": 54.09,
+        "raw_log_sha256": "a0d94a9ed7bf793cff619eef5d11580a8f1f757c855ede6d495595f2eb8eb7e1",
+        "input_manifest_sha256": "1cd13cf5b88f22620dadd68b10be61e9d1e0eac042b058d7b241a9b82f750c2e",
+        "unchanged_inputs": true,
+        "runtime_tests": 0,
+        "classification": "compile-only missing UIKit import in new CIImage test; preserved"
+      },
+      {
+        "prefix": "build/results/ios-pairing-multipart-focused-v2",
+        "exit_code": 0,
+        "seconds": 160.0,
+        "raw_log_sha256": "aaf4c71d478997dca476881ade2643d2576c23d79e0d2bffcd44de3fbf6134bf",
+        "input_manifest_sha256": "5dcc2ea7105752e3b15a753a7d2296c4fcdb571699490a6bcdb8121419659e63",
+        "unchanged_inputs": true,
+        "actual_counts": {
+          "passedTests": 13,
+          "failedTests": 0,
+          "skippedTests": 1,
+          "totalTestCount": 14
+        }
+      },
+      {
+        "prefix": "build/results/ios-native-pairing-multipart-v1",
+        "exit_code": 0,
+        "seconds": 19.1,
+        "raw_log_sha256": "5a45b5c52c77ad7c99bd5aae7db2b35c839d69665e56cb2ecf5dd8b02034f824",
+        "input_manifest_sha256": "475eeef9c7603e52322f7cd23875ce4b11bbc6f0da8aaacf7990782f062f3267",
+        "unchanged_inputs": true,
+        "actual_counts": {
+          "passedTests": 1,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 1
+        }
+      },
+      {
+        "prefix": "build/results/ios-pairing-multipart-affected-v1",
+        "exit_code": 0,
+        "seconds": 19.38,
+        "raw_log_sha256": "34842b611f8af46eff8bd7ab989549ad2794311fe3d3be495468d29924e01189",
+        "input_manifest_sha256": "5dcc2ea7105752e3b15a753a7d2296c4fcdb571699490a6bcdb8121419659e63",
+        "unchanged_inputs": true,
+        "actual_counts": {
+          "passedTests": 144,
+          "failedTests": 0,
+          "skippedTests": 1,
+          "totalTestCount": 145
+        }
+      }
+    ],
+    "native_actual": {
+      "c_challenge_bytes": 4729,
+      "c_challenge_frames": 4,
+      "approved_enrollment_bytes": 8244,
+      "enrollment_frames": 6,
+      "max_frame_utf8": 2149,
+      "sdk_authenticated_all_packets": true,
+      "actual_original_b_approval": true,
+      "all_three_settled": true,
+      "actual_storage_closes": 3
+    },
+    "scoped_static": {
+      "pinned_swiftlint_version": "0.63.2",
+      "changed_swift_files": 50,
+      "strict_exit": 0,
+      "diff_check_exit": 0
+    },
+    "localization": "Reuses existing translated Scan pairing QR,Start over,Back,Next,%@ of %@; c39 Apple import proof retained.",
+    "limits": [
+      "Native fixture explicitly opted in via generated slim Staging xctestrun; ordinary focused/affected native skip remains honestly recorded.",
+      "Native fixture/codecs/rendered images qualify transport, not installed camera or physical pairing journey.",
+      "Final full published/experimental PR and backend/integration promotion pending.",
+      "Main M1 ready/installed accounts, current SDK987 artifacts and previous SDKs unchanged."
+    ],
+    "form_controls": {
+      "source_commit": "a493c81",
+      "source_file": "whitenoise-ios/Settings/DevicePairingQRViews.swift",
+      "source_sha256": "ebfe81b69dd04a3f893cd161b04b7a41681dee665ba3b927fd3eef7ebee534be",
+      "behavior": "Existing WNButton standard44pt/Form-safe action controls; alert Cancel stays available when expired import disables retry. No original/model/codec changes.",
+      "prefix": "build/results/ios-pairing-qr-buttons-focused-v1",
+      "actual_counts": {
+        "passedTests": 30,
+        "failedTests": 0,
+        "skippedTests": 1,
+        "totalTestCount": 31
+      },
+      "raw_log_sha256": "75830b2205a71d4549b2147d2f14da048a05f9e3b1150b81a7d1fedd42913d76",
+      "source_unchanged": true,
+      "other939_product_test_sdk_inputs_match_prior_focused": true,
+      "prior_compact_proof_postgate_delta": true,
+      "reused_native": "native1/0/0 unchanged codec/fixture/SDK; buttons do not perform native actions",
+      "strict_swiftlint_exit": 0,
+      "diff_check_exit": 0
+    }
+  },
+  "approval_retirement_fixture": {
+    "capture": "ed32b57f72f6358c755da0aa21d829305955f133",
+    "source_files": {
+      "whitenoise-iosTests/DeviceEnrollmentApprovalReviewTests.swift": "0df75b7f0c2206841881e5eda4d5193109a92ac527750d70438f168b2cfee0e1",
+      "whitenoise-ios.xcodeproj/project.pbxproj": "6008cbd3d30ef4f5e31d5fb1e0f6180c8c1e33d54d1258f25506599b75d6e6a4"
+    },
+    "cohorts": [
+      {
+        "prefix": "build/results/automatic-host-ios-final-experimental-v1",
+        "exit_code": 65,
+        "seconds": 189.79,
+        "raw_log_sha256": "eb4adeced1a38d853e6887aabe8005c285a7439fdd6331d1813f9619f16eda05",
+        "input_manifest_sha256": "b67eb48683f465181d15b40acc2b86f2b0b3a40bb99faed90be50b71a12f43e1",
+        "actual_counts": {
+          "passedTests": 2915,
+          "failedTests": 1,
+          "skippedTests": 10,
+          "totalTestCount": 2926
+        },
+        "source_unchanged": true
+      },
+      {
+        "prefix": "build/results/ios-approval-retirement-unchanged-v1",
+        "exit_code": 0,
+        "seconds": 9.32,
+        "raw_log_sha256": "8c02fddf52d3f056969f73884cf4956fd8e3a3b7094a3d656295749bb0536b27",
+        "input_manifest_sha256": "b67eb48683f465181d15b40acc2b86f2b0b3a40bb99faed90be50b71a12f43e1",
+        "actual_counts": {
+          "passedTests": 14,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 14
+        },
+        "source_unchanged": true
+      },
+      {
+        "prefix": "build/results/ios-approval-retirement-completion-v1",
+        "exit_code": 0,
+        "seconds": 18.58,
+        "raw_log_sha256": "8256dbbb79f42c372cb454434c917d9335d3d714de80f57cd224039f962c9f26",
+        "input_manifest_sha256": "568b029857d843ac35359f6aadbba4db2d613cf510fdc9a3c88a4465591601bf",
+        "actual_counts": {
+          "passedTests": 14,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 14
+        },
+        "source_unchanged": true
+      },
+      {
+        "prefix": "build/results/ios-approval-retirement-affected-v1",
+        "exit_code": 0,
+        "seconds": 8.89,
+        "raw_log_sha256": "c57f898a98f7e841a0846c2c7540f6bbe0d266daafe036bc5682a361bbcdee6d",
+        "input_manifest_sha256": "568b029857d843ac35359f6aadbba4db2d613cf510fdc9a3c88a4465591601bf",
+        "actual_counts": {
+          "passedTests": 50,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 50
+        },
+        "source_unchanged": true
+      }
+    ],
+    "finding": "Fullsuite retirement0 expected completedcancel immediately afterreviewcompletion, but actualAccountStore invalidates synchronously and schedules independentcleanup. Unchanged focused14pass doesnot reproducefullfailure; no productiondefect asserted.",
+    "change": "Observe actual successfuloriginalcancel completion via cancellableAsyncStream with30s failclosedwatch. Original retired/no-review/no-approval assertions staybeforewait; exactcancelCount1 staysaftercompletion. No extra cancelcall, fixedyield or sleepusedasoracle.",
+    "production_delta": false,
+    "apple_project_serialization": {
+      "base": "5db840f5a4831edd5e2cdb092a489344d574824d",
+      "signed_project_sha256": "28dc8ad1ae1dd80b233c33f9619fa399f1a20ed6339b33b92ce2fd1cc07e4e25",
+      "tested_project_sha256": "6008cbd3d30ef4f5e31d5fb1e0f6180c8c1e33d54d1258f25506599b75d6e6a4",
+      "canonical_json_semantic_equality": true,
+      "origin": "Actual xcodebuild -importLocalizations v2 nine imports serialized existing UI automation target entries; no project patch in test runner",
+      "live_inputs_not_mutated": true
+    },
+    "static": {
+      "pinned_swiftlint": "0.63.2",
+      "strict_exit": 0,
+      "parse_exit": 0,
+      "diff_check_exit": 0
+    },
+    "limits": [
+      "Fullv1 failed2915/1/10 is preserved, not fullqualification.",
+      "No additionalfullmatrix until matchedSDK incorporatesgenuine nativewithdrawalfix; Rootholdsdevelopmentpromotion.",
+      "OriginalnativeABC QR1/0/0 remains separatelyqualified onunchangedcodec/SDK inputs."
+    ]
+  }
+}

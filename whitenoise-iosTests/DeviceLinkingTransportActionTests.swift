@@ -8,7 +8,7 @@ import Testing
     // Immutable control; the generated superclass requires restating its unchecked conformance.
     // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class TransportSubscription: DeviceLinkingSubscription, @unchecked Sendable {
-        override func close() {}
+        override func closeStream() {}
         override func next() async throws -> DeviceLinkingSnapshotFfi { throw MarmotKitError.DeviceLinkingClosed }
     }
 

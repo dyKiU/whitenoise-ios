@@ -37,6 +37,12 @@
             try requireActive()
         }
 
+        func approveAndShareChats(displayedRevision: UInt64) async throws {
+            try requireActive()
+            try await approval.approveAndShareChats(displayedRevision: displayedRevision)
+            try requireActive()
+        }
+
         func receiveEnrollmentPacket(displayedRevision: UInt64, packet: Data) async throws {
             try requireActive()
             try await approval.receiveEnrollmentPacket(displayedRevision: displayedRevision, packet: packet)

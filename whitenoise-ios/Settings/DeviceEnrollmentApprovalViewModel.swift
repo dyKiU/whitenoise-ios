@@ -57,7 +57,7 @@
         }
         private(set) var isWorking = false
         private(set) var actionError: Error?
-        enum ReviewAction { case approve, receivePacket }
+        enum ReviewAction { case approve, approveAndShareChats, receivePacket }
         func performReviewAction(_ action: ReviewAction, displayedRevision: UInt64, input: String = "") async throws {
             try checkActive()
             guard !isWorking else { throw MarmotKitError.DeviceLinkingNotReady }
@@ -68,6 +68,8 @@
                 switch action {
                 case .approve:
                     try await approveReviewed(displayedRevision: displayedRevision)
+                case .approveAndShareChats:
+                    try await approveReviewedAndShareChats(displayedRevision: displayedRevision)
                 case .receivePacket:
                     guard snapshot?.phase == .approvedAwaitingPacket, snapshot?.revision == displayedRevision else {
                         throw MarmotKitError.DeviceLinkingStaleRevision
@@ -110,6 +112,15 @@
             guard review?.revision == displayedRevision else { throw MarmotKitError.DeviceLinkingStaleRevision }
             currentReview = nil
             try await approve(displayedRevision: displayedRevision)
+            try await refresh()
+        }
+
+        func approveReviewedAndShareChats(displayedRevision: UInt64) async throws {
+            try checkActive()
+            guard review?.revision == displayedRevision else { throw MarmotKitError.DeviceLinkingStaleRevision }
+            currentReview = nil
+            try await original.approveAndShareChats(displayedRevision: displayedRevision)
+            try checkActive()
             try await refresh()
         }
 

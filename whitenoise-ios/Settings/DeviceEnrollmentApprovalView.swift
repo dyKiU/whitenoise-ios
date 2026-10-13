@@ -17,8 +17,14 @@
                             CopyableValueRow(title: "Source device key", value: review.sourceKey)
                             CopyableValueRow(title: "Joining device key", value: review.joiningKey)
                             LabeledContent("Existing devices", value: String(review.existingDeviceCount))
-                            WNButton(title: "Approve", size: .standard, isLoading: model.isWorking) {
-                                perform(.approve, revision: review.revision)
+                            Text(
+                                "Pairing shares all existing and future chats, chat history, and messaging between these devices."
+                            )
+                            WNButton(
+                                title: "Approve pairing and share all chats", size: .standard,
+                                isLoading: model.isWorking
+                            ) {
+                                perform(.approveAndShareChats, revision: review.revision)
                             }.disabled(model.isWorking)
                         }
                     } else if model.isActive, let snapshot = model.snapshot,
@@ -29,6 +35,8 @@
                             WNInput(
                                 placeholder: L10n.string("Opaque packet from the other device"), text: $incoming,
                                 kind: .multiline(2...4), surface: .filled)
+                            qrImportButton(model)
+                                .disabled(model.isWorking || model.cleanupError != nil)
                             WNButton(title: "Receive packet", size: .standard, isLoading: model.isWorking) {
                                 perform(.receivePacket, revision: snapshot.revision)
                             }.disabled(model.isWorking)
@@ -74,6 +82,15 @@
                 }
             }
         }
+        private func qrImportButton(_ captured: DeviceEnrollmentApprovalViewModel) -> some View {
+            let revision = captured.snapshot?.revision
+            let identity = "\(ObjectIdentifier(captured)):\(revision ?? 0)"
+            return DevicePairingQRImportButton(isCurrent: {
+                model === captured && captured.isActive && captured.cleanupError == nil
+                    && captured.snapshot?.phase == .approvedAwaitingPacket && captured.snapshot?.revision == revision
+            }, onScan: { incoming = $0 }).id(identity)
+        }
+
         private func perform(_ operation: DeviceEnrollmentApprovalViewModel.ReviewAction, revision: UInt64) {
             guard let model, model.isActive, !model.isWorking else { return }
             let packet = incoming
