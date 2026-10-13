@@ -402,12 +402,7 @@ private struct EmojiPickerContent: View {
                 }
             }
         } header: {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 7)
-                .background(.bar)
+            EmojiSectionHeader(title: title)
         }
     }
 
@@ -429,12 +424,7 @@ private struct EmojiPickerContent: View {
                 }
             }
         } header: {
-            Text("Custom")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 7)
-                .background(.bar)
+            EmojiSectionHeader(title: "Custom")
         }
     }
 
@@ -493,5 +483,21 @@ private struct EmojiPickerContent: View {
                 .background(selected ? Color(.tertiarySystemFill) : .clear, in: .circle)
         }
         .buttonStyle(.plain)
+    }
+}
+
+/// Pinned over scrolling emoji, so it keeps a background; the capsule and inset
+/// keep the title off the edges.
+private struct EmojiSectionHeader: View {
+    let title: LocalizedStringKey
+
+    var body: some View {
+        Text(title)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 7)
+            .padding(.horizontal, 12)
+            .background(.bar, in: .capsule)
     }
 }
