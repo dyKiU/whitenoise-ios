@@ -42,6 +42,9 @@ nonisolated final class MarmotClient: Sendable {
     static let seedRelays = AppContainerConfig.seedRelays
 
     let marmot: Marmot
+    /// Whether this build's IPF reports destination was accepted. It is set
+    /// once from build settings at construction and never changes at runtime.
+    let moderationReportingAvailable: Bool
     let rootPath: String
     let relayUrls: [String]
     /// Durable transport-cursor policy this runtime was constructed with.
@@ -88,8 +91,14 @@ nonisolated final class MarmotClient: Sendable {
             rootPath: rootPath,
             relayUrls: relayUrls,
             options: MarmotOptions(cursorPersistence: cursorPersistence, clientName: "whitenoise",
-                attachmentAcquisitionMode: .hostManaged)
+                attachmentAcquisitionMode: .hostManaged,
+                moderationReportConfig: ModerationReportBuildConfig.current()?.ffi)
         )
+        moderationReportingAvailable = marmot.moderationReportingAvailable()
+        // Opt-in startup capture must begin before the first account read.
+        if StartupDiagnosticsPreference.isEnabled() {
+            try? marmot.setStartupDiagnosticsEnabled(enabled: true)
+        }
         // A rejected audit destination must not block startup; recordings stay local.
         do {
             _ = try marmot.setAuditOtlpConfigV5(config: telemetryConfig.auditOtlpConfig())
@@ -714,6 +723,14 @@ nonisolated final class MarmotClient: Sendable {
         try await marmot.uploadMedia(accountRef: accountRef, groupIdHex: groupIdHex, request: request)
     }
 
+    /// File-backed upload; `control` is the only cancellation input and must be
+    /// fresh for this call. Keep every source file in place until it returns.
+    func uploadMediaFiles(accountRef: String, groupIdHex: String, request: MediaFileUploadRequestFfi,
+                          control: MediaFileTransferControlFfi) async throws -> MediaUploadResultFfi {
+        try await marmot.uploadMediaFiles(accountRef: accountRef, groupIdHex: groupIdHex,
+            request: request, control: control)
+    }
+
     func downloadMedia(accountRef: String, groupIdHex: String, reference: MediaAttachmentReferenceFfi) async throws -> MediaDownloadResultFfi {
         try await marmot.downloadMedia(accountRef: accountRef, groupIdHex: groupIdHex, reference: reference)
     }
@@ -902,6 +919,22 @@ nonisolated final class MarmotClient: Sendable {
         }.value
     }
 
+    func submitModerationReport(
+        accountRef: String,
+        reportedPubkey: String,
+        reason: ReportReasonFfi,
+        explanation: String,
+        origin: ModerationReportOriginFfi
+    ) async throws -> ModerationReportOutcomeFfi {
+        try await marmot.submitModerationReport(
+            accountRef: accountRef,
+            reportedPubkey: reportedPubkey,
+            reason: reason,
+            explanation: explanation,
+            origin: origin
+        )
+    }
+
     func reportMessage(accountRef: String, groupID: String, messageID: String,
                        reason: ReportReasonFfi, explanation: String) async throws -> SendSummaryFfi {
         try await marmot.reportMessage(accountRef: accountRef, groupIdHex: groupID,
@@ -966,6 +999,16 @@ nonisolated final class MarmotClient: Sendable {
             try marmot.pollVotes(accountRef: accountRef, groupIdHex: groupIdHex, pollEventId: pollEventId,
                                  afterVotedAt: afterVotedAt, afterVoterAccountIdHex: afterVoterAccountIdHex,
                                  limit: limit)
+        }.value
+    }
+
+    /// Every effective reaction on one message, without the conversation
+    /// preview cap. `messageReactions` is a synchronous local read, so it runs
+    /// off the MainActor.
+    func messageReactions(accountRef: String, groupIdHex: String,
+                          messageIdHex: String) async throws -> [TimelineUserReactionFfi] {
+        try await Task.detached(priority: .userInitiated) { [marmot] in
+            try marmot.messageReactions(accountRef: accountRef, groupIdHex: groupIdHex, messageIdHex: messageIdHex)
         }.value
     }
 

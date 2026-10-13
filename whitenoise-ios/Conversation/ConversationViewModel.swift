@@ -717,6 +717,28 @@ final class ConversationViewModel {
         return timelineStore.reactionDetails(for: messageIdHex)
     }
 
+    /// The window's bounded reaction preview for a message, with local
+    /// optimistic changes, or nil when the message is not in the window.
+    func projectedReactionDetails(for messageIdHex: String) -> ReactionDetails? {
+        _ = timelineStore.timelineProjectionGeneration
+        guard let value = windowReactions[messageIdHex] else { return nil }
+        return timelineStore.reactionProjections.preparedDetails(value, target: messageIdHex, me: myAccountId ?? "")
+    }
+
+    /// The complete-reactions read for a message in the active account and
+    /// runtime, or nil when there is no account or durable message id.
+    func messageReactionsSubject(for messageIdHex: String) -> MessageReactionsSubject? {
+        guard let appState, let accountRef = appState.activeAccountRef, !messageIdHex.isEmpty else { return nil }
+        return MessageReactionsSubject(accountRef: accountRef, groupIdHex: group.groupIdHex,
+                                       messageIdHex: messageIdHex, runtimeGeneration: appState.runtimeGeneration)
+    }
+
+    /// Changes with every installed conversation revision; MDK bumps it even
+    /// when only reactions outside the bounded preview change.
+    var conversationWindowRevision: ConversationWindowRevisionFfi? {
+        conversationWindow?.revision
+    }
+
     func windowAvatarURL(for accountId: String) -> URL? {
         guard conversationWindow != nil else { return appState?.avatarURL(forAccountIdHex: accountId) }
         if case .remoteImage(let url, _) = windowIdentities[accountId]?.avatar { return ContentSanitizer.imageURL(url) }
@@ -912,6 +934,18 @@ final class ConversationViewModel {
 
     func refreshProfileDependentTimelineProjections() {
         timelineStore.refreshProfileDependentTimelineProjections()
+    }
+
+    func applyTimestampRenderGeneration(_ generation: Int) {
+        timelineStore.applyTimestampRenderGeneration(generation)
+    }
+
+    func setTimestampRowVisible(_ rowId: String, isVisible: Bool) {
+        timelineStore.setTimestampRowVisible(rowId, isVisible: isVisible)
+    }
+
+    func setRelativeTimestampRefreshActive(_ active: Bool) {
+        timelineStore.setRelativeTimestampRefreshActive(active)
     }
 
     init(
@@ -1153,9 +1187,9 @@ final class ConversationViewModel {
         return PollVotesSubject(accountRef: accountRef, groupIdHex: group.groupIdHex, pollEventId: messageIdHex)
     }
 
-    /// MDK only accepts polls in group conversations, never direct messages.
+    /// MDK 0.13 accepts polls in direct conversations as well as groups.
     var canCreatePolls: Bool {
-        canSendMessages && !groupDisplay.isDirectMessage
+        canSendMessages
     }
 
     var canVoteInPolls: Bool {
@@ -1232,6 +1266,18 @@ final class ConversationViewModel {
     }
 
     func canReportToDeveloper(_ message: AppMessageRecordFfi) -> Bool {
+        ModerationReportSender.isAvailable(appState)
+            && moderationAccountRef != nil && appState?.activeAccountRef == moderationAccountRef
+            && MessageModerationPolicy.isOtherAuthor(
+                direction: message.direction,
+                sender: message.sender,
+                myAccountId: myAccountId,
+                isDeleted: isDeleted(message.messageIdHex)
+            )
+    }
+
+    /// Blocking needs no report destination; only "Block and Report" does.
+    func canBlockAuthor(of message: AppMessageRecordFfi) -> Bool {
         moderationAccountRef != nil && appState?.activeAccountRef == moderationAccountRef
             && MessageModerationPolicy.isOtherAuthor(
                 direction: message.direction,
@@ -1241,9 +1287,7 @@ final class ConversationViewModel {
             )
     }
 
-    func canBlockAuthor(of message: AppMessageRecordFfi) -> Bool {
-        canReportToDeveloper(message)
-    }
+    var canBlockAndReport: Bool { ModerationReportSender.isAvailable(appState) }
 
     var canModerateReports: Bool {
         moderationAccountRef != nil && appState?.activeAccountRef == moderationAccountRef
@@ -3034,18 +3078,42 @@ final class ConversationViewModel {
 
         var successful = Set<String>()
         var failed = Set<String>()
+        let route = MediaUploadRoute.route(for: [prepared])
         for destination in destinations {
             do {
-                _ = try await client.uploadMedia(
-                    accountRef: accountRef,
-                    groupIdHex: destination,
-                    request: MediaUploadRequestFfi(
-                        attachments: [prepared.uploadRequest],
-                        caption: nil,
-                        send: true,
-                        blossomServer: nil
+                switch route {
+                case .bytes:
+                    _ = try await client.uploadMedia(
+                        accountRef: accountRef,
+                        groupIdHex: destination,
+                        request: MediaUploadRequestFfi(
+                            attachments: [prepared.uploadRequest],
+                            caption: nil,
+                            send: true,
+                            blossomServer: nil
+                        )
                     )
-                )
+                case .files:
+                    // One control per destination: each is its own MDK operation.
+                    let control = MediaFileTransferControlFfi()
+                    _ = try await MediaFileUploadRunner.run(
+                        [prepared],
+                        control: control,
+                        limit: maxFileMediaCiphertextBytes()
+                    ) { sources in
+                        try await client.uploadMediaFiles(
+                            accountRef: accountRef,
+                            groupIdHex: destination,
+                            request: MediaFileUploadRequestFfi(
+                                attachments: sources,
+                                caption: nil,
+                                send: true,
+                                blossomServer: nil
+                            ),
+                            control: control
+                        )
+                    }
+                }
                 successful.insert(destination)
             } catch {
                 failed.insert(destination)

@@ -287,6 +287,16 @@ final class AppState {
         }
     }
 
+    /// Device-wide opt-in for MDK's native startup diagnostics. Applied to the
+    /// running runtime immediately and to future runtimes before account reads.
+    /// Disabling clears captured history.
+    var startupDiagnosticsEnabled: Bool = StartupDiagnosticsPreference.isEnabled() {
+        didSet {
+            StartupDiagnosticsPreference.setEnabled(startupDiagnosticsEnabled)
+            try? client?.marmot.setStartupDiagnosticsEnabled(enabled: startupDiagnosticsEnabled)
+        }
+    }
+
     /// Effective streaming-debug flag: requires developer mode.
     var streamingDebugEnabled: Bool {
         developerMode && streamingDebugMode
@@ -352,6 +362,18 @@ final class AppState {
     /// `@ObservationIgnored client`), matching the original raw-handle semantics.
     var client: MarmotClient? { runtimeLifecycle.client }
 
+    /// IPF moderation reports are configured per build flavor. Unconfigured
+    /// builds hide every report-to-White-Noise affordance.
+    var moderationReportingAvailable: Bool {
+#if DEBUG
+        if let moderationReportingAvailableForTesting { return moderationReportingAvailableForTesting }
+#endif
+        return client?.moderationReportingAvailable == true
+    }
+#if DEBUG
+    @ObservationIgnored var moderationReportingAvailableForTesting: Bool?
+#endif
+
     /// Launch-to-root-surface timing, held until the first runtime can record it.
     @ObservationIgnored var hostWindowInitStartedAt: ContinuousClock.Instant?
     @ObservationIgnored private var pendingHostWindowInitMilliseconds: UInt64?
@@ -372,6 +394,8 @@ final class AppState {
     let appReviewDemo = AppReviewDemoCoordinator()
     let toastState = ToastState()
     let navigation = NavigationState()
+    /// Invalidates rendered Markdown timestamps; see `MarkdownTimestampRenderClock`.
+    let markdownTimestampClock = MarkdownTimestampRenderClock()
     /// Optional local-auth gate and app-switcher privacy shield. UI-only:
     /// runtime suspend/resume stays independent of the lock state.
     let appLock = AppLockController()
@@ -448,6 +472,7 @@ final class AppState {
     }
 
     var groupRecoveryUpdate: GroupRecoveryUpdate?
+    var groupMembershipUpdate: GroupRecoveryUpdate?
     var groupProjectionUpdate: GroupRecoveryUpdate?
     let historyNotices = HistoryNoticeStore()
     let pollVotesInvalidation = PollVotesInvalidation()
@@ -473,6 +498,16 @@ final class AppState {
            activeAccount?.accountIdHex == accountID,
            visibleChat?.groupIdHex == groupID {
             groupRecoveryUpdate = GroupRecoveryUpdate(accountID: accountID, groupID: groupID)
+        }
+        // MDK applies device-local membership changes before delivering these
+        // events and creates no system row. The group-record subscription can
+        // deduplicate them, so the open conversation re-reads its snapshot
+        // (membership) and recovery state directly.
+        if case .groupEvent(let accountID, _, let groupID, let kind) = event,
+           GroupEventPresentationPolicy.refreshesMembershipPresentation(kind),
+           activeAccount?.accountIdHex == accountID,
+           visibleChat?.groupIdHex == groupID {
+            groupMembershipUpdate = GroupRecoveryUpdate(accountID: accountID, groupID: groupID)
         }
         if case .historyNoticesChanged(let accountID, _) = event, activeAccount?.accountIdHex == accountID {
             Task { await historyNotices.refresh(using: self) }
@@ -1675,8 +1710,12 @@ final class AppState {
     /// Creates the durable identity without routing out of onboarding. The
     /// sign-up profile flow uses the returned account to publish optional
     /// metadata, then calls `completeIdentityProfileSetup` exactly once.
+    /// An `initialProfile` becomes the identity's first public kind-0, so
+    /// relays and contacts never see MDK's generated name first.
     @MainActor
-    func createIdentityForProfileSetup() async throws -> IdentityCreationResultFfi {
+    func createIdentityForProfileSetup(
+        initialProfile: UserProfileMetadataFfi? = nil
+    ) async throws -> IdentityCreationResultFfi {
         let ticket = productAnalytics.ticket()
         productOnboardingTicket = ticket
         productAnalytics.record(.onboarding(.identitySelection, .create, .success), ticket: ticket)
@@ -1686,11 +1725,21 @@ final class AppState {
         defer { runtimeLifecycle.endForegroundRuntimeMutation(lease) }
         let relays = lease.client.relayUrls
         let existingAccountLabels = Set(accounts.map(\.label))
-        let creation = try await lease.client.marmot.createIdentityWithProfile(
-            defaultRelays: AppContainerConfig.accountRelays(runtimeRelays: relays),
-            bootstrapRelays: relays,
-            inboxRelays: relays
-        )
+        let defaultRelays = AppContainerConfig.accountRelays(runtimeRelays: relays)
+        let creation = if let initialProfile {
+            try await lease.client.marmot.createIdentityWithInitialProfile(
+                profile: initialProfile,
+                defaultRelays: defaultRelays,
+                bootstrapRelays: relays,
+                inboxRelays: relays
+            )
+        } else {
+            try await lease.client.marmot.createIdentityWithProfile(
+                defaultRelays: defaultRelays,
+                bootstrapRelays: relays,
+                inboxRelays: relays
+            )
+        }
         // MDK deliberately coalesces generated-identity calls while an earlier
         // account is still publishing. Never let a second-account flow edit or
         // activate that already-existing identity as though it were new.
@@ -2075,4 +2124,17 @@ extension AppState: NotificationCoordinatorHost {
 
     var isRuntimeSuspendingForNotificationCoordinator: Bool { isRuntimeSuspending }
     var isSigningOutForNotificationCoordinator: Bool { isSigningOut }
+}
+
+nonisolated enum GroupEventPresentationPolicy {
+    /// Device-local membership changes (MDK 0.13): this copy was terminated or
+    /// restored, or member-leave records were removed.
+    static func refreshesMembershipPresentation(_ kind: GroupEventKindFfi) -> Bool {
+        switch kind {
+        case .localGroupCopyTerminated, .localGroupCopyRestored, .groupMemberLeavesRemoved:
+            return true
+        default:
+            return false
+        }
+    }
 }

@@ -146,7 +146,7 @@ struct AccountSetupTests {
         let profile = UserProfileMetadataFfi(name: "Alex", displayName: nil, about: nil,
                                             picture: nil, banner: nil, nip05: nil, lud16: nil)
         value.proposal = .init(step: .profile, revision: value.revision, previousEventId: nil,
-                               readRelays: [], writeRelays: [], profile: profile, follows: nil)
+                               readRelays: [], writeRelays: [], profile: profile, follows: nil, relayRepair: nil)
         let interrupted = AccountSetupProfilePresentation(snapshot: value)
         #expect(interrupted.isInterrupted)
         #expect(interrupted.profile == profile)
@@ -165,7 +165,7 @@ struct AccountSetupTests {
         value.steps = [.init(step: .profile, status: .needsInput, findings: [],
                              actions: [.editProfile, .continueWithout], checkedAt: nil)]
         value.proposal = .init(step: .relays, revision: value.revision, previousEventId: nil,
-                               readRelays: ["wss://relay.example.com"], writeRelays: [], profile: nil, follows: nil)
+                               readRelays: ["wss://relay.example.com"], writeRelays: [], profile: nil, follows: nil, relayRepair: nil)
         let presentation = AccountSetupProfilePresentation(snapshot: value)
         #expect(presentation.canEdit && presentation.canSkip)
         #expect(!presentation.isInterrupted)
@@ -659,6 +659,35 @@ struct AccountSetupTests {
         await model.drain()
     }
 
+    @Test(arguments: [OnboardingStepFfi.relays, .inboxRelays])
+    func suggestedRelayFixOnlyPreviewsAndManualReviewIsNeverApproved(_ step: OnboardingStepFfi) async {
+        var initial = snapshot()
+        initial.steps[0].step = step
+        initial.steps[0].actions = [.retry, .editDiscoveryRelays, .editRelays]
+        let client = SetupTestClient(initial: initial)
+        let model = AccountSetupModel(snapshot: initial)
+        await model.connect(client)
+        await settle { model.isConnected && !model.isBusy }
+        // Connecting never requests a preview on the user's behalf.
+        #expect(await client.relayRepairPreviews.isEmpty)
+
+        await model.send(.suggestRelayRepair(step))?.value
+
+        #expect(await client.relayRepairPreviews == [step])
+        #expect(model.snapshot.proposal?.relayRepair?.mode == .manualReview)
+        let presentation = AccountSetupRelayStepPresentation(
+            step: step, actions: model.snapshot.steps[0].actions, proposal: model.snapshot.proposal
+        )
+        #expect(presentation.status == .manualReview)
+        #expect(presentation.primaryAction?.action == .edit)
+        #expect(!presentation.isValidProposal)
+        #expect(AccountSetupPolicy.automaticAction(model.snapshot) == nil)
+        #expect(await client.approvalCount == 0)
+        #expect(await client.defaultPublicationCount == 0)
+        model.suspend()
+        await model.drain()
+    }
+
     @Test func recoveredPublicationUsesTheEpochOfTheDisplayedProposal() async throws {
         var proposed = proposalSnapshot(step: .profile)
         proposed.recoveryEpoch = "recovered-epoch"
@@ -733,7 +762,7 @@ struct AccountSetupTests {
         value.steps[0].step = step
         value.steps[0].actions = [.approveRepair, .cancelRepair]
         value.proposal = OnboardingRepairProposalFfi(step: step, revision: 8, previousEventId: nil,
-                                                   readRelays: [], writeRelays: [], profile: nil, follows: nil)
+                                                   readRelays: [], writeRelays: [], profile: nil, follows: nil, relayRepair: nil)
         return value
     }
 
@@ -877,6 +906,7 @@ private actor SetupTestClient: AccountSetupClient {
     var approvalCount = 0
     var skipCount = 0
     var defaultPublicationCount = 0
+    var relayRepairPreviews: [OnboardingStepFfi] = []
     let profileSaveFails: Bool
     let discoveryResult: OnboardingSnapshotFfi?
     let skipResult: OnboardingSnapshotFfi?
@@ -911,13 +941,28 @@ private actor SetupTestClient: AccountSetupClient {
             runCount += 1
             await runGate?.wait()
         case .discovery: return discoveryResult ?? initial
+        case .suggestRelayRepair(let step):
+            relayRepairPreviews.append(step)
+            var value = initial
+            value.revision += 1
+            value.steps[0].actions = [.editRelays, .cancelRepair]
+            let current = OnboardingRelayTagFfi(fields: ["r", "wss://current.example"], endpoint: "wss://current.example",
+                                                role: .unmarked)
+            value.proposal = OnboardingRepairProposalFfi(
+                step: step, revision: value.revision, previousEventId: "event", readRelays: [], writeRelays: [],
+                profile: nil, follows: nil, relayRepair: OnboardingRelayRepairFfi(
+                    mode: .manualReview, originalEventId: "event", originalContent: "", proposedContent: "",
+                    beforeTags: [current], afterTags: [current], changes: []
+                )
+            )
+            return value
         case .editRelays(let step, let reads, let writes):
             var value = initial
             value.revision += 1
             value.steps[0].actions = [.approveRepair, .cancelRepair]
             value.proposal = OnboardingRepairProposalFfi(
                 step: step, revision: value.revision, previousEventId: nil,
-                readRelays: reads, writeRelays: writes, profile: nil, follows: nil
+                readRelays: reads, writeRelays: writes, profile: nil, follows: nil, relayRepair: nil
             )
             return value
         case .useDefaults:

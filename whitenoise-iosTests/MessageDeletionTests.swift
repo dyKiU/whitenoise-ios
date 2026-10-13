@@ -133,6 +133,28 @@ struct MessageDeletionTests {
         #expect(!viewModel.canReport(theirs))
     }
 
+    @Test func deviceLocalMembershipEventsRefreshOnlyTheOpenConversation() throws {
+        let state = try appState(accountRef: "members", accountIdHex: hex("11"))
+        state.setPhase(.ready)
+        let generation = try #require(state.runtimeEventsGeneration)
+        let route = try #require(state.beginViewingChat(groupIdHex: "group"))
+        defer { state.endViewingChat(route) }
+        func event(_ group: String, _ kind: GroupEventKindFfi) -> MarmotEventFfi {
+            .groupEvent(accountIdHex: hex("11"), accountLabel: "members", groupIdHex: group, event: kind)
+        }
+
+        state.handleRuntimeEvent(event("other", .localGroupCopyRestored), generation: generation)
+        #expect(state.groupMembershipUpdate == nil)
+        state.handleRuntimeEvent(event("group", .messageReceived(senderIdHex: hex("22"), epoch: 1)), generation: generation)
+        #expect(state.groupMembershipUpdate == nil)
+
+        state.handleRuntimeEvent(event("group", .localGroupCopyTerminated(voluntary: false)), generation: generation)
+        let first = try #require(state.groupMembershipUpdate)
+        #expect(first.groupID == "group" && first.accountID == hex("11"))
+        state.handleRuntimeEvent(event("group", .groupMemberLeavesRemoved(epoch: 3)), generation: generation)
+        #expect(state.groupMembershipUpdate?.id != first.id)
+    }
+
     @Test func moderationRefreshSurvivesNavigationAwayFromTheVisibleTimeline() throws {
         let state = try appState(accountRef: "reports", accountIdHex: hex("11"))
         state.setPhase(.ready)
@@ -158,6 +180,7 @@ struct MessageDeletionTests {
         let other = hex("22")
         let group = groupRecord(id: String(repeating: "ab", count: 16), name: "Reports", admins: [other])
         let state = try appState(accountRef: "reports-\(UUID())", accountIdHex: me)
+        state.moderationReportingAvailableForTesting = true
         let model = ConversationViewModel(appState: state, group: group)
         let mine = appRecord(id: hex("44"), groupId: group.groupIdHex, sender: me, direction: "sent")
         let theirs = appRecord(id: hex("55"), groupId: group.groupIdHex, sender: other, direction: "received")
@@ -182,6 +205,7 @@ struct MessageDeletionTests {
         let other = hex("22")
         let group = groupRecord(id: String(repeating: "cd", count: 16), name: "")
         let state = try appState(accountRef: "reports-\(UUID())", accountIdHex: me)
+        state.moderationReportingAvailableForTesting = true
         let model = ConversationViewModel(appState: state, group: group, initialOtherMember: other, initialMemberCount: 2)
         let mine = appRecord(id: hex("44"), groupId: group.groupIdHex, sender: me, direction: "sent")
         let theirs = appRecord(id: hex("55"), groupId: group.groupIdHex, sender: other, direction: "received")
@@ -194,6 +218,14 @@ struct MessageDeletionTests {
         #expect(model.canReportToDeveloper(theirs))
         #expect(model.canReport(theirs))
         #expect(!model.canReport(mine))
+        // MarmotKit 0.13 accepts polls in direct conversations too.
+        #expect(model.canCreatePolls == model.canSendMessages)
+        // Unconfigured builds offer no report in a direct chat, but Block stays.
+        state.moderationReportingAvailableForTesting = false
+        #expect(!model.canReport(theirs))
+        #expect(model.canBlockAuthor(of: theirs))
+        #expect(!model.canBlockAndReport)
+        state.moderationReportingAvailableForTesting = true
         state.activeAccountRef = "replacement-account"
         #expect(!model.canReport(theirs))
         #expect(!model.canBlockAuthor(of: theirs))

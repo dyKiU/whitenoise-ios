@@ -108,6 +108,13 @@ begins setup or approves publication. The user explicitly signs in again.
 Bind repair/device approvals to the displayed revision and recovery epoch; use
 the epoch-aware APIs whenever the same displayed snapshot has a recovery epoch. Reject an entire relay
 proposal if any address is unsafe; never hide an invalid entry and approve the rest.
+Request `proposeOnboardingRelayRepair` only on explicit Suggest a Fix. On the shared
+Relay/Inbox step, `AccountSetupRelayStepPresentation` makes it the primary action
+when Use Default Relays isn't offered (a step retry and Search Default Relays then
+stay available as secondary actions). Show MDK's typed relay diff for consent and
+approve only when it accounts for every published tag. `ManualReview` never
+approves: prefill the editor from `beforeTags` or offer the separately labeled
+default-relay replacement, which returns its own diff.
 
 The generated Swift bindings and immutable remote binary declaration live in `Packages/MarmotKit`. The source of truth is the MDK MarmotKit release published from `marmot-protocol/mdk`.
 
@@ -151,13 +158,17 @@ Conversation-open performance ends at rendered layout, uses the navigation conse
 ticket, and records unavailable/cancelled/timeout outcomes separately from success.
 
 Group reports use encrypted group transport and are visible to group members.
-App Review also requires reports and blocks to reach the developer, only on
-explicit user action, as an ordinary encrypted message to the White Noise support
-account in the reporter's support chat. Report (including in direct chats, which
-have no group report) sends only the reported npub, the reason, and the
-reporter's optional explanation. Block and Report sends only the blocked npub,
-after the block is confirmed. Never include the reported message, its id, or
-anything identifying the conversation.
+App Review also requires reports and blocks to reach the developer. Report
+(including in direct chats, which have no group report) and Block and Report also
+call MDK's `submitModerationReport`, a NIP-59 gift-wrapped NIP-56 report to the
+flavor's IPF reports key (`WHITENOISE_MODERATION_REPORT_PUBKEY`) on the seed
+relays, only on explicit user action. It is additive to `reportMessage`. MDK
+sends only the reported key, the reason and the optional explanation; Block and
+Report sends `other` with no explanation, and only after the block is confirmed.
+Never add message, group or relay identifiers. Gate every report-to-White-Noise
+affordance on `moderationReportingAvailable`; Block itself never depends on it.
+Retained outcomes (`AcceptedPending`, `CompletionUnknown`) are queued by MDK and
+retried on catch-up: report them as waiting, never resubmit them.
 Dismissal labels resolve individual reports without deleting their message.
 Admin deletion uses `deleteMessage`; MDK authorizes it against source group state.
 Pending acceptance is not completed moderation. Refresh reports from projection
@@ -318,6 +329,7 @@ Do not add a second storage path for data Marmot already owns.
 - Draft photo attachment decoding, downsampling, JPEG encoding, and thumbnail generation should run off the MainActor; hop back to the UI actor only to append prepared drafts or surface errors.
 - Chat-list subscription row bursts should be coalesced before publishing SwiftUI-observed arrays; keep durable row/item caches keyed by group id and update only affected avatar rows after backfill.
 - Markdown display blocks are cacheable per message content and profile refresh generation; do not call `MarkdownMessageBuilder.displayBlocks` directly from bubble body paths.
+- Markdown timestamps are formatted at build time, never persisted. Rows that render one also key on `MarkdownTimestampRenderClock.generation` (locale, time zone, language, clock, resume); rows without one must not rebuild. Visible `relative` timestamps refresh through the conversation's single `RelativeTimestampRefreshScheduler` task only while on screen and active. Previews, reply quotes and notifications are not refreshed, so they render `relative` as absolute text.
 - Markdown preview/plain-text walkers must budget table rows and cells, including empty cells, so hostile ASTs cannot bypass node limits.
 - Developer-mode streaming debug may show agent-stream MLS events and live QUIC update rows in the conversation timeline. Console logs for agent streams should log sizes, counts, hashes, and stream ids rather than plaintext message content.
 - Build user-visible date formats from localized templates rather than raw `DateFormatter.dateFormat` patterns.

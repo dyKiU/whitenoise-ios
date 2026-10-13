@@ -234,7 +234,8 @@ before every release tag.
       notice still shows it. Diagnostics logs "history notices changed".
 - [ ] In a group, **+** → Poll opens New Poll. Validation stays inline (empty
       question, fewer than two options, duplicates, over-long text) and the sheet
-      closes only after the send succeeds. Poll is absent in direct messages.
+      closes only after the send succeeds. Poll is also offered in direct
+      messages (MarmotKit 0.13), and a direct-chat poll votes and closes the same way.
 - [ ] Send single-choice and multiple-choice polls. On a second account, vote,
       change the vote, and confirm tallies, voter count and your selection update
       live on both devices. A single-choice tap on the current answer does
@@ -643,6 +644,18 @@ only from custom emoji already shown in that chat.
       nothing; review the roles, then approve to replace the list. Closing the
       editor or cancelling the proposal preserves the original list. Repeat for
       inbox relays; invalid/private/retired selections fail without publication.
+- [ ] Import a profile whose relay list has a retired relay or lacks a write
+      route, plus unrelated tags or duplicate entries. Suggest a Fix is the main
+      button when Use Default Relays isn't offered (Try Again and Search Default
+      Relays stay below it when the step allows them), and secondary otherwise.
+      Suggest a Fix publishes nothing; it shows Will be added / Will be removed /
+      Unchanged rows and what an added relay lets the profile do. Save Relay Changes publishes only that diff;
+      other tags, duplicates, marker spelling and content survive. A list with no
+      safe automatic fix shows Current relays and no save action: Edit Relays opens
+      prefilled with the current list, and Replace With Default Relays leads to a
+      reviewable diff. Saving an unchanged edit keeps the editor open. Any invalid
+      published address (such as a retained `ws://…onion`) blocks the whole save.
+      Repeat on the Inbox Relays step, where saving is labeled Use These Relays.
 - [ ] For both relay-list and inbox-list recovery, search a reachable relay that
       returns no declaration. After any earlier checks finish, Use default relays
       remains available alongside Look on another relay. Defaults publish only
@@ -768,6 +781,13 @@ only from custom emoji already shown in that chat.
       not add a locally retryable duplicate beside the MDK message. Reopen the
       conversation: an unaccepted draft remains available; an accepted message
       stays in the timeline without restoring its submitted composer.
+- [ ] Leave a draft with a photo in a chat, open it and send on a slow
+      connection, then go back to Chats before the upload ends. The row shows
+      “You: …” for the sent message instead of “Draft: …”, and does not flash
+      the draft back when the send is accepted. Make a send fail before
+      acceptance (offline upload): the row returns to “Draft: …” and reopening
+      the chat restores the draft. On iPad, type a new draft after sending: it
+      shows as “Draft: …” once saved, even with the same text.
 
 ### Oversized attachments and text
 
@@ -789,6 +809,23 @@ then AirDrop or drag them into Files on the device or simulator.
       at 8000 characters; `message-at-limit-8000-chars.txt` sends as-is.
 - [ ] Interrupt connectivity during an attachment send. An uncertain outcome
       never restores the composer, so no duplicate can be sent.
+
+### File-backed media upload (MarmotKit 0.13.0)
+
+Videos, documents and any batch of 4 MiB or more upload from a protected
+temporary file through `uploadMediaFiles`; small photos and voice notes keep the
+byte-array path.
+
+- [ ] Send a single 30–50 MiB video. The pending bubble's spinner becomes a ring
+      that fills through preparation and upload; the video then delivers and
+      plays on a second device.
+- [ ] Send two videos together. The bubble keeps the plain spinner and both
+      deliver.
+- [ ] Attach a large video, then remove it from the composer while it is still
+      pre-uploading. Nothing is sent, and a later send of another file works.
+- [ ] Forward a received video to another chat. It arrives and plays there.
+- [ ] After these sends, `tmp/WhiteNoiseMediaUploads` in the app container
+      (Xcode > Devices > Download Container) holds no leftover files.
 
 ## Conversation keyboard avoidance
 
@@ -929,6 +966,26 @@ iOS 26 and UIKit takes over the navigation bar when a native field activates.
       lands); a `nostr:note1…` reference renders monospaced and inert.
 - [ ] Chat-list preview and reply quote show `@Display Name` for
       mentions, not the npub.
+- [ ] Send `<t:1767225600> <t:1767225600:t> <t:1767225600:F> <t:1767225600:R>`:
+      each renders as a subtly tinted time in the device's language, date
+      order and time zone (`F` includes the weekday; `R` reads like
+      "9 months ago"); `<t:1767225600:x>` and `` `<t:1767225600:R>` `` stay
+      literal. With VoiceOver, the paragraph offers "Exact time" with the
+      full date and time under More Content.
+- [ ] Send `<t:N:R>` where `N` is a couple of minutes ahead
+      (`date -v+2M +%s`): while the bubble is on screen it counts down
+      ("in 2 minutes", "in 1 minute", "in 50 seconds", "now",
+      "10 seconds ago") without scrolling or reopening the chat. It stops
+      updating while scrolled off screen or backgrounded and is current again
+      when it returns.
+- [ ] With such a chat open, change Settings → General → Date & Time
+      (24-Hour Time, Time Zone) and the region or in-app language, then return:
+      every timestamp in the open chat, its reply quotes and the chat list
+      re-renders in the new format without reopening the chat. Messages
+      without timestamps do not flicker.
+- [ ] The chat-list preview, reply quote and notification for a message with
+      `<t:…:R>` show an absolute date and time, never a relative phrase or the
+      raw `<t:…>` syntax.
 
 ## Groups (3+ members)
 
@@ -1394,7 +1451,15 @@ Marmot root. Automated simulator checks do not replace these device checks.
       preserving group participation and stored history. Verify cross-device
       delivery and notification behavior with a second test identity.
 - [ ] Reactions show the full count and your selected state even when your identity
-      is outside the preview. Overflow/truncated reactor previews are disclosed.
+      is outside the preview. With more reactors or reaction kinds than the bubble
+      previews, tapping a chip or the overflow pill opens Reactions listing every
+      reactor (not a truncated preview), with All and per-emoji counts matching the
+      bubble. A fast read shows no spinner flash; the tapped emoji stays selected.
+      With the sheet open, a reaction added, changed or removed on another device
+      (including one outside the two-name preview) updates the list. Removing your
+      own reaction updates it immediately. Blocked reactors are not listed. A
+      deleted or hidden message shows “No reactions”; a failed read shows Retry.
+      Switching profiles or backgrounding/resuming never shows another profile's list.
 - [ ] Developer Key Packages shows current and superseded relay events.
 - [ ] Welcome shows an unchecked terms checkbox above Sign In/Sign Up, and both
       buttons stay disabled until it is checked. Tapping the row toggles it; the
@@ -1412,13 +1477,16 @@ Marmot root. Automated simulator checks do not replace these device checks.
 - [ ] In a direct chat, long-press the other person's message: **Report** sends
       only to the White Noise team (no group report), and **Block** offers
       **Block and Report** and **Block User**. Your own messages offer neither.
-      A sent report appears as a message in **Chat with support** containing
-      only the reported npub, the reason, and any explanation; Block and Report
-      sends the npub only. Neither includes the reported message, its id, or the
-      chat. The support chat is created if missing. With relays down, a report
-      either fails with an error or dismisses with "Saved and waiting to send to
-      the White Noise team." (or the pending-confirmation line), and Block still
-      succeeds or fails on its own.
+      Reports are gift-wrapped to the flavor's reports key; nothing appears in
+      Chat with support. Confirm with IPF's reader that a staging report arrives
+      on the staging key only, carrying just the reported npub, the reason, any
+      explanation, and the `report`/`block` label. With relays down, a report
+      dismisses with "Saved and waiting to send to the White Noise team." and
+      publishes after the next catch-up; repeating it within 10 minutes does not
+      send a second report. Block still succeeds or fails on its own.
+- [ ] In a build with no valid `WHITENOISE_MODERATION_REPORT_PUBKEY`, direct
+      chats offer no Report, groups hide **Send to White Noise**, and Block offers
+      only **Block User**.
 - [ ] With two profiles on this device (for example after Create Demo
       Environment), the active profile can Block and Block and Report the other
       from a message, its profile and the direct chat's details; neither profile
@@ -1616,3 +1684,22 @@ Marmot root. Automated simulator checks do not replace these device checks.
   or native image decoding. A cancelled synchronous system resolver can continue
   until the OS returns, retaining its slot throughout; this change neither kills
   resolver threads nor changes negative-cache or retry policy.
+
+## MarmotKit 0.13.0 adoption
+
+- [ ] Upgrade a device that has 0.12 data: first open completes migrations
+      102–107 (note the time on a large account), chats, drafts and retained
+      media remain, and the previous app build refuses the upgraded database.
+- [ ] Sign up with a chosen name and about but no photo: another client sees
+      that name as the account's first profile, never the generated default,
+      and setup publishes no second profile. With a photo, the photo follows in
+      one profile update.
+- [ ] In a direct chat, **+** → Poll creates a poll the other person can vote on.
+- [ ] Send a message with custom emoji: the emoji artwork renders inline and is
+      absent from Group Info shared media and the full media library, even when
+      the newest 100+ attachments are all emoji; real photos still appear.
+- [ ] Developer Tools → Startup Diagnostics: turn on capture, relaunch, and the
+      Steps list shows account-open phases with durations and migration numbers.
+      Share exports the same text. Turning capture off clears it.
+- [ ] Leave or get removed from a group on this device while its conversation
+      is open: the composer and recovery banner update without reopening it.
