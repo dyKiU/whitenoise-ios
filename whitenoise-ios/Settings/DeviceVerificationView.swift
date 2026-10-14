@@ -1,6 +1,7 @@
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     import Foundation
     import MarmotKit
+    import OSLog
     import SwiftUI
 
     struct DeviceVerificationDestinationView: View {
@@ -32,6 +33,10 @@
         @State private var isWorking = false
         @State private var actionTask: Task<Void, Never>?
         @State private var scanning = false
+        private static let diagnostics = Logger(
+            subsystem: Bundle.main.bundleIdentifier ?? "dev.ipf.whitenoise.ios",
+            category: "device-verification"
+        )
 
         init(model: DeviceVerificationViewModel) { _model = State(initialValue: model) }
 
@@ -255,7 +260,10 @@
             actionTask = Task {
                 defer { isWorking = false }
                 do { try await action() } catch {
-                    if !Task.isCancelled, model.isActive { actionFailed = true }
+                    if !Task.isCancelled, model.isActive {
+                        actionFailed = true
+                        Self.diagnostics.error("Verification action failed category=\(DeviceVerificationFailure(error).rawValue, privacy: .public)")
+                    }
                 }
             }
         }
