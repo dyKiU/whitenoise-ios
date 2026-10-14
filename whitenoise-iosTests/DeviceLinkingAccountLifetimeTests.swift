@@ -5,6 +5,8 @@ import Testing
 @testable import whitenoise_ios
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
+    // Generated superclass requires unchecked conformance; NSLock protects all mutable controls.
+    // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class LifetimeSubscription: DeviceLinkingSubscription, @unchecked Sendable {
         private let lock = NSLock()
         private var pending: CheckedContinuation<DeviceLinkingSnapshotFfi, Error>?
@@ -13,7 +15,7 @@ import Testing
         var readCount: Int { lock.withLock { reads } }
         var closeCount: Int { lock.withLock { closes } }
         var isWaiting: Bool { lock.withLock { pending != nil } }
-        override func close() { lock.withLock { closes += 1 } }
+        override func closeStream() { lock.withLock { closes += 1 } }
         override func next() async throws -> DeviceLinkingSnapshotFfi {
             try await withCheckedThrowingContinuation { continuation in
                 lock.withLock {
@@ -41,6 +43,8 @@ import Testing
                     revision: 7, phase: .comparisonAvailable, decimals: nil))
         }
     }
+    // Generated superclass requires unchecked conformance; NSLock protects all mutable controls.
+    // swiftlint:disable:next no_unchecked_sendable
     nonisolated private final class LifetimeSession: DeviceLinkingSession, @unchecked Sendable {
         let stream = LifetimeSubscription(noPointer: .init())
         private let lock = NSLock()

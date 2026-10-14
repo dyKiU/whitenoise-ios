@@ -40,7 +40,7 @@
             guard active else { return }
             active = false
             latestSnapshot = nil
-            subscription.close()
+            subscription.closeStream()
             observation?.cancel()
             observation = nil
         }
