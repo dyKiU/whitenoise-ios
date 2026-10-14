@@ -6,8 +6,15 @@
     struct DeviceVerificationDestinationView: View {
         @Environment(AppState.self) private var appState
         var body: some View {
-            DeviceVerificationView(model: appState.makeDeviceVerificationViewModel())
-                .id(appState.accountStore.deviceLinkingOwnershipIdentity)
+            Group {
+                if let generation = appState.runtimeEventsGeneration {
+                    DeviceVerificationView(model: appState.makeDeviceVerificationViewModel())
+                        .id(generation)
+                        .id(appState.accountStore.deviceLinkingOwnershipIdentity)
+                } else {
+                    ProgressView(L10n.string("Connecting…"))
+                }
+            }
         }
     }
 
