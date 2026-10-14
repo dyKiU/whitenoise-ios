@@ -14,7 +14,7 @@
         private(set) var outgoingPacket: String?
         private(set) var isWorking = false
         private(set) var transportError: Error?
-        enum TransportAction { case continueLinking, exportPacket, receivePacket, finalizeLinking }
+        enum TransportAction { case continueLinking, shareChats, exportPacket, receivePacket, finalizeLinking }
         var isActive: Bool { !retired && isCurrent() }
         var snapshot: DeviceLinkingSnapshotFfi? { isActive ? original.latestSnapshot : nil }
 
@@ -36,6 +36,11 @@
         func continueLinking(displayedRevision: UInt64) async throws {
             try checkActive()
             try await original.continueLinking(displayedRevision: displayedRevision)
+            try checkActive()
+        }
+        func continueLinkingAndShareChats(displayedRevision: UInt64) async throws {
+            try checkActive()
+            try await original.continueLinkingAndShareChats(displayedRevision: displayedRevision)
             try checkActive()
         }
         func enrollmentPacket(displayedRevision: UInt64) async throws -> Data {
@@ -84,6 +89,7 @@
             defer { isWorking = false }
             do {
                 switch action {
+                case .shareChats: try await continueLinkingAndShareChats(displayedRevision: displayedRevision)
                 case .continueLinking: try await continueLinking(displayedRevision: displayedRevision)
                 case .exportPacket:
                     let packet = try await enrollmentPacket(displayedRevision: displayedRevision)
