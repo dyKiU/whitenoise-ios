@@ -8,6 +8,7 @@
     @Observable
     final class DeviceLinkingAccountScope: DeviceVerificationSession {
         let accountRef: String
+        @ObservationIgnored private var automaticBootstrap: Data?
         private(set) var latestSnapshot: DeviceLinkingSnapshotFfi?
         private(set) var cleanupError: Error?
         private(set) var observationError: Error?
@@ -39,6 +40,7 @@
         func invalidate() {
             guard active else { return }
             active = false
+            automaticBootstrap = nil
             latestSnapshot = nil
             subscription.closeStream()
             observation?.cancel()
@@ -54,7 +56,21 @@
         // Enrollment is a separate explicit action on this original owner.
         func continueLinking(displayedRevision: UInt64) async throws {
             try requireActive()
-            try await session.continueLinking(displayedRevision: displayedRevision)
+            if automaticBootstrap != nil {
+                try await session.continueAutomaticLinking(displayedRevision: displayedRevision, shareChats: false)
+            } else {
+                try await session.continueLinking(displayedRevision: displayedRevision)
+            }
+            try requireActive()
+        }
+
+        func continueLinkingAndShareChats(displayedRevision: UInt64) async throws {
+            try requireActive()
+            if automaticBootstrap != nil {
+                try await session.continueAutomaticLinking(displayedRevision: displayedRevision, shareChats: true)
+            } else {
+                try await session.continueLinkingAndShareChats(displayedRevision: displayedRevision)
+            }
             try requireActive()
         }
 
@@ -89,9 +105,17 @@
             guard active else { throw CancellationError() }
         }
 
+        /// Activate only after the exact original has been adopted by this live account scope.
+        func activateAutomaticPairing(displayBootstrap: Bool) async throws {
+            try requireActive()
+            let code = try await session.automaticPairingCode()
+            try requireActive()
+            automaticBootstrap = displayBootstrap ? Data(code.utf8) : Data()
+        }
+
         func setupPacket() throws -> Data {
             try requireActive()
-            return session.setupPacket()
+            return automaticBootstrap ?? session.setupPacket()
         }
 
         func receiveSetupPacket(_ packet: Data) async throws {
