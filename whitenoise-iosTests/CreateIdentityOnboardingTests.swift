@@ -7,6 +7,38 @@ import UIKit
 
 @MainActor
 struct CreateIdentityOnboardingTests {
+    @Test func reopeningSignUpDoesNotReplayRetainedFailure() {
+        var presentation = SignUpFailurePresentation(retaining: .profile)
+        #expect(presentation.takeNewFailure(.profile) == nil)
+        #expect(presentation.takeNewFailure(.profile) == nil)
+    }
+
+    @Test func preparationFailureIsPresentedOnceAcrossObserverAndCompletion() {
+        var presentation = SignUpFailurePresentation(retaining: .profile)
+        #expect(presentation.takeNewFailure(.draftStorage) == .draftStorage)
+        #expect(presentation.takeNewFailure(.draftStorage) == nil)
+        #expect(presentation.takeNewFailure(nil) == nil)
+        #expect(presentation.takeNewFailure(.draftStorage) == .draftStorage)
+    }
+
+    @Test func openingSavedDraftPresentsANewStorageFailure() async throws {
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try Data([0]).write(to: file)
+        defer { try? FileManager.default.removeItem(at: file) }
+        let store = SignUpDraftStore(directory: file)
+        let state = AppState.test(signUpDraftStore: store)
+        var draft = SignUpDraft()
+        draft.stage = .creating
+        await state.signUpModel.configurePersistence(store: store, restored: draft)
+        #expect(state.signUpModel.failure == nil)
+        var presentation = SignUpFailurePresentation(retaining: state.signUpModel.failure)
+
+        await state.openSignUpDraft()
+
+        #expect(presentation.takeNewFailure(state.signUpModel.failure) == .draftStorage)
+        #expect(presentation.takeNewFailure(state.signUpModel.failure) == nil)
+    }
+
     @Test func onlySignInPrefersTheCompactSheetHeight() {
         #expect(!OnboardingSheetContent.welcome.prefersCompactHeight)
         #expect(OnboardingSheetContent.signIn.prefersCompactHeight)
@@ -41,6 +73,38 @@ struct CreateIdentityOnboardingTests {
         #expect(service.publishedProfile?.displayName == "Suggested Name")
         #expect(service.completeCount == 1)
         #expect(dismissed)
+    }
+
+    @Test func chosenNameIsTheFirstPublishedProfileWithoutARepublish() async {
+        let service = CreateIdentityServiceStub()
+        service.creationEchoesInitialProfile = true
+        let model = CreateIdentityViewModel()
+        await model.prepare(using: service)
+        model.displayName = "  Ada  "
+        model.about = "Hello"
+        var dismissed = false
+        await model.submit(using: service) { dismissed = true }
+        #expect(service.createCount == 1)
+        #expect(service.initialProfiles.count == 1)
+        #expect(service.initialProfiles.first??.name == "Ada")
+        #expect(service.initialProfiles.first??.displayName == "Ada")
+        #expect(service.initialProfiles.first??.about == "Hello")
+        #expect(service.initialProfiles.first??.picture == nil)
+        #expect(service.publishCount == 0)
+        #expect(service.completeCount == 1)
+        #expect(dismissed)
+    }
+
+    @Test func profileIsRepublishedWhenCreationIgnoredTheInitialProfile() async {
+        let service = CreateIdentityServiceStub()
+        let model = CreateIdentityViewModel()
+        await model.prepare(using: service)
+        model.displayName = "Ada"
+        await model.submit(using: service) {}
+        // A resumed setup returns the bootstrap profile instead of "Ada".
+        #expect(service.initialProfiles.first??.name == "Ada")
+        #expect(service.publishCount == 1)
+        #expect(service.publishedProfile?.name == "Ada")
     }
 
     @Test func lateSuggestionDoesNotOverwriteTyping() async {
@@ -634,6 +698,29 @@ struct CreateIdentityOnboardingTests {
         try await client.marmot.shutdownAndClose()
     }
 
+    @Test func retryRestorationClosesRecoveryWhenTheSavedDraftIsGone() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let file = directory.appendingPathComponent("draft.json")
+        try Data("broken".utf8).write(to: file)
+        let client = try MarmotClient.testClient()
+        try await client.startRuntime()
+        let state = AppState.test(client: client, notifications: .shared,
+                                  signUpDraftStore: SignUpDraftStore(directory: directory))
+        try await state.refreshAccounts(refreshUnreadSummaries: false)
+        #expect(state.signUpModel.isRestorationBlocked)
+        #expect(state.restoreSignUpPresentation)
+
+        try FileManager.default.removeItem(at: file)
+        await state.retrySignUpRestoration()
+
+        #expect(!state.signUpModel.isRestorationBlocked)
+        #expect(!state.restoreSignUpPresentation)
+        #expect(state.accounts.isEmpty)
+        try await client.marmot.shutdownAndClose()
+    }
+
     @Test(arguments: [false, true])
     func missingOrUnidentifiedAccountOffersRecoveryWithoutChangingAccounts(unknownID: Bool) async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -917,6 +1004,10 @@ private final class CreateIdentityServiceStub: CreateIdentityServicing {
     var beforeSuggestionReturn: (() async -> Void)?
     private(set) var suggestionCount = 0
     private(set) var publishedProfile: UserProfileMetadataFfi?
+    private(set) var initialProfiles: [UserProfileMetadataFfi?] = []
+    /// When set, creation honors the initial profile like MDK does instead of
+    /// returning the generated default.
+    var creationEchoesInitialProfile = false
     private var savedProfile: UserProfileMetadataFfi?
 
     var beforeAccountsReturn: (() async -> Void)?
@@ -953,8 +1044,9 @@ private final class CreateIdentityServiceStub: CreateIdentityServicing {
         running: true
     )
 
-    func createIdentityForProfileSetup() async throws -> IdentityCreationResultFfi {
+    func createIdentityForProfileSetup(initialProfile: UserProfileMetadataFfi?) async throws -> IdentityCreationResultFfi {
         createCount += 1
+        initialProfiles.append(initialProfile)
         if createFailuresRemaining > 0 {
             createFailuresRemaining -= 1
             throw StubError.failed
@@ -962,6 +1054,9 @@ private final class CreateIdentityServiceStub: CreateIdentityServicing {
         await beforeCreateReturn?()
         storedAccounts.append(identity)
         if loseCreationReply { loseCreationReply = false; throw StubError.failed }
+        if creationEchoesInitialProfile, let initialProfile {
+            return IdentityCreationResultFfi(account: identity, profile: initialProfile, readiness: .localReady)
+        }
         return IdentityCreationResultFfi(
             account: identity,
             profile: UserProfileMetadataFfi(

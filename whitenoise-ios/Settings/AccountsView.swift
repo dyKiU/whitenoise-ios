@@ -278,6 +278,8 @@ struct AddProfileSheet: View {
         .presentationDetents(supportedDetents, selection: $selectedDetent)
         .presentationDragIndicator(.visible)
         .presentationContentInteraction(.resizes)
+        // Sign Up pushes into this sheet, so iPad needs room for its form.
+        .presentationSizing(.page)
         .onAppear { appState.diagnosticsConsent.onboardingVisible = true }
         .onDisappear {
             appState.diagnosticsConsent.onboardingVisible = false

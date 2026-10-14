@@ -6,7 +6,7 @@ struct AccountSetupRelayEditor: View {
     let model: AccountSetupModel
     var step: OnboardingStepFfi = .relays
     @Binding var draft: AccountSetupRelayDraft
-    var onFailure: ((String) -> Void)?
+    var onFailure: ((AccountSetupFailure) -> Void)?
     @State private var editingEntry: AccountSetupRelayDraft.Entry?
     @State private var error: String?
     @State private var invalidEntryID: UUID?
@@ -137,16 +137,21 @@ struct AccountSetupRelayEditor: View {
         isSubmitting = true
         Task {
             await operation.value
-            if model.errorMessage == nil, model.isConnected,
-               model.snapshot.proposal?.step == step,
-               model.snapshot.steps.first(where: { $0.step == step })?.actions.contains(.approveRepair) == true {
+            let outcome = model.isConnected
+                ? AccountSetupRelayRepairPresentation.editOutcome(model.snapshot, step: step, errorMessage: model.errorMessage)
+                : .failed
+            if outcome == .review {
                 dismiss()
+            } else if outcome == .unchanged {
+                // MDK found nothing to publish; keep the draft open for another change.
+                isSubmitting = false
+                error = L10n.string("This matches your current relay list. Change at least one relay to continue.")
             } else {
                 isSubmitting = false
                 operationFailed = true
-                let message = model.errorMessage ?? L10n.string("Couldn’t finish this step. Try again.")
-                error = message
-                onFailure?(message)
+                let failure = model.failure ?? .operation
+                error = failure.message
+                onFailure?(failure)
             }
         }
     }

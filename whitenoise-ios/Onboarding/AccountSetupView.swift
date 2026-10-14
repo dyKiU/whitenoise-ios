@@ -8,7 +8,6 @@ struct AccountSetupView: View {
     let onClose: () -> Void
     let onOpenChats: () -> Void
     @State private var decision: SetupDecision?
-    @State private var failedCloseError: String?
 
     var body: some View {
         List {
@@ -53,7 +52,7 @@ struct AccountSetupView: View {
             }
         }
         .modifier(WNOnboardingActionBar(
-            isPresented: model.errorMessage != nil || model.isDurablyReady || isOpeningChats || reviewStep != nil
+            isPresented: model.errorMessage != nil || (!model.cancelled && (model.isDurablyReady || isOpeningChats || reviewStep != nil))
         ) {
             bottomAction
                 .safeAreaPadding(.horizontal, 16)
@@ -64,9 +63,6 @@ struct AccountSetupView: View {
             if appState.canUseRuntimeForLocalForegroundWork { await appState.connectAccountSetup() }
         }
         .onDisappear { model.suspend() }
-        .onChange(of: model.errorMessage) {
-            if model.errorMessage != failedCloseError { failedCloseError = nil }
-        }
         .sheet(item: $decision) { decision in
             AccountSetupActions(model: model, selectedStep: decision.step)
                 .appAppearance()
@@ -74,18 +70,17 @@ struct AccountSetupView: View {
     }
 
     private var reviewStep: OnboardingStepFfi? {
-        AccountSetupPresentation.stepToReview(model.snapshot, isBusy: model.isBusy, isConnected: model.isConnected)
+        guard !model.cancelled else { return nil }
+        return AccountSetupPresentation.stepToReview(model.snapshot, isBusy: model.isBusy, isConnected: model.isConnected)
     }
 
     private var closeFailed: Bool {
-        failedCloseError != nil && model.errorMessage == failedCloseError
+        model.failure == .closeSignIn
     }
 
     private func close() async {
         if await appState.cancelAccountSetup() {
             onClose()
-        } else {
-            failedCloseError = model.errorMessage
         }
     }
 
@@ -111,7 +106,7 @@ struct AccountSetupView: View {
     private var header: some View {
         let content = AccountSetupPresentation.header(
             model.snapshot, reviewStep: reviewStep, errorMessage: model.errorMessage,
-            isOpeningChats: isOpeningChats, closeFailed: closeFailed
+            isOpeningChats: isOpeningChats, closeFailed: closeFailed, isCancelled: model.cancelled
         )
         return VStack(alignment: .leading, spacing: 4) {
             Text(content.title)

@@ -19,6 +19,7 @@ struct ImportIdentityView: View {
     @State private var isKeyboardVisible = false
     @State private var showScanner = false
     @State private var openingSetup: AccountSetupModel?
+    @State private var isRecoveringSetup = false
 
     let isPushed: Bool
     let onPreferredSheetExpansionChange: (Bool) -> Void
@@ -43,8 +44,10 @@ struct ImportIdentityView: View {
         return Self.isPlausibleNsec(normalizedIdentity) ? .valid : .invalid
     }
 
+    private var isBusy: Bool { model.isImporting || isRecoveringSetup }
+
     private var canSubmit: Bool {
-        !model.isImporting && keyState == .valid
+        !isBusy && keyState == .valid
     }
 
     /// Accept only a checksum-valid NIP-19 encoding of a 32-byte private key.
@@ -56,12 +59,6 @@ struct ImportIdentityView: View {
         let normalized = NostrProfileReference.normalizedNsec(raw) ?? ""
         raw = ""
         return normalized
-    }
-
-    static func redactedImportError(_ message: String) -> String {
-        message
-            .replacing(/nsec1[a-z0-9]+/.ignoresCase(), with: "nsec1…")
-            .replacing(/[0-9a-fA-F]{32,}/, with: "…")
     }
 
     var body: some View {
@@ -100,7 +97,8 @@ struct ImportIdentityView: View {
 
         ScrollView {
             VStack(alignment: .leading) {
-                OnboardingRecoverySection()
+                OnboardingRecoverySection(isRecovering: $isRecoveringSetup)
+                    .disabled(model.isImporting)
                 Text("Private Key")
                     .font(.headline)
                     .padding(.leading)
@@ -108,7 +106,7 @@ struct ImportIdentityView: View {
                 HStack {
                     privateKeyField(identity: $model.identity)
 
-                    if !model.isImporting && (isKeyFocused || normalizedIdentity.isEmpty) {
+                    if !isBusy && (isKeyFocused || normalizedIdentity.isEmpty) {
                         Button {
                             if isKeyFocused {
                                 isKeyFocused = false
@@ -161,7 +159,7 @@ struct ImportIdentityView: View {
                 ) {
                     dismiss()
                 }
-                .disabled(model.isImporting)
+                .disabled(isBusy)
             }
         }
         .sheet(isPresented: $showScanner) {
@@ -201,7 +199,7 @@ struct ImportIdentityView: View {
                 }
             }
         }
-        .interactiveDismissDisabled(model.isImporting)
+        .interactiveDismissDisabled(isBusy)
         .alert(
             "Recover incomplete setup?",
             isPresented: $model.showIncompleteSetupRecoveryConfirmation
@@ -237,7 +235,7 @@ struct ImportIdentityView: View {
             PasteAwareSecureField(
                 text: identity,
                 isFocused: $isKeyFocused,
-                showsAccessory: !model.isImporting,
+                showsAccessory: !isBusy,
                 onFocusRequest: { onPreferredSheetExpansionChange(true) },
                 onPaste: { token, resultingIdentity in
                     model.recordPastedClipboardToken(
@@ -259,6 +257,6 @@ struct ImportIdentityView: View {
         .frame(height: 50)
         .background(Color(uiColor: .secondarySystemFill), in: .capsule)
         .preservesKeyboardOnTap()
-        .disabled(model.isImporting)
+        .disabled(isBusy)
     }
 }

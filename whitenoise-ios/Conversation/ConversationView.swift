@@ -588,6 +588,7 @@ struct ConversationView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ConversationViewModel?
+    @State private var isConversationOnScreen = false
     @State private var draft: String = ""
     @State private var didRestorePersistedDraft = false
     @State private var composerChangedBeforeDraftRestore = false
@@ -620,6 +621,7 @@ struct ConversationView: View {
     @State private var editSaveInFlight = false
     @State private var editHistoryTarget: ActionsTarget?
     @State private var reportTarget: ActionsTarget?
+    @State private var blockTarget: ActionsTarget?
     @State private var deleteTarget: ActionsTarget?
     @State private var failedSendTarget: FailedSendTarget?
     @State private var senderProfileTarget: SenderProfileTarget?
@@ -979,7 +981,8 @@ struct ConversationView: View {
             .sheet(item: $reactionDetailsTarget) { target in
                 if let viewModel {
                     ReactionDetailsSheet(
-                        details: viewModel.reactionDetails(for: target.messageIdHex),
+                        messageIdHex: target.messageIdHex,
+                        viewModel: viewModel,
                         initialEmoji: target.initialEmoji,
                         onRemoveOwnReaction: { emoji in
                             Task {
@@ -988,10 +991,7 @@ struct ConversationView: View {
                                     reactionDetailsTarget = nil
                                 }
                             }
-                        },
-                        identityName: viewModel.windowDisplayName,
-                        identityAvatar: viewModel.windowAvatarURL,
-                        identityAvatarAsset: { viewModel.windowIdentities[$0]?.avatarAsset }
+                        }
                     )
                     .environment(\.customEmojiStore, viewModel.customEmojiStore)
                     .appAppearance()
@@ -1051,6 +1051,31 @@ struct ConversationView: View {
             .sheet(item: $reportTarget) { target in
                 if let viewModel {
                     ReportMessageSheet(conversation: viewModel, message: target.record).appAppearance()
+                }
+            }
+            .confirmationDialog(
+                L10n.string("Block this user?"),
+                isPresented: Binding(
+                    get: { blockTarget != nil },
+                    set: { if !$0 { blockTarget = nil } }
+                ),
+                titleVisibility: .visible,
+                presenting: blockTarget
+            ) { target in
+                if ModerationReportSender.isAvailable(appState) {
+                    Button(L10n.string("Block and Report"), role: .destructive) {
+                        blockAuthor(of: target.record, reporting: true)
+                    }
+                }
+                Button(L10n.string("Block User"), role: .destructive) {
+                    blockAuthor(of: target.record, reporting: false)
+                }
+                Button(L10n.string("Cancel"), role: .cancel) {}
+            } message: { _ in
+                if ModerationReportSender.isAvailable(appState) {
+                    Text("You won't see their messages. Block and Report also notifies the White Noise team.")
+                } else {
+                    Text("You won't see their messages.")
                 }
             }
             .sheet(item: $editHistoryTarget) { target in
@@ -1227,6 +1252,13 @@ struct ConversationView: View {
                 store: timelineVisibility,
                 onBecameVisible: {
                     markCurrentlyVisibleMessagesRead(viewModel: viewModel)
+                    clearPassedDownArrowStops(viewModel: viewModel)
+                },
+                onBecameHidden: {
+                    clearPassedDownArrowStops(viewModel: viewModel)
+                },
+                onVisibilityChange: { isVisible in
+                    viewModel.setTimestampRowVisible(item.rowFrameKey, isVisible: isVisible)
                 }
             ))
 
@@ -1324,6 +1356,12 @@ struct ConversationView: View {
                 else { return }
                 await viewModel?.recovery.refresh(using: appState, groupID: chat.groupIdHex)
             }
+            .task(id: appState.groupMembershipUpdate) {
+                guard let update = appState.groupMembershipUpdate, update.groupID == chat.groupIdHex,
+                      update.accountID == appState.activeAccount?.accountIdHex else { return }
+                _ = await viewModel?.refreshGroupManagement()
+                await viewModel?.recovery.refresh(using: appState, groupID: chat.groupIdHex)
+            }
     }
 
     private var conversationStateObservers: some View {
@@ -1333,6 +1371,12 @@ struct ConversationView: View {
             }
             .onChange(of: appState.profileRefreshGeneration) { _, _ in
                 viewModel?.refreshProfileDependentTimelineProjections()
+            }
+            .onChange(of: timestampRenderKey, initial: true) { _, key in
+                viewModel?.applyTimestampRenderGeneration(key.generation)
+            }
+            .onChange(of: relativeTimestampRefreshActive, initial: true) { _, active in
+                viewModel?.setRelativeTimestampRefreshActive(active)
             }
             .onChange(of: appState.retentionSweepGeneration) { _, _ in
                 guard appState.retentionSweepPrunedGroupIds.contains(chat.groupIdHex) else { return }
@@ -1372,8 +1416,10 @@ struct ConversationView: View {
             }
             .onAppear {
                 visibleChatRoute = appState.beginViewingChat(groupIdHex: chat.groupIdHex)
+                isConversationOnScreen = true
             }
             .onDisappear {
+                isConversationOnScreen = false
                 if let visibleChatRoute {
                     appState.endViewingChat(visibleChatRoute)
                 }
@@ -1394,6 +1440,24 @@ struct ConversationView: View {
                 exitMessageSelection()
                 Task { await appState.conversationDraftStore.flush() }
             }
+    }
+
+    private struct TimestampRenderKey: Equatable {
+        let generation: Int
+        let hasViewModel: Bool
+    }
+
+    /// Includes view-model readiness so a generation that changed before the
+    /// view model existed is still applied once it does.
+    private var timestampRenderKey: TimestampRenderKey {
+        TimestampRenderKey(
+            generation: appState.markdownTimestampClock.generation,
+            hasViewModel: viewModel != nil
+        )
+    }
+
+    private var relativeTimestampRefreshActive: Bool {
+        viewModel != nil && isConversationOnScreen && appState.isAppSceneActive
     }
 
     private var blockedPeerSubscriptionKey: String {
@@ -1885,18 +1949,20 @@ struct ConversationView: View {
                                                     sequence: viewModel.conversationWindow?.revision.sequence ?? 0,
                                                     viewport: conversationViewport)
                                             }
-                                            .modifier(
-                                                TimelineRowVisibilityModifier(
-                                                    rowKey: item.rowFrameKey,
-                                                    store: timelineVisibility,
-                                                    onBecameVisible: {
-                                                        markCurrentlyVisibleMessagesRead(viewModel: viewModel)
-                                                        clearPassedDownArrowStops(viewModel: viewModel)
-                                                    },
-                                                    onBecameHidden: {
-                                                        clearPassedDownArrowStops(viewModel: viewModel)
-                                                    }
-                                                ))
+                                            .modifier(TimelineRowVisibilityModifier(
+                                                rowKey: item.rowFrameKey,
+                                                store: timelineVisibility,
+                                                onBecameVisible: {
+                                                    markCurrentlyVisibleMessagesRead(viewModel: viewModel)
+                                                    clearPassedDownArrowStops(viewModel: viewModel)
+                                                },
+                                                onBecameHidden: {
+                                                    clearPassedDownArrowStops(viewModel: viewModel)
+                                                },
+                                                onVisibilityChange: { isVisible in
+                                                    viewModel.setTimestampRowVisible(item.rowFrameKey, isVisible: isVisible)
+                                                }
+                                            ))
                                         }
                                         .padding(.bottom, 4)
                                     #endif
@@ -2393,6 +2459,7 @@ struct ConversationView: View {
                 : { senderProfileTarget = SenderProfileTarget(senderAccountIdHex: record.sender) }
         )
         .environment(\.customEmojiStore, viewModel.customEmojiStore)
+        .environment(\.mediaUploadProgress, viewModel.composer.uploadProgress)
         .id(AttachmentPresentationState.shared.revision)
     }
 
@@ -4089,8 +4156,48 @@ struct ConversationView: View {
             canViewEditHistory: viewModel.hasEditHistory(record.messageIdHex),
             canDelete: viewModel.deleteCapability(for: record).canDelete,
             canReport: viewModel.canReport(record),
+            canBlock: canBlockAuthor(of: record, viewModel: viewModel),
             canViewVotes: canViewPollVotes(for: record, viewModel: viewModel)
         )
+    }
+
+    private func canBlockAuthor(of record: AppMessageRecordFfi, viewModel: ConversationViewModel) -> Bool {
+        viewModel.canBlockAuthor(of: record) && blockedUsers.canMutate
+            && BlockedUsersPresentation.canBlock(
+                targetAccountIdHex: record.sender,
+                activeAccountIdHex: appState.activeAccount?.accountIdHex
+            )
+            && !blockedUsers.isConfirmedBlocked(record.sender, accountRef: appState.activeAccountRef)
+    }
+
+    /// Blocks through the live subscription this screen owns. A report goes
+    /// to the White Noise team only once the block is confirmed.
+    private func blockAuthor(of record: AppMessageRecordFfi, reporting: Bool) {
+        guard let author = Hex.normalized32Bytes(record.sender),
+              let accountRef = draftAccountRef else { return }
+        Task {
+            // `setBlocked` blocks for whichever profile is active when it runs,
+            // so a profile switch while the dialog was open must not block there.
+            guard appState.activeAccountRef == accountRef else { return }
+            await blockedUsers.setBlocked(true, userId: author, using: appState)
+            guard appState.activeAccountRef == accountRef else { return }
+            // The message menu has no inline row to show the model's error.
+            // The block list can unload while the confirmation is open, and then
+            // `setBlocked` returns without an error, so this must not stay silent.
+            guard blockedUsers.isConfirmedBlocked(author, accountRef: accountRef) else {
+                appState.present(.error(
+                    L10n.string("Couldn't block user"),
+                    message: blockedUsers.error ?? L10n.string("Please try again.")
+                ))
+                return
+            }
+            guard reporting else { return }
+            await ModerationReportSender.sendBlockReport(
+                reportedAccountIdHex: author,
+                accountRef: accountRef,
+                using: appState
+            )
+        }
     }
 
     private func canViewPollVotes(for record: AppMessageRecordFfi, viewModel: ConversationViewModel) -> Bool {
@@ -4134,6 +4241,7 @@ struct ConversationView: View {
             canViewEditHistory: viewModel.hasEditHistory(record.messageIdHex),
             canDelete: viewModel.deleteCapability(for: record).canDelete,
             canReport: viewModel.canReport(record),
+            canBlock: canBlockAuthor(of: record, viewModel: viewModel),
             canViewVotes: canViewPollVotes(for: record, viewModel: viewModel),
             quickReactions: appState.quickReactions,
             selectedReaction: viewModel.reactions(for: record.messageIdHex).first(where: \.mine)?.emoji,
@@ -4197,6 +4305,10 @@ struct ConversationView: View {
                 dismissActions()
                 reportTarget = ActionsTarget(record: record, status: status)
             },
+            onBlock: {
+                dismissActions()
+                blockTarget = ActionsTarget(record: record, status: status)
+            },
             onViewVotes: {
                 dismissActions()
                 openPollVotes(for: record, viewModel: viewModel)
@@ -4242,6 +4354,9 @@ private struct TimelineRowVisibilityModifier: ViewModifier {
     let store: TimelineVisibilityStore
     let onBecameVisible: () -> Void
     var onBecameHidden: () -> Void = {}
+    /// Every row-level visibility flip, including ones the shared store
+    /// doesn't report (relative timestamps track their own rows).
+    var onVisibilityChange: (Bool) -> Void = { _ in }
 
     @State private var isVisible = false
 
@@ -4253,6 +4368,7 @@ private struct TimelineRowVisibilityModifier: ViewModifier {
             ) { nextIsVisible in
                 guard nextIsVisible != isVisible else { return }
                 isVisible = nextIsVisible
+                onVisibilityChange(nextIsVisible)
                 guard store.set(rowKey, isVisible: nextIsVisible) else { return }
                 if nextIsVisible {
                     onBecameVisible()
