@@ -41,7 +41,7 @@ import XCTest
             let directory = URL(fileURLWithPath: path, isDirectory: true)
             let fixture = try await readFixture(directory)
             let root = URL(fileURLWithPath: fixture.root, isDirectory: true).resolvingSymlinksInPath()
-            guard root.path.hasPrefix("/Users/pj/project/build/native-"),
+            guard try HostedNativeFixtureRoot.accepts(root, prefix: "native-"),
                 try Data(contentsOf: root.appendingPathComponent(".native-acceptance"))
                     == Data("native-sdk83-test-only-v1\n".utf8), fixture.version == 2,
                 fixture.oldContent.utf8.count == 8192

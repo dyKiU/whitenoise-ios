@@ -54,7 +54,7 @@ import XCTest
         throw XCTSkip("Requires a fresh positively closed synthetic paired native root")
       }
       let root = URL(fileURLWithPath: path, isDirectory: true).resolvingSymlinksInPath()
-      guard root.path.hasPrefix("/Users/pj/project/build/automatic-host-switch-"),
+      guard try HostedNativeFixtureRoot.accepts(root, prefix: "automatic-host-switch-"),
         try FileManager.default.attributesOfItem(atPath: root.path)[.posixPermissions] as? NSNumber
           == 0o700,
         try Data(contentsOf: root.appendingPathComponent(".native-acceptance"))
