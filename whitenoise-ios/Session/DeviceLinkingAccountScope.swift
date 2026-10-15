@@ -74,13 +74,6 @@
             try requireActive()
         }
 
-        // Broad chat sharing is a distinct explicit action; ordinary linking remains separate.
-        func continueLinkingAndShareChats(displayedRevision: UInt64) async throws {
-            try requireActive()
-            try await session.continueLinkingAndShareChats(displayedRevision: displayedRevision)
-            try requireActive()
-        }
-
         func enrollmentPacket(displayedRevision: UInt64) async throws -> Data {
             try requireActive()
             let packet = try await session.enrollmentPacket(displayedRevision: displayedRevision)
