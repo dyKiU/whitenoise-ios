@@ -83,6 +83,20 @@
 
         func begin() async throws { try await start(beginOriginal) }
 
+        /// Scanning starts transport only; comparison and device approval remain explicit.
+        func scanAndSync(request: Data) async throws {
+            guard isActive, verificationSupported, owner == nil, !isStarting,
+                request.count <= 1024, String(data: request, encoding: .utf8)?.hasPrefix("WNPAIR1:") == true
+            else { throw MarmotKitError.DeviceLinkingNotReady }
+            try await loadTargets()
+            guard !Task.isCancelled, targets.count <= 1 else { throw MarmotKitError.DeviceLinkingNotReady }
+            if let target = targets.first {
+                try await approve(request: request, target: target.selector)
+            } else {
+                try await approveFirstDeviceSetup(request: request)
+            }
+        }
+
         private func start(_ factory: @escaping @MainActor () async throws -> any DeviceVerificationSession)
             async throws
         {

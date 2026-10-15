@@ -41,6 +41,21 @@ nonisolated final class MarmotClient: Sendable {
     /// identities. Per-account relay lists live in Marmot after setup.
     static let seedRelays = AppContainerConfig.seedRelays
 
+    /// Pairing needs general-purpose relays; the inbox relays reject its event kind.
+    /// Explicit custom runtimes retain their supplied route, including isolated tests.
+    static let pairingRelays = ["wss://nos.lol", "wss://relay.primal.net"]
+
+    static func pairingOptions(_ options: MarmotOptions, runtimeRelays: [String]) -> MarmotOptions {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            guard runtimeRelays == seedRelays else { return options }
+            var configured = options
+            configured.pairingRelayUrls = pairingRelays
+            return configured
+        #else
+            return options
+        #endif
+    }
+
     let marmot: Marmot
     let rootPath: String
     let relayUrls: [String]
@@ -151,9 +166,12 @@ nonisolated final class MarmotClient: Sendable {
         self.marmot = try Marmot.newWithConfiguration(
             rootPath: rootPath,
             relayUrls: relayUrls,
-            options: MarmotOptions(
-                relayPolicy: relayPolicy, cursorPersistence: cursorPersistence, clientName: "whitenoise",
-                secretStore: secretStore, attachmentAcquisitionMode: .hostManaged)
+            options: Self.pairingOptions(
+                MarmotOptions(
+                    relayPolicy: relayPolicy, cursorPersistence: cursorPersistence, clientName: "whitenoise",
+                    secretStore: secretStore, attachmentAcquisitionMode: .hostManaged
+                ), runtimeRelays: relayUrls
+            )
         )
         // A rejected audit destination must not block startup; recordings stay local.
         do {
@@ -708,9 +726,11 @@ nonisolated final class MarmotClient: Sendable {
         peerAccountId: String
     ) async throws -> DirectConversationDestination? {
         #if WN_EXPERIMENTAL_DEVICE_SYNC
-            guard let conversation = try await marmot.existingAccountDirectConversation(
-                accountRef: accountRef, peerAccountId: peerAccountId
-            ) else { return nil }
+            guard
+                let conversation = try await marmot.existingAccountDirectConversation(
+                    accountRef: accountRef, peerAccountId: peerAccountId
+                )
+            else { return nil }
             switch conversation {
             case .localMls(let conversation): return .localMls(conversation)
             case .pairedSource(let conversation): return .pairedSource(conversation)
