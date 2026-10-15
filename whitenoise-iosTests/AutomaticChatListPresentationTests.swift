@@ -25,6 +25,13 @@ import Testing
             #expect(AutomaticChatListPresentation.rows(remote, excluding: [], query: "") == remote)
         }
 
+        @Test func searchMatchesUpdatedContactTitle() {
+            let remote = [row("first", name: "Old"), row("second", name: "Other")]
+            let visible = AutomaticChatListPresentation.rows(
+                remote, excluding: [], query: "new", title: { $0.groupIdHex == "first" ? "New name" : "Other" })
+            #expect(visible == [remote[0]])
+        }
+
         @Test func searchMatchesRenderedSanitizedTitle() {
             let remote = [row("first", name: "  Friends  "), row("second", name: "Other")]
             #expect(AutomaticChatListPresentation.rows(remote, excluding: [], query: " friends ") == [remote[0]])

@@ -8,11 +8,27 @@ import SwiftUI
         @State private var blockedUsers = BlockedUsersModel()
 
         var body: some View {
-            AutomaticConversationContent(model: model, blockedAuthors: blockedUsers.blockedAccountIds)
-                .id(appState.automaticChatOwner)
-                .task(id: appState.automaticChatOwner) {
-                    await blockedUsers.run(using: appState, target: nil)
-                }
+            AutomaticConversationContent(
+                model: model, blockedAuthors: blockedUsers.blockedAccountIds,
+                title: model?.pairedHeader.map { row in
+                    AutomaticChatListPresentation.title(
+                        row,
+                        peerDisplayName: row.directPeerAccountIdHex.flatMap {
+                            appState.cachedKnownDisplayName(forAccountIdHex: $0)
+                        })
+                } ?? L10n.string("Unnamed group")
+            )
+            .id(appState.automaticChatOwner)
+            .task(id: appState.automaticChatOwner) {
+                await blockedUsers.run(using: appState, target: nil)
+            }
+            .task(id: model?.pairedHeader?.directPeerAccountIdHex) {
+                guard !Task.isCancelled, let model, model.isCurrentOwner,
+                    model.accountRef == appState.activeAccountRef,
+                    let peer = model.pairedHeader?.directPeerAccountIdHex
+                else { return }
+                _ = appState.knownDisplayName(forAccountIdHex: peer)
+            }
 
         }
     }
@@ -20,6 +36,7 @@ import SwiftUI
     private struct AutomaticConversationContent: View {
         let model: AccountConversationViewModel?
         let blockedAuthors: Set<String>
+        let title: String
         @State private var text = ""
         @State private var sending = false
         @State private var sendFailed = false
@@ -55,7 +72,7 @@ import SwiftUI
             }
             .listStyle(.plain)
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle(ContentSanitizer.groupName(model?.pairedHeader?.name) ?? L10n.string("Unnamed group"))
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
                 VStack(alignment: .leading, spacing: 8) {
@@ -130,7 +147,9 @@ import SwiftUI
     }
 
     #Preview("Shared conversation") {
-        NavigationStack { AutomaticConversationContent(model: nil, blockedAuthors: []) }
+        NavigationStack {
+            AutomaticConversationContent(model: nil, blockedAuthors: [], title: L10n.string("Unnamed group"))
+        }
     }
 
     #Preview("Shared message") { AutomaticPairedMessageRow(message: nil) }

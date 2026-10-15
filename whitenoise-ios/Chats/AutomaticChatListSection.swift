@@ -3,15 +3,20 @@ import SwiftUI
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     enum AutomaticChatListPresentation {
+        static func title(_ row: PairedChatSummaryFfi, peerDisplayName: String? = nil) -> String {
+            PairedChatDisplayTitle.resolve(
+                name: row.name, directPeerAccountIdHex: row.directPeerAccountIdHex, peerDisplayName: peerDisplayName)
+        }
+
         static func rows(
-            _ rows: [PairedChatSummaryFfi], excluding ordinaryIds: Set<String>, query: String
+            _ rows: [PairedChatSummaryFfi], excluding ordinaryIds: Set<String>, query: String,
+            title: (PairedChatSummaryFfi) -> String = { AutomaticChatListPresentation.title($0) }
         ) -> [PairedChatSummaryFfi] {
             let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
             return rows.filter {
                 !ordinaryIds.contains($0.groupIdHex)
                     && (query.isEmpty
-                        || (ContentSanitizer.groupName($0.name) ?? L10n.string("Unnamed group"))
-                            .localizedStandardContains(query))
+                        || title($0).localizedStandardContains(query))
             }
         }
     }
@@ -20,6 +25,7 @@ import SwiftUI
         let model: AccountChatListViewModel?
         let rows: [PairedChatSummaryFfi]
         let select: (String) -> Void
+        var title: (PairedChatSummaryFfi) -> String = { AutomaticChatListPresentation.title($0) }
 
         var body: some View {
             ForEach(rows, id: \.groupIdHex) { row in
@@ -31,7 +37,7 @@ import SwiftUI
                             .font(.title2)
                             .frame(width: 44, height: 44)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(ContentSanitizer.groupName(row.name) ?? L10n.string("Unnamed group"))
+                            Text(verbatim: title(row))
                                 .font(.headline)
                                 .lineLimit(2)
                             Text("Shared from a linked device")

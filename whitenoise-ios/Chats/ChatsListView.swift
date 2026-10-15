@@ -608,8 +608,21 @@ struct ChatsListView: View {
                     Text(error).foregroundStyle(.secondary)
                 }
                 #if WN_EXPERIMENTAL_DEVICE_SYNC
-                    AutomaticChatListSection(model: automaticChats, rows: automaticRows) { groupId in
-                        path.append(ChatNavigationTarget(groupIdHex: groupId))
+                    AutomaticChatListSection(
+                        model: automaticChats, rows: automaticRows,
+                        select: { path.append(ChatNavigationTarget(groupIdHex: $0)) },
+                        title: pairedChatTitle
+                    )
+                    .task(
+                        id: [automaticChats?.accountRef ?? ""]
+                            + (automaticChats?.pairedRows.compactMap(\.directPeerAccountIdHex) ?? [])
+                    ) {
+                        guard !Task.isCancelled, let model = automaticChats,
+                            model.isCurrentOwner, model.accountRef == appState.activeAccountRef
+                        else { return }
+                        for peer in model.pairedRows.compactMap(\.directPeerAccountIdHex) {
+                            _ = appState.knownDisplayName(forAccountIdHex: peer)
+                        }
                     }
                 #endif
             }
@@ -651,7 +664,15 @@ struct ChatsListView: View {
             guard scope == .active, !selectionMode else { return [] }
             return AutomaticChatListPresentation.rows(
                 automaticChats?.pairedRows ?? [], excluding: Set(viewModel?.items.map(\.id) ?? []),
-                query: search.query)
+                query: search.query, title: pairedChatTitle)
+        }
+
+        private func pairedChatTitle(_ row: PairedChatSummaryFfi) -> String {
+            AutomaticChatListPresentation.title(
+                row,
+                peerDisplayName: row.directPeerAccountIdHex.flatMap {
+                    appState.cachedKnownDisplayName(forAccountIdHex: $0)
+                })
         }
     #endif
 
