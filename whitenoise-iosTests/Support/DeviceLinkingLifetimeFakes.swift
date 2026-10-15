@@ -47,6 +47,7 @@ import MarmotKit
         private let lock = NSLock()
         private var cancellations = 0
         private var shouldFail = false
+        private var alreadyClosed = false
         private var pauseCancellation = false
         private var waitingCancellation: CheckedContinuation<Void, Never>?
         var cancellationIsWaiting: Bool { lock.withLock { waitingCancellation != nil } }
@@ -61,6 +62,7 @@ import MarmotKit
             continuation?.resume()
         }
         func setCancellationFailure(_ value: Bool) { lock.withLock { shouldFail = value } }
+        func reportAlreadyClosed() { lock.withLock { alreadyClosed = true } }
         var cancelCount: Int { lock.withLock { cancellations } }
         private var bootstrapWaiter: CheckedContinuation<Void, Never>?
         private var automaticChoices: [(UInt64, Bool)] = []
@@ -91,6 +93,7 @@ import MarmotKit
                     lock.withLock { waitingCancellation = continuation }
                 }
             }
+            if lock.withLock({ alreadyClosed }) { throw MarmotKitError.DeviceLinkingClosed }
             if lock.withLock({ shouldFail }) { throw CancellationError() }
         }
     }

@@ -143,7 +143,11 @@
                 task = cleanup
             } else {
                 let session = self.session
-                task = Task { try await session.cancel() }
+                task = Task {
+                    do { try await session.cancel() } catch MarmotKitError.DeviceLinkingClosed {
+                        // The SDK has already retired this exact original and its transport.
+                    }
+                }
                 cleanup = task
             }
             do {
