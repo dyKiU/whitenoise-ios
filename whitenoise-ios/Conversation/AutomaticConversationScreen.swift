@@ -28,7 +28,7 @@ import SwiftUI
             switch status {
             case .completed: "Sent"
             case .rejected: "Send failed"
-            case .engineOwned: "Sending"
+            case .engineOwned: "Sending…"
             case .queued, nil: "Pending"
             }
         }
