@@ -543,14 +543,6 @@ enum MarkdownMessageBuilder {
             switch inline {
             case .text(let content):
                 emitted = append(content, to: &out, context: context, budget: &budget) || emitted
-            #if WN_EXPERIMENTAL_DEVICE_SYNC
-                case .timestamp(let unixSeconds, let style):
-                    let literal = MarkdownTimestampFallback.literal(
-                        unixSeconds: unixSeconds, style: style)
-                    emitted =
-                        append(literal, to: &out, context: context, budget: &budget) || emitted
-            #endif
-
             case .softBreak:
                 emitted = appendBreak(" ", to: &out, budget: &budget) || emitted
 

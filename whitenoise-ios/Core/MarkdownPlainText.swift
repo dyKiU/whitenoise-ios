@@ -109,11 +109,6 @@ nonisolated enum MarkdownPlainText {
             switch inline {
             case .text(let content), .code(let content), .math(let content):
                 state.append(content)
-            #if WN_EXPERIMENTAL_DEVICE_SYNC
-                case .timestamp(let unixSeconds, let style):
-                    state.append(
-                        MarkdownTimestampFallback.literal(unixSeconds: unixSeconds, style: style))
-            #endif
             case .softBreak, .hardBreak:
                 break
             case .emph(let children), .strong(let children), .strikethrough(let children):
@@ -143,24 +138,3 @@ nonisolated enum MarkdownPlainText {
         }
     }
 }
-
-#if WN_EXPERIMENTAL_DEVICE_SYNC
-    // Preserve timestamp content until this host supports localized live timestamps.
-    nonisolated enum MarkdownTimestampFallback {
-        static func literal(unixSeconds: Int64, style: MarkdownTimestampStyleFfi) -> String {
-            let marker: String
-            switch style {
-            case .shortTime: marker = "t"
-            case .longTime: marker = "T"
-            case .shortDate: marker = "d"
-            case .longDate: marker = "D"
-            case .shortDateTime: marker = "f"
-            case .longDateTime: marker = "F"
-            case .compactDateTime: marker = "s"
-            case .compactDateTimeSeconds: marker = "S"
-            case .relative: marker = "R"
-            }
-            return "<t:\(unixSeconds):\(marker)>"
-        }
-    }
-#endif
