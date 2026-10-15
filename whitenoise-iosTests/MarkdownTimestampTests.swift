@@ -50,6 +50,25 @@ struct MarkdownTimestampTests {
         #expect(format(.compactDateTimeSeconds, locale: enUS) == "1/1/2026, 1:05:09 PM")
     }
 
+    @Test func negativeUnixInstantsHaveIndependentLocalizedStaticExpectations() {
+        let expected: [(MarkdownTimestampStyleFfi, String)] = [
+            (.shortTime, "11:59 PM"),
+            (.longTime, "11:59:59 PM"),
+            (.shortDate, "12/31/1969"),
+            (.longDate, "December 31, 1969"),
+            (.shortDateTime, "December 31, 1969 at 11:59 PM"),
+            (.longDateTime, "Wednesday, December 31, 1969 at 11:59 PM"),
+            (.compactDateTime, "12/31/1969, 11:59 PM"),
+            (.compactDateTimeSeconds, "12/31/1969, 11:59:59 PM"),
+            (.relative, "December 31, 1969 at 11:59 PM"),
+        ]
+        for (style, text) in expected {
+            #expect(normalized(MarkdownTimestampFormatter.staticText(
+                unixSeconds: -1, style: style, locale: enUS, timeZone: utc
+            )) == text)
+        }
+    }
+
     @Test func everyStyleFollowsTheGermanConventions() {
         #expect(format(.shortTime, locale: deDE) == "13:05")
         #expect(format(.longTime, locale: deDE) == "13:05:09")
