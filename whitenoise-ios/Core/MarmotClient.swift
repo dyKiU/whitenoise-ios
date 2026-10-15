@@ -706,11 +706,10 @@ nonisolated final class MarmotClient: Sendable {
     func existingDirectConversation(
         accountRef: String,
         peerAccountId: String
-    ) async throws -> ExistingDirectConversationFfi? {
+    ) async throws -> DirectConversationDestination? {
         try await marmot.existingDirectConversation(
-            accountRef: accountRef,
-            peerAccountId: peerAccountId
-        )
+            accountRef: accountRef, peerAccountId: peerAccountId
+        ).map(DirectConversationDestination.localMls)
     }
 
     // MARK: - Group mutations & reads
