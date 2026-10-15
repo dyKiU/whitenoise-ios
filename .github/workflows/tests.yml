@@ -132,6 +132,7 @@ jobs:
           trap 'rm -f "$raw_summary"' EXIT
           xcrun xcresulttool get test-results summary --path "$bundle" > "$raw_summary"
           export TEST_CHECKOUT_SHA="$(git rev-parse HEAD)"
+          export TEST_CHECKOUT_TREE="$(git rev-parse 'HEAD^{tree}')"
           python3 - "$raw_summary" <<'PYTHON'
           import json
           import os
@@ -139,6 +140,9 @@ jobs:
           from pathlib import Path
 
           raw = json.loads(Path(sys.argv[1]).read_text())
+          for key in ("totalTestCount", "passedTests", "failedTests", "skippedTests"):
+              if key not in raw or type(raw[key]) is not int or raw[key] < 0:
+                  raise ValueError("Missing or invalid native count field: " + key)
           fields = ("totalTestCount", "passedTests", "failedTests", "skippedTests",
                     "expectedFailures", "result", "startTime", "finishTime", "duration")
           summary = {key: raw[key] for key in fields if key in raw}
@@ -152,6 +156,7 @@ jobs:
           report = {
               "provenance": {
                   "checkout_sha": os.environ["TEST_CHECKOUT_SHA"],
+                  "checkout_tree": os.environ["TEST_CHECKOUT_TREE"],
                   "source_sha": os.environ["TEST_SOURCE_SHA"],
                   "event_sha": os.environ["GITHUB_SHA"],
                   "command": ["xcrun", "xcresulttool", "get", "test-results", "summary",
