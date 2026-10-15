@@ -67,6 +67,7 @@
                 XCTAssertEqual(source.groupIdHex, fixture.group)
                 let before = try await client.chatList(accountRef: account.label, includeArchived: true)
                 XCTAssertTrue(before.isEmpty, "No ordinary chat is present in this source-only recipient")
+                var mappedPeerAccountIds: [String?] = []
                 for _ in 0..<3 {
                     let found = try await client.existingDirectConversation(
                         accountRef: account.label, peerAccountId: fixture.peer)
@@ -76,6 +77,7 @@
                         XCTFail("paired-direct-adapter-destination")
                         return
                     }
+                    mappedPeerAccountIds.append(observed.directPeerAccountIdHex)
                     XCTAssertEqual(observed, source)
                     XCTAssertEqual(destination.groupIdHex, fixture.group)
                     XCTAssertTrue(destination.reusable)
@@ -88,6 +90,10 @@
                 XCTAssertNil(localAfter, "Direct lookup must not claim local MLS membership")
                 try await client.marmot.shutdownAndClose()
                 try writeObservation(["runtime_closed": true], named: "paired-direct-closed.json", bridge: bridge)
+                XCTAssertEqual(source.directPeerAccountIdHex, fixture.peer)
+                for mappedPeerAccountId in mappedPeerAccountIds {
+                    XCTAssertEqual(mappedPeerAccountId, fixture.peer)
+                }
                 try writeObservation([
                     "paired_destination": true, "same_group": true, "lookup_count": 3,
                     "no_local_membership": true, "no_new_ordinary_chat": true, "runtime_closed": true,
