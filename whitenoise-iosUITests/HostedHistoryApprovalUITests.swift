@@ -1,6 +1,12 @@
 import XCTest
 
 @MainActor final class HostedHistoryApprovalUITests: XCTestCase {
+    func testExternalRunnerStartsWithoutLaunchingAbsentHost() {
+        // Provision the public UI runner before any hosted original exists.
+        let app = XCUIApplication(bundleIdentifier: "dev.ipf.whitenoise.ios.staging.personal")
+        XCTAssertEqual(app.state, .notRunning)
+    }
+
     func testExternalHostedControlTap() throws {
         try tapExistingHostedButton(identifier: "native-hosted-control", result: "native-hosted-control-tapped")
     }
