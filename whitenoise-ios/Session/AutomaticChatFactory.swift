@@ -13,7 +13,7 @@
             AutomaticChatOwner(
                 accountRef: activeAccountRef, generation: runtimeGeneration,
                 epoch: accountStore.deviceLinkingOwnershipIdentity,
-                ready: canUseRuntimeForForegroundWork && isAppSceneActive
+                ready: runtimeEventsGeneration != nil && canUseRuntimeForForegroundWork && isAppSceneActive
                     && !isAccountExitInProgress && !isErasingAppData)
         }
 
