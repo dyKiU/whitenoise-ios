@@ -1,6 +1,180 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Pairing shares all existing and future chats, chat history, and messaging between these devices.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durch die Kopplung werden alle bestehenden und zukünftigen Chats, Chatverläufe und Nachrichten zwischen diesen Geräten geteilt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La vinculación comparte todos los chats actuales y futuros, el historial de chats y los mensajes entre estos dispositivos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’association partage tous les chats actuels et futurs, l’historique des chats et les messages entre ces appareils."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’abbinamento condivide tutte le chat attuali e future, la cronologia delle chat e i messaggi tra questi dispositivi."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O pareamento compartilha todos os chats atuais e futuros, o histórico dos chats e as mensagens entre estes dispositivos."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сопряжение предоставляет этим устройствам общий доступ ко всем существующим и будущим чатам, истории чатов и обмену сообщениями."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleştirme, mevcut ve gelecekteki tüm sohbetleri, sohbet geçmişini ve mesajlaşmayı bu cihazlar arasında paylaşır."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对后，这些设备之间将共享所有现有和未来的聊天、聊天历史及消息收发。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配對後，這些裝置之間將共享所有現有與未來的聊天、聊天記錄及訊息收發。"
+          }
+        }
+      }
+    },
+    "Approve pairing and share all chats": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopplung genehmigen und alle Chats teilen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aprobar vinculación y compartir todos los chats"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Approuver l’association et partager tous les chats"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Approva l’abbinamento e condividi tutte le chat"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aprovar pareamento e compartilhar todos os chats"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Одобрить сопряжение и общий доступ ко всем чатам"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleştirmeyi onayla ve tüm sohbetleri paylaş"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "批准配对并共享所有聊天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "核准配對並共享所有聊天"
+          }
+        }
+      }
+    },
+    "Pair and share all chats": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koppeln und alle Chats teilen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vincular y compartir todos los chats"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Associer et partager tous les chats"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbina e condividi tutte le chat"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parear e compartilhar todos os chats"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выполнить сопряжение и предоставить общий доступ ко всем чатам"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleştir ve tüm sohbetleri paylaş"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对并共享所有聊天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配對並共享所有聊天"
+          }
+        }
+      }
+    },
     "Invitation delivery pending" : {
       "extractionState" : "manual",
       "localizations" : {

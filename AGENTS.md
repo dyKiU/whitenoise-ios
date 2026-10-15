@@ -387,3 +387,11 @@ Commit related work as one clear checkpoint when asked. Leave unrelated cleanup 
 - Use `v<MARKETING_VERSION>` for the first build of a version, or `v<MARKETING_VERSION>-build.<CURRENT_PROJECT_VERSION>` for a subsequent shipment with the same marketing version. Never move or overwrite a published tag.
 - Record the app version, build number, MarmotKit version, and validation results in the tag annotation. Distinguish automated checks from pending signed-device/manual checks; a tag alone does not establish App Store/TestFlight publication.
 - Keep `CLAUDE.md` as a symlink to this canonical file.
+
+One-scan development pairing uses the compact native bootstrap and automatic
+SDK-owned encrypted relay exchange. Activate only after exact account/runtime
+factory adoption; a late result must be cancelled before it can export a scanner
+response. Keep visual SAS comparison, bilateral enrollment/chat-sharing approval
+and each existing device's explicit review. Transport receipts never replace
+approval. The normal UI offers no per-packet export/import/receive/ACK/finalize
+controls; the existing low-level SDK APIs remain available for controlled tests.
