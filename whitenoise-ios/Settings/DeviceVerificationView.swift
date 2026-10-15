@@ -31,7 +31,6 @@
         @State private var actionFailed = false
         @State private var isWorking = false
         @State private var actionTask: Task<Void, Never>?
-        @State private var scanning = false
         private static let diagnostics = Logger(
             subsystem: Bundle.main.bundleIdentifier ?? "dev.ipf.whitenoise.ios",
             category: "device-verification"
@@ -81,9 +80,13 @@
                     }
                     if model.owner == nil {
                         Section {
-                            WNButton(title: "Scan pairing QR", emphasis: .secondary, size: .standard) {
-                                incoming = ""
-                                scanning = true
+                            DevicePairingQRImportButton(
+                                isCurrent: { model.isActive && model.owner == nil && !model.cleanupRequired && !isWorking },
+                                onStart: { incoming = "" }
+                            ) { packet in
+                                guard scenePhase == .active, model.isActive, model.owner == nil,
+                                      !model.cleanupRequired, !isWorking else { return }
+                                incoming = packet
                             }
                             .disabled(isWorking || !model.isActive || model.cleanupRequired)
                             if model.owner == nil {
@@ -172,13 +175,6 @@
             }
             .localizedNavigationTitle("Device verification")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $scanning) {
-                DevicePairingScannerSheet { packet in
-                    guard scanning, scenePhase == .active, model.isActive, !model.cleanupRequired else { return }
-                    incoming = packet
-                    scanning = false
-                }
-            }
             .sheet(isPresented: Binding(get: { enrollment != nil }, set: { if !$0 { enrollment = nil } })) {
                 NavigationStack { DeviceEnrollmentTransportView(model: enrollment) }
             }
@@ -196,7 +192,6 @@
             }
             .onDisappear { actionTask?.cancel() }
             .onChange(of: model.isActive) { _, active in if !active { clearPackets() } }
-            .onChange(of: scenePhase) { _, phase in if phase != .active { scanning = false } }
         }
 
         private func decodedPacket() throws -> Data {
@@ -207,7 +202,6 @@
         }
 
         private func clearPackets() {
-            scanning = false
             enrollment = nil
             approval = nil
             incoming = ""

@@ -56,14 +56,23 @@
         @Environment(\.scenePhase) private var scenePhase
         let isCurrent: @MainActor () -> Bool
         let onScan: (String) -> Void
+        private let onStart: () -> Void
         @State private var transport: DevicePairingQRImport?
         @State private var scanning = false
+
+        init(isCurrent: @escaping @MainActor () -> Bool,
+             onStart: @escaping () -> Void = {}, onScan: @escaping (String) -> Void) {
+            self.isCurrent = isCurrent
+            self.onStart = onStart
+            self.onScan = onScan
+        }
 
         var body: some View {
             VStack {
                 WNButton(title: "Scan pairing QR", emphasis: .secondary, size: .standard) {
                     guard scenePhase == .active, isCurrent() else { return }
                     if transport == nil { transport = DevicePairingQRImport(isCurrent: isCurrent) }
+                    onStart()
                     scanning = true
                 }.disabled(transport?.terminal == true)
                 if transport != nil {
@@ -89,6 +98,9 @@
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase != .active { transport?.retire(); scanning = false }
+            }
+            .onChange(of: isCurrent()) { _, current in
+                if !current { transport?.retire(); scanning = false }
             }
             .onDisappear { transport?.retire(); scanning = false }
         }
