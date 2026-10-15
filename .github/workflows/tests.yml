@@ -117,6 +117,60 @@ jobs:
         timeout-minutes: 40
         run: ./scripts/test-with-relay.sh
 
+      - name: Export native test execution counts
+        if: always()
+        env:
+          TEST_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          bundle="build/TestResults.xcresult"
+          if [ ! -d "$bundle" ]; then
+            echo "::notice::No XCResult bundle was produced; native execution counts are unavailable."
+            exit 0
+          fi
+          umask 077
+          raw_summary="$RUNNER_TEMP/TestResults-summary-private.json"
+          trap 'rm -f "$raw_summary"' EXIT
+          xcrun xcresulttool get test-results summary --path "$bundle" > "$raw_summary"
+          export TEST_CHECKOUT_SHA="$(git rev-parse HEAD)"
+          python3 - "$raw_summary" <<'PYTHON'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          raw = json.loads(Path(sys.argv[1]).read_text())
+          fields = ("totalTestCount", "passedTests", "failedTests", "skippedTests",
+                    "expectedFailures", "result", "startTime", "finishTime", "duration")
+          summary = {key: raw[key] for key in fields if key in raw}
+          # Preserve per-configuration native counts separately; parameterized
+          # runs and definition counts must never be added together.
+          if "devicesAndConfigurations" in raw:
+              summary["devicesAndConfigurations"] = [
+                  {key: row[key] for key in fields if key in row}
+                  for row in raw["devicesAndConfigurations"]
+              ]
+          report = {
+              "provenance": {
+                  "checkout_sha": os.environ["TEST_CHECKOUT_SHA"],
+                  "source_sha": os.environ["TEST_SOURCE_SHA"],
+                  "event_sha": os.environ["GITHUB_SHA"],
+                  "command": ["xcrun", "xcresulttool", "get", "test-results", "summary",
+                              "--path", "build/TestResults.xcresult"],
+              },
+              "summary": summary,
+              "counts_note": "Native summary fields retained verbatim; no cross-configuration or parameterized-run totals are synthesized.",
+          }
+          Path("build/TestResults-summary.json").write_text(json.dumps(report, indent=2) + "\n")
+          PYTHON
+
+      - name: Upload native test execution counts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults-summary
+          path: build/TestResults-summary.json
+          if-no-files-found: warn
+
       - name: Save compilation cache
         if: always() && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v4
