@@ -1,7 +1,22 @@
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     import Foundation
 
+    struct AutomaticChatOwner: Hashable {
+        let accountRef: String?
+        let generation: Int
+        let epoch: UUID
+        let ready: Bool
+    }
+
     @MainActor extension AppState {
+        var automaticChatOwner: AutomaticChatOwner {
+            AutomaticChatOwner(
+                accountRef: activeAccountRef, generation: runtimeGeneration,
+                epoch: accountStore.deviceLinkingOwnershipIdentity,
+                ready: canUseRuntimeForForegroundWork && isAppSceneActive
+                    && !isAccountExitInProgress && !isErasingAppData)
+        }
+
         func makeAutomaticChatListModel() throws -> AccountChatListViewModel {
             let (client, account, current) = try automaticChatContext()
             if let held = accountStore.automaticChatListModel, held.isCurrentOwner { return held }
