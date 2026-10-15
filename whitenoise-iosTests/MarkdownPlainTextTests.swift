@@ -17,6 +17,8 @@ struct MarkdownPlainTextTests {
                 .paragraph(inlines: [.timestamp(unixSeconds: -1, style: style)])
             ])
             let expected = MarkdownTimestampFormatter.staticText(unixSeconds: -1, style: style)
+                .replacingOccurrences(of: "\u{202F}", with: " ")
+                .replacingOccurrences(of: "\u{00A0}", with: " ")
             #expect(expected != MarkdownTimestampFormatter.literalToken(unixSeconds: -1, style: style))
             #expect(MarkdownPlainText.flatten(document) == expected)
         }
