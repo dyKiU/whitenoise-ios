@@ -82,6 +82,10 @@ struct Marmot0104BindingTests {
     }
 
     @Test func terminalAttachmentStatesDoNotWaitOrRetryAutomatically() {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+        #expect(!AttachmentAcquisitionPresentation.canAwait(.storageBlocked))
+        #expect(AttachmentTransferPresentation.label(.storageBlocked) == L10n.string("Waiting to retry"))
+        #endif
         for state in [AttachmentTransferStateFfi.previouslyAcquiredUnavailable, .completedUnretained,
                       .retryExhausted, .removed, .cancelled, .failed, .policyBlocked, .paused, .unavailable] {
             #expect(!AttachmentAcquisitionPresentation.canAwait(state))
@@ -90,4 +94,56 @@ struct Marmot0104BindingTests {
             #expect(AttachmentAcquisitionPresentation.canAwait(state))
         }
     }
+
+    @Test func readyAttachmentWaitReadsRetainedBytes() async throws {
+        let probe = AttachmentWaitProbe(states: [.queued, .ready])
+        let data = try await AttachmentAcquisitionPresentation.awaitRetainedBytes(
+            next: { await probe.next() }, read: { await probe.read() })
+        #expect(data == Data([1]))
+        let counts = await probe.counts()
+        #expect(counts.snapshots == 2)
+        #expect(counts.reads == 1)
+    }
+
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+    @Test func storageBlockedStopsAnAlreadyRunningAttachmentWait() async {
+        let probe = AttachmentWaitProbe(states: [.queued, .storageBlocked, .ready])
+        do {
+            _ = try await AttachmentAcquisitionPresentation.awaitRetainedBytes(
+                next: { await probe.next() }, read: { await probe.read() })
+            Issue.record("A parked transfer must stop the existing wait before ready bytes can be read")
+        } catch AttachmentReadError.unavailable {
+            // Expected on the second snapshot, without consuming the later ready frame.
+        } catch {
+            Issue.record("Expected the bounded unavailable attachment outcome")
+        }
+        let counts = await probe.counts()
+        #expect(counts.snapshots == 2)
+        #expect(counts.reads == 0)
+    }
+    #endif
+}
+
+private actor AttachmentWaitProbe {
+    private let states: [AttachmentTransferStateFfi]
+    private var snapshots = 0
+    private var reads = 0
+
+    init(states: [AttachmentTransferStateFfi]) { self.states = states }
+
+    func next() -> AttachmentTransferSnapshotFfi? {
+        guard snapshots < states.count else { return nil }
+        let state = states[snapshots]
+        snapshots += 1
+        return AttachmentTransferSnapshotFfi(items: [AttachmentTransferStatusFfi(
+            reference: "synthetic-checkpoint", state: state, attempt: 1,
+            received: 16, total: 32, retryAt: nil)])
+    }
+
+    func read() -> Data? {
+        reads += 1
+        return Data([1])
+    }
+
+    func counts() -> (snapshots: Int, reads: Int) { (snapshots, reads) }
 }

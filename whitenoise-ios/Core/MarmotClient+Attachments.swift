@@ -115,21 +115,10 @@ extension MarmotClient {
             groupIdHex: groupID, targets: [target])
         return try await withTaskCancellationHandler {
             defer { subscription.cancel() }
-            while let snapshot = try await subscription.next() {
-                try Task.checkCancellation()
-                guard let current = snapshot.items.first else { throw AttachmentReadError.unavailable }
-                switch current.state {
-                case .ready:
-                    guard let data = try await attachmentData(accountRef: accountRef, groupID: groupID, target: target)
-                    else { throw AttachmentReadError.stale }
-                    return data
-                case .unavailable, .cancelled, .removed, .failed, .policyBlocked, .paused,
-                     .previouslyAcquiredUnavailable, .completedUnretained, .retryExhausted, .notRequested:
-                    throw AttachmentReadError.unavailable
-                default: break
-                }
-            }
-            throw AttachmentReadError.unavailable
+            return try await AttachmentAcquisitionPresentation.awaitRetainedBytes(
+                next: { try await subscription.next() },
+                read: { try await self.attachmentData(accountRef: accountRef, groupID: groupID, target: target) }
+            )
         } onCancel: {
             subscription.cancel()
         }
@@ -180,8 +169,29 @@ extension MarmotClient {
 }
 
 nonisolated enum AttachmentAcquisitionPresentation {
+    /// Consume the existing subscription until bytes are ready or work parks.
+    /// The caller retains subscription cancellation and the exact account scope.
+    static func awaitRetainedBytes(
+        next: @Sendable () async throws -> AttachmentTransferSnapshotFfi?,
+        read: @Sendable () async throws -> Data?
+    ) async throws -> Data {
+        while let snapshot = try await next() {
+            try Task.checkCancellation()
+            guard let current = snapshot.items.first else { throw AttachmentReadError.unavailable }
+            guard canAwait(current.state) else { throw AttachmentReadError.unavailable }
+            if current.state == .ready {
+                guard let data = try await read() else { throw AttachmentReadError.stale }
+                return data
+            }
+        }
+        throw AttachmentReadError.unavailable
+    }
+
     static func canAwait(_ state: AttachmentTransferStateFfi) -> Bool {
         switch state {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+        case .storageBlocked: false
+        #endif
         case .queued, .downloading, .verifyingCiphertext, .decrypting, .verifyingPlaintext,
              .ready, .retryScheduled: true
         case .unavailable, .notRequested, .paused, .failed, .policyBlocked, .cancelled, .removed,
