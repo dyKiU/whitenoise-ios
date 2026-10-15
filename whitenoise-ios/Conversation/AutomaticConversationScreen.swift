@@ -3,30 +3,17 @@ import SwiftUI
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     struct AutomaticConversationScreen: View {
-        let groupIdHex: String
+        let model: AccountConversationViewModel?
         @Environment(AppState.self) private var appState
-        @State private var model: AccountConversationViewModel?
         @State private var blockedUsers = BlockedUsersModel()
 
         var body: some View {
             AutomaticConversationContent(model: model, blockedAuthors: blockedUsers.blockedAccountIds)
                 .id(appState.automaticChatOwner)
                 .task(id: appState.automaticChatOwner) {
-                    if let model { appState.releaseAutomaticConversationModel(model, groupIdHex: groupIdHex) }
-                    model = nil
-                    guard let current = try? appState.makeAutomaticConversationModel(groupIdHex: groupIdHex) else {
-                        return
-                    }
-                    model = current
-                    current.start()
-                }
-                .task(id: appState.automaticChatOwner) {
                     await blockedUsers.run(using: appState, target: nil)
                 }
-                .onDisappear {
-                    if let model { appState.releaseAutomaticConversationModel(model, groupIdHex: groupIdHex) }
-                    model = nil
-                }
+
         }
     }
 
@@ -148,6 +135,6 @@ import SwiftUI
 
     #Preview("Shared message") { AutomaticPairedMessageRow(message: nil) }
     #Preview("Shared conversation screen") {
-        AutomaticConversationScreen(groupIdHex: "preview").environment(AppState())
+        AutomaticConversationScreen(model: nil).environment(AppState())
     }
 #endif

@@ -1734,6 +1734,9 @@ private struct ChatDestination: View {
     let onGroupDeleted: (String) -> Void
     @State private var timedOut = false
     @State private var retryPerformance: ConversationOpenPerformance?
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        @State private var automaticDestination: AccountConversationViewModel?
+    #endif
 
     private var performance: ConversationOpenPerformance? { retryPerformance ?? target.performance }
 
@@ -1743,7 +1746,25 @@ private struct ChatDestination: View {
 
     var body: some View {
         destination
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                .task(id: appState.automaticChatOwner) {
+                    if let automaticDestination {
+                        appState.releaseAutomaticConversationModel(automaticDestination, groupIdHex: target.groupIdHex)
+                    }
+                    automaticDestination = nil
+                    guard let model = try? appState.makeAutomaticConversationModel(groupIdHex: target.groupIdHex)
+                    else { return }
+                    automaticDestination = model
+                    model.start()
+                }
+            #endif
             .onDisappear {
+                #if WN_EXPERIMENTAL_DEVICE_SYNC
+                    if let automaticDestination {
+                        appState.releaseAutomaticConversationModel(automaticDestination, groupIdHex: target.groupIdHex)
+                    }
+                    automaticDestination = nil
+                #endif
                 if appState.navigation.pendingChatPerformance !== performance {
                     performance?.finish(.cancelled, recorder: appState.productAnalytics)
                 }
@@ -1752,9 +1773,7 @@ private struct ChatDestination: View {
 
     private var hasPairedDestination: Bool {
         #if WN_EXPERIMENTAL_DEVICE_SYNC
-            appState.accountStore.automaticChatListModel?.pairedRows.contains {
-                $0.groupIdHex == target.groupIdHex
-            } == true
+            automaticDestination?.pairedHeader?.groupIdHex == target.groupIdHex
         #else
             false
         #endif
@@ -1762,7 +1781,7 @@ private struct ChatDestination: View {
 
     @ViewBuilder private var pairedDestination: some View {
         #if WN_EXPERIMENTAL_DEVICE_SYNC
-            AutomaticConversationScreen(groupIdHex: target.groupIdHex)
+            AutomaticConversationScreen(model: automaticDestination)
         #else
             EmptyView()
         #endif

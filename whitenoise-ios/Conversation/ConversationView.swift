@@ -590,7 +590,9 @@ struct ConversationView: View {
     @State private var viewModel: ConversationViewModel?
     @State private var isConversationOnScreen = false
     #if WN_EXPERIMENTAL_DEVICE_SYNC
-        @State private var automaticConversation: AccountConversationViewModel?
+        private var automaticConversation: AccountConversationViewModel? {
+            appState.accountStore.automaticConversationModels[chat.groupIdHex]
+        }
     #endif
     @State private var draft: String = ""
     @State private var didRestorePersistedDraft = false
@@ -1227,25 +1229,6 @@ struct ConversationView: View {
 
     private var conversationRuntimeTasks: some View {
         conversationAttachmentSheets
-            #if WN_EXPERIMENTAL_DEVICE_SYNC
-                .task(id: appState.automaticChatOwner) {
-                    if let automaticConversation {
-                        appState.releaseAutomaticConversationModel(automaticConversation, groupIdHex: chat.groupIdHex)
-                    }
-                    automaticConversation = nil
-                    guard let model = try? appState.makeAutomaticConversationModel(groupIdHex: chat.groupIdHex) else {
-                        return
-                    }
-                    automaticConversation = model
-                    model.start()
-                }
-                .onDisappear {
-                    if let automaticConversation {
-                        appState.releaseAutomaticConversationModel(automaticConversation, groupIdHex: chat.groupIdHex)
-                    }
-                    automaticConversation = nil
-                }
-            #endif
             .task(
                 id: ConversationRuntimeStartToken(
                     accountRef: appState.activeAccountRef,

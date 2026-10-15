@@ -283,5 +283,31 @@ import Testing
             #expect(model.pairedMessages.isEmpty)
         }
 
+        @Test func pairedConversationResolvesWithoutOpeningAnAccountChatList() async throws {
+            // This factory refuses every list read; direct navigation must use the exact native group window.
+            let (model, _, _) = try await ready()
+            defer { model.invalidate() }
+            #expect(model.pairedHeader?.groupIdHex == group)
+            #expect(model.isCurrentOwner)
+        }
+
+        @Test func releasingAnOldNavigationOwnerCannotRetireItsReplacement() async throws {
+            let name = "automatic-navigation-replacement-" + UUID().uuidString
+            let defaults = try #require(UserDefaults(suiteName: name))
+            defer { defaults.removePersistentDomain(forName: name) }
+            let store = AccountStore(defaults: defaults)
+            store.activeAccountRef = "synthetic-account"
+            let (old, _, _) = try await ready()
+            try store.holdAutomaticConversation(old, groupIdHex: group)
+            let (replacement, _, _) = try await ready()
+            defer { replacement.invalidate() }
+            try store.holdAutomaticConversation(replacement, groupIdHex: group)
+            store.releaseAutomaticConversation(old, groupIdHex: group)
+            #expect(!old.isCurrentOwner)
+            #expect(store.automaticConversationModels[group] === replacement)
+            #expect(replacement.isCurrentOwner)
+            #expect(replacement.pairedHeader?.groupIdHex == group)
+        }
+
     }
 #endif
