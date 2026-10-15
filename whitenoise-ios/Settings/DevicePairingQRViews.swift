@@ -54,14 +54,16 @@
     /// Retains the same import across camera retries and sheet reopen.
     struct DevicePairingQRImportButton: View {
         @Environment(\.scenePhase) private var scenePhase
+        let title: LocalizedStringKey
         let isCurrent: @MainActor () -> Bool
         let onScan: (String) -> Void
         private let onStart: () -> Void
         @State private var transport: DevicePairingQRImport?
         @State private var scanning = false
 
-        init(isCurrent: @escaping @MainActor () -> Bool,
+        init(title: LocalizedStringKey = "Scan pairing QR", isCurrent: @escaping @MainActor () -> Bool,
              onStart: @escaping () -> Void = {}, onScan: @escaping (String) -> Void) {
+            self.title = title
             self.isCurrent = isCurrent
             self.onStart = onStart
             self.onScan = onScan
@@ -69,7 +71,7 @@
 
         var body: some View {
             VStack {
-                WNButton(title: "Scan pairing QR", emphasis: .secondary, size: .standard) {
+                WNButton(title: title, emphasis: .secondary, size: .standard) {
                     guard scenePhase == .active, isCurrent() else { return }
                     if transport == nil { transport = DevicePairingQRImport(isCurrent: isCurrent) }
                     onStart()

@@ -25,9 +25,7 @@
         @State private var model: DeviceVerificationViewModel
         @State private var enrollment: DeviceEnrollmentViewModel?
         @State private var approval: DeviceEnrollmentApprovalViewModel?
-        @State private var incoming = ""
         @State private var setup = ""
-        @State private var selectedTarget: Data?
         @State private var actionFailed = false
         @State private var isWorking = false
         @State private var actionTask: Task<Void, Never>?
@@ -43,7 +41,7 @@
                 if !model.verificationSupported {
                     Text("Device verification is unavailable in this build.")
                 } else {
-                    if model.enrollmentSupported {
+                    if model.enrollmentSupported, !model.targets.isEmpty {
                         Section {
                             WNButton(title: "Review enrollment", size: .standard) {
                                 perform { approval = try await model.enrollmentApproval() }
@@ -52,28 +50,23 @@
                     }
                     Section {
                         if model.owner == nil {
-                            WNButton(title: "Start verification", size: .standard, isLoading: model.isStarting) {
+                            WNButton(title: "Show pairing QR code", size: .standard, isLoading: model.isStarting) {
                                 perform {
                                     try await model.begin()
                                     setup = try model.setupPacket().base64EncodedString()
                                 }
                             }
                             .disabled(isWorking || !model.isActive || model.cleanupRequired)
-                            if !model.targets.isEmpty {
-                                Picker("Existing device group", selection: $selectedTarget) {
-                                    Text("Choose a target").tag(Optional<Data>.none)
-                                    ForEach(Array(model.targets.enumerated()), id: \.offset) { index, target in
-                                        Text(L10n.formatted("Target %lld", index + 1)).tag(Optional(target.selector))
-                                    }
-                                }
-                            }
                         }
                     } footer: {
                         if !model.enrollmentSupported {
                             Text("Verification only. Device enrollment is not available in this build.")
                         }
                     }
-                    if !setup.isEmpty {
+                    if !setup.isEmpty,
+                        model.snapshot?.phase == nil || model.snapshot?.phase == .awaitingSetup
+                            || model.snapshot?.phase == .awaitingPeer
+                    {
                         Section {
                             DevicePairingQRCard(packet: setup)
                         }
@@ -81,49 +74,15 @@
                     if model.owner == nil {
                         Section {
                             DevicePairingQRImportButton(
+                                title: "Scan and sync",
                                 isCurrent: { model.isActive && model.owner == nil && !model.cleanupRequired && !isWorking },
-                                onStart: { incoming = "" }
+                                onStart: { actionFailed = false }
                             ) { packet in
                                 guard scenePhase == .active, model.isActive, model.owner == nil,
                                       !model.cleanupRequired, !isWorking else { return }
-                                incoming = packet
+                                perform { try await model.scanAndSync(request: decodedPacket(packet)) }
                             }
                             .disabled(isWorking || !model.isActive || model.cleanupRequired)
-                            if model.owner == nil {
-                                if model.offersFirstDeviceSetupAttempt {
-                                    WNButton(
-                                        title: "Approve first-device setup", size: .standard,
-                                        isLoading: model.isStarting
-                                    ) {
-                                        perform {
-                                            try await model.approveFirstDeviceSetup(request: decodedPacket())
-                                            setup = try model.setupPacket().base64EncodedString()
-                                            incoming = ""
-                                        }
-                                    }
-                                    .disabled(incoming.isEmpty || isWorking || !model.isActive || model.cleanupRequired)
-                                } else if !model.targets.isEmpty {
-                                    WNButton(title: "Approve setup", size: .standard, isLoading: model.isStarting) {
-                                        perform {
-                                            guard let selectedTarget else {
-                                                throw DeviceVerificationPacketInput.Error.invalidPacket
-                                            }
-                                            try await model.approve(request: decodedPacket(), target: selectedTarget)
-                                            setup = try model.setupPacket().base64EncodedString()
-                                            incoming = ""
-                                        }
-                                    }
-                                    .disabled(
-                                        incoming.isEmpty || selectedTarget == nil || isWorking || !model.isActive
-                                            || model.cleanupRequired)
-                                }
-                                if !model.hasLoadedTargets && !model.isReadingTargets && actionFailed {
-                                    WNButton(title: "Try again", emphasis: .secondary, size: .standard) {
-                                        perform { try await model.loadTargets() }
-                                    }
-                                    .disabled(isWorking || !model.isActive)
-                                }
-                            }
                         }
                     }
                     if let snapshot = model.snapshot, let decimals = snapshot.decimals,
@@ -147,12 +106,19 @@
                             .disabled(snapshot.phase != .comparisonAvailable || isWorking || !model.isActive)
                         }
                     }
-                    if model.snapshot?.phase == .verificationCompleteEnrollmentPending {
+                    if let snapshot = model.snapshot, snapshot.phase == .verificationCompleteEnrollmentPending {
                         if model.enrollmentSupported {
-                            WNButton(title: "Device enrollment", size: .standard) {
-                                perform { enrollment = try model.enrollmentTransport() }
-                            }
-                            .disabled(isWorking || !model.isActive)
+                            Text(
+                                "Pairing shares all existing and future chats, chat history, and messaging between these devices."
+                            )
+                            WNButton(title: "Pair and share all chats", size: .standard, isLoading: isWorking) {
+                                perform {
+                                    let original = try model.enrollmentTransport()
+                                    enrollment = original
+                                    try await original.performTransportAction(
+                                        .shareChats, displayedRevision: snapshot.revision)
+                                }
+                            }.disabled(isWorking || !model.isActive)
                         } else {
                             Text("Verification complete. Enrollment remains unavailable.")
                         }
@@ -160,7 +126,11 @@
                     if let snapshot = model.snapshot {
                         if snapshot.phase == .enrollmentComplete {
                             Text("Done")
-                        } else if snapshot.decimals == nil {
+                        } else if snapshot.phase == .cancelled || snapshot.phase == .expired
+                            || snapshot.phase == .failed
+                        {
+                            Text("Verification action failed. Retry or cancel.").foregroundStyle(.red)
+                        } else if snapshot.decimals == nil && snapshot.phase != .verificationCompleteEnrollmentPending {
                             ProgressView(L10n.string("Waiting"))
                         }
                     }
@@ -175,9 +145,6 @@
             }
             .localizedNavigationTitle("Device verification")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: Binding(get: { enrollment != nil }, set: { if !$0 { enrollment = nil } })) {
-                NavigationStack { DeviceEnrollmentTransportView(model: enrollment) }
-            }
             .sheet(isPresented: Binding(get: { approval != nil }, set: { if !$0 { approval = nil } })) {
                 NavigationStack { DeviceEnrollmentApprovalView(model: approval) }
             }
@@ -192,10 +159,13 @@
             }
             .onDisappear { actionTask?.cancel() }
             .onChange(of: model.isActive) { _, active in if !active { clearPackets() } }
+            .onChange(of: model.snapshot?.phase) { _, phase in
+                if phase == .cancelled || phase == .expired || phase == .failed { setup = "" }
+            }
         }
 
-        private func decodedPacket() throws -> Data {
-            let bytes = try DeviceVerificationPacketInput.decode(incoming)
+        private func decodedPacket(_ packet: String) throws -> Data {
+            let bytes = try DeviceVerificationPacketInput.decode(packet)
             guard bytes.count <= 1024, String(data: bytes, encoding: .utf8)?.hasPrefix("WNPAIR1:") == true
             else { throw DeviceVerificationPacketInput.Error.invalidPacket }
             return bytes
@@ -204,9 +174,7 @@
         private func clearPackets() {
             enrollment = nil
             approval = nil
-            incoming = ""
             setup = ""
-            selectedTarget = nil
         }
 
         private func cancel() {
