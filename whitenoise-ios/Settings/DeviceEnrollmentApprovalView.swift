@@ -5,7 +5,6 @@
     /// Read-only authenticated review and explicit actions on the original account-owned approval.
     struct DeviceEnrollmentApprovalView: View {
         let model: DeviceEnrollmentApprovalViewModel?
-        @State private var incoming = ""
         @State private var action: Task<Void, Never>?
         @State private var readFailed = false
 
@@ -27,25 +26,12 @@
                                 perform(.approveAndShareChats, revision: review.revision)
                             }.disabled(model.isWorking)
                         }
-                    } else if model.isActive, let snapshot = model.snapshot,
-                        snapshot.phase == .approvedAwaitingPacket
-                    {
-                        Section {
-                            Text("Opaque packet from the other device").font(.subheadline)
-                            WNInput(
-                                placeholder: L10n.string("Opaque packet from the other device"), text: $incoming,
-                                kind: .multiline(2...4), surface: .filled)
-                            qrImportButton(model)
-                                .disabled(model.isWorking || model.cleanupError != nil)
-                            WNButton(title: "Receive packet", size: .standard, isLoading: model.isWorking) {
-                                perform(.receivePacket, revision: snapshot.revision)
-                            }.disabled(model.isWorking)
-                        }
+                    } else if model.isActive, model.snapshot?.phase == .approvedAwaitingPacket {
+                        ProgressView(L10n.string("Waiting"))
                     } else if model.isActive, let snapshot = model.snapshot,
                         snapshot.phase == .awaitingSettlement || snapshot.phase == .settled
                     {
                         if snapshot.phase == .settled { Text("Done") } else { Text("Waiting") }
-                        WNButton(title: "Refresh", size: .standard) { refreshReview() }.disabled(model.isWorking)
                     } else if model.isActive {
                         WNButton(title: "Try again", size: .standard) { refreshReview() }.disabled(model.isWorking)
                     }
@@ -54,7 +40,6 @@
                             Text("Enrollment action failed. Retry or cancel.").foregroundStyle(.red)
                         }
                         Button(L10n.string(model.cleanupError == nil ? "Cancel" : "Try again")) {
-                            incoming = ""
                             action?.cancel()
                             action = Task { try? await model.cancel() }
                         }
@@ -65,12 +50,24 @@
             }
             .localizedNavigationTitle("Review enrollment")
             .navigationBarTitleDisplayMode(.inline)
-            .task { refreshReview() }
+            .task {
+                refreshReview()
+                while !Task.isCancelled, model?.isActive == true {
+                    do {
+                        try await Task.sleep(for: .milliseconds(500))
+                        if let model, !model.isWorking {
+                            try await model.refresh()
+                            if model.snapshot?.phase == .awaitingApproval, model.reviewDisplay == nil {
+                                try await model.refreshForDisplay()
+                            }
+                            readFailed = false
+                        }
+                    } catch is CancellationError { return } catch { if !Task.isCancelled { readFailed = true } }
+                }
+            }
             .onDisappear {
                 action?.cancel()
-                incoming = ""
             }
-            .onChange(of: model?.isActive) { _, active in if active != true { incoming = "" } }
         }
         private func refreshReview() {
             guard let model, model.isActive, !model.isWorking else { return }
@@ -82,22 +79,11 @@
                 }
             }
         }
-        private func qrImportButton(_ captured: DeviceEnrollmentApprovalViewModel) -> some View {
-            let revision = captured.snapshot?.revision
-            let identity = "\(ObjectIdentifier(captured)):\(revision ?? 0)"
-            return DevicePairingQRImportButton(isCurrent: {
-                model === captured && captured.isActive && captured.cleanupError == nil
-                    && captured.snapshot?.phase == .approvedAwaitingPacket && captured.snapshot?.revision == revision
-            }, onScan: { incoming = $0 }).id(identity)
-        }
-
         private func perform(_ operation: DeviceEnrollmentApprovalViewModel.ReviewAction, revision: UInt64) {
             guard let model, model.isActive, !model.isWorking else { return }
-            let packet = incoming
             action = Task {
                 do {
-                    try await model.performReviewAction(operation, displayedRevision: revision, input: packet)
-                    if model.isActive, !Task.isCancelled { incoming = "" }
+                    try await model.performReviewAction(operation, displayedRevision: revision)
                 } catch {
                     // The original model retains the typed error for retry or exact cleanup.
                 }

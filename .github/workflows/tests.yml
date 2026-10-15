@@ -16,6 +16,8 @@ on:
       - "scripts/check-marmotkit-bindings.py"
       - "scripts/tests/**"
       - "scripts/test.sh"
+      - "scripts/test-with-relay.sh"
+      - "scripts/test-relay/**"
       - "scripts/pick-simulator.sh"
       - ".github/workflows/tests.yml"
   push:
@@ -99,10 +101,21 @@ jobs:
           restore-keys: |
             cas-${{ runner.os }}-xcode26-
 
+      - name: Install relay fixture toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+
+      - name: Build isolated Nostr relay
+        env:
+          CARGO_BUILD_JOBS: "2"
+          CARGO_INCREMENTAL: "1"
+        run: cargo build --locked --manifest-path scripts/test-relay/Cargo.toml --target-dir build/TestRelay
+
       - name: Run tests
         # End the step before the job deadline so failure artifacts can upload.
         timeout-minutes: 40
-        run: ./scripts/test.sh
+        run: ./scripts/test-with-relay.sh
 
       - name: Save compilation cache
         if: always() && github.ref == 'refs/heads/master'

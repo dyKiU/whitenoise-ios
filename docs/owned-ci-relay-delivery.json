@@ -1,0 +1,26 @@
+{
+  "red_ci": "https://github.com/dyKiU/whitenoise-ios/actions/runs/38594062871",
+  "red_source": "8288487b4188012877d14143bdafff5c217f8385",
+  "failure": "NativeSecretStoreBoundaryTests identity creation failed publishing to the unstarted loopback relay.",
+  "fix": "CI builds a pinned actual Nostr relay, starts an owned loopback process, validates protocol readiness and forwards its port to the native test host.",
+  "focused_sdk": "14336e1f0c4067e8e13aff63877241ee29109c37",
+  "native_tests": {
+    "passed": 3,
+    "failed": 0,
+    "port": 18183,
+    "admitted_events": 5,
+    "owned_relay_stopped": true,
+    "preexisting_relay_preserved": true
+  },
+  "guards": "Occupied port 18181 refused before dispatch; prior process 1416 remained alive.",
+  "script_tests": 18,
+  "lint": "Pinned SwiftLint 0.63.2 scoped strict check passed.",
+  "logs": {
+    "ios-ci-relay-build-v2.log": "398a76c9ee9a9a8f6335d72535e67e1601c6e641ba44c9ca0d2797d19e111314",
+    "ios-ci-relay-port-refusal-v1.log": "1edbe1d66cbc7c3d3d11ca956bd2aa72cb30219eeec60f13c76e067449182536",
+    "ios-ci-relay-script-tests-v1.log": "63dabfc9bbb8257bf1f91a039f070d4f08f6881e0338147f0ec7378c7a004428",
+    "ios-owned-relay-native-v2.log": "482b7ff25173b714745cd7ea06f6252e605e91a9bff2ca69f3f6c432b5dfac26",
+    "relay.log": "25d4b0f17f92f3ca60de16c184943fd2503761d2604862d51a992047363efc72"
+  },
+  "limit": "Focused M5 native results use experimental SDK143. The new published-SDK GitHub run still must execute; no full-app or installed sync claim is made."
+}

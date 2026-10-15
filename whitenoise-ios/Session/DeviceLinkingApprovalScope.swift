@@ -63,7 +63,11 @@
                 task = cleanup
             } else {
                 let approval = self.approval
-                task = Task { try await approval.cancel() }
+                task = Task {
+                    do { try await approval.cancel() } catch MarmotKitError.DeviceLinkingClosed {
+                        // The SDK has already retired this exact original and its transport.
+                    }
+                }
                 cleanup = task
             }
             do {

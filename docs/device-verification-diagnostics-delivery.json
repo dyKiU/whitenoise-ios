@@ -1,0 +1,16 @@
+{
+  "base_source": "02a10408bab0658b47f86a8ad7300df12e037bf0",
+  "sdk": "14336e1f0c4067e8e13aff63877241ee29109c37",
+  "purpose": "Distinguish the physical first-device setup rejection without disclosing associated error payloads. This does not fix or identify the rejection by itself.",
+  "logging": "Only a closed enum category in OSLog device-verification; no keys, packet contents, account identifiers, NSError domain or associated backend detail.",
+  "tests": {
+    "passed": 12,
+    "failed": 0,
+    "suites": 2,
+    "evidence": "Authoritative M5 test process exited 0; tool output recorded 12 passing tests in two suites.",
+    "remote_log": "/Users/pj/project/build/results/ios-safe-verification-diagnostics-v1.log",
+    "raw_transfer_pending": true
+  },
+  "lint": "Pinned SwiftLint 0.63.2 scoped strict check passed.",
+  "physical_limit": "Both public keys match by user confirmation. No fresh diagnostic-equipped physical attempt has executed yet. M5 SSH now times out; signed packaging and installation remain pending."
+}

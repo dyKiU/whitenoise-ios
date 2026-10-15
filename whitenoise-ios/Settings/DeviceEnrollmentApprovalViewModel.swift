@@ -66,6 +66,13 @@
             defer { isWorking = false }
             do {
                 switch action {
+                case .approveAndShareChats:
+                    try checkActive()
+                    guard review?.revision == displayedRevision else { throw MarmotKitError.DeviceLinkingStaleRevision }
+                    currentReview = nil
+                    try await original.approveAndShareChats(displayedRevision: displayedRevision)
+                    try checkActive()
+                    try await refresh()
                 case .approve:
                     try await approveReviewed(displayedRevision: displayedRevision)
                 case .approveAndShareChats:

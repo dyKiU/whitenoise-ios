@@ -5,7 +5,6 @@
     /// Opaque A/C transport on an already-held original; no approval or packet interpretation.
     struct DeviceEnrollmentTransportView: View {
         let model: DeviceEnrollmentViewModel?
-        @State private var incoming = ""
         @State private var action: Task<Void, Never>?
 
         var body: some View {
@@ -21,39 +20,19 @@
                             WNButton(title: "Pair and share all chats", size: .standard, isLoading: model.isWorking) {
                                 perform(.shareChats, revision: snapshot.revision)
                             }.disabled(model.isWorking)
-                            WNButton(title: "Read outgoing packets", emphasis: .secondary, size: .standard) {
-                                perform(.exportPacket, revision: snapshot.revision)
-                            }.disabled(model.isWorking)
-                            if let outgoing = model.outgoingPacket {
-                                DevicePairingQRCard(packet: outgoing)
-                                WNCopyButton(value: outgoing, accessibilityTitle: L10n.string("Copy")) { copied in
-                                    Label(
-                                        copied ? L10n.string("Copied") : L10n.string("Copy"),
-                                        systemImage: copied ? "checkmark" : "doc.on.doc")
-                                }
-                            }
-                            Text("Opaque packet from the other device").font(.subheadline)
-                            WNInput(
-                                placeholder: L10n.string("Opaque packet from the other device"), text: $incoming,
-                                kind: .multiline(2...4), surface: .filled
-                            )
-                            .disabled(model.isWorking)
-                            qrImportButton(model)
-                                .disabled(model.isWorking || model.cleanupError != nil)
-                            WNButton(title: "Receive packet", emphasis: .secondary, size: .standard) {
-                                perform(.receivePacket, revision: snapshot.revision)
-                            }.disabled(model.isWorking)
-                            WNButton(title: "Finalize enrollment", size: .standard) {
-                                perform(.finalizeLinking, revision: snapshot.revision)
-                            }.disabled(model.isWorking)
+
                         }
+                    }
+                    if model.snapshot?.phase == .enrollmentComplete {
+                        Text("Done")
+                    } else {
+                        ProgressView(L10n.string("Waiting"))
                     }
                     Section {
                         if model.transportError != nil || model.cleanupError != nil {
                             Text("Enrollment action failed. Retry or cancel.").foregroundStyle(.red)
                         }
                         Button(L10n.string(model.cleanupError == nil ? "Cancel" : "Try again")) {
-                            incoming = ""
                             action?.cancel()
                             action = Task { try? await model.cancel() }
                         }
@@ -65,27 +44,14 @@
             .navigationTitle("Device enrollment")
             .onDisappear {
                 action?.cancel()
-                incoming = ""
             }
-            .onChange(of: model?.isActive) { _, active in if active != true { incoming = "" } }
-        }
-
-        private func qrImportButton(_ captured: DeviceEnrollmentViewModel) -> some View {
-            let revision = captured.snapshot?.revision
-            let identity = "\(ObjectIdentifier(captured)):\(revision ?? 0)"
-            return DevicePairingQRImportButton(isCurrent: {
-                model === captured && captured.isActive && captured.cleanupError == nil
-                    && captured.snapshot?.phase == .verificationCompleteEnrollmentPending && captured.snapshot?.revision == revision
-            }, onScan: { incoming = $0 }).id(identity)
         }
 
         private func perform(_ operation: DeviceEnrollmentViewModel.TransportAction, revision: UInt64) {
             guard let model, model.isActive, !model.isWorking else { return }
-            let input = incoming
             action = Task {
                 do {
-                    try await model.performTransportAction(operation, displayedRevision: revision, input: input)
-                    if model.isActive, !Task.isCancelled, operation == .receivePacket { incoming = "" }
+                    try await model.performTransportAction(operation, displayedRevision: revision)
                 } catch {
                     // The original model retains the typed action or cleanup error.
                 }

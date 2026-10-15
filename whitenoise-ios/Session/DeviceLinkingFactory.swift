@@ -108,14 +108,40 @@
         }
 
         func beginOwnedDeviceLinkingSession() async throws -> DeviceLinkingAccountScope {
-            try await adoptDeviceLinkingFactory { client, accountRef in
+            let owner = try await adoptDeviceLinkingFactory { client, accountRef in
                 try await client.beginDeviceLinkingSession(accountRef: accountRef)
+            }
+            do {
+                try await owner.activateAutomaticPairing(displayBootstrap: true)
+                return owner
+            } catch {
+                // Clear this adopted owner on activation failure; a retired
+                // result must never cancel a different current account scope.
+                if accountStore.deviceLinkingScope === owner {
+                    try await accountStore.cancelDeviceLinking()
+                } else {
+                    try await owner.cancel()
+                }
+                throw error
             }
         }
 
         func approveOwnedDeviceLinkingSession(request: Data, target: Data?) async throws -> DeviceLinkingAccountScope {
-            try await adoptDeviceLinkingFactory { client, accountRef in
+            let owner = try await adoptDeviceLinkingFactory { client, accountRef in
                 try await client.approveDeviceLinkingSession(accountRef: accountRef, request: request, target: target)
+            }
+            do {
+                try await owner.activateAutomaticPairing(displayBootstrap: false)
+                return owner
+            } catch {
+                // Clear this adopted owner on activation failure; a retired
+                // result must never cancel a different current account scope.
+                if accountStore.deviceLinkingScope === owner {
+                    try await accountStore.cancelDeviceLinking()
+                } else {
+                    try await owner.cancel()
+                }
+                throw error
             }
         }
 

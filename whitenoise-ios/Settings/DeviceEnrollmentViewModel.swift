@@ -89,6 +89,7 @@
             defer { isWorking = false }
             do {
                 switch action {
+                case .shareChats: try await continueLinkingAndShareChats(displayedRevision: displayedRevision)
                 case .continueLinking: try await continueLinking(displayedRevision: displayedRevision)
                 case .shareChats: try await continueLinkingAndShareChats(displayedRevision: displayedRevision)
                 case .exportPacket:

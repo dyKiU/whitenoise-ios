@@ -111,7 +111,12 @@ nonisolated final class MarmotClient: Sendable {
         func approveDeviceLinkingSession(accountRef: String, request: Data, target: Data?) async throws
             -> DeviceLinkingSession
         {
-            try await marmot.approveDeviceLinkingSession(accountRef: accountRef, request: request, target: target)
+            if let code = String(data: request, encoding: .utf8), code.hasPrefix("WNPAIR1:") {
+                return try await marmot.approveAutomaticDeviceLinkingSession(
+                    accountRef: accountRef, code: code, target: target)
+            }
+            return try await marmot.approveDeviceLinkingSession(
+                accountRef: accountRef, request: request, target: target)
         }
     #endif
 

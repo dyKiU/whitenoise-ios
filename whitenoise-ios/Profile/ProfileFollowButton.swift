@@ -36,7 +36,7 @@ struct ProfileFollowButton: View {
                 || (model.isFollowing == nil && !model.loadFailed))
             .accessibilityLabel(model.loadFailed ? L10n.string("Couldn't load follow status. Retry.")
                 : L10n.string(model.isFollowing == true ? "Unfollow" : "Follow"))
-            .task(id: context) { await load() }
+            .task(id: context) { await observeFollowStatus() }
         }
     }
 
@@ -61,6 +61,24 @@ struct ProfileFollowButton: View {
                 accountRef: loadingContext.accountRef,
                 userRef: loadingContext.peerAccountIdHex
             )
+        }
+    }
+
+    private func observeFollowStatus() async {
+        let observedContext = context
+        await load()
+        guard let observedContext else { return }
+        while !Task.isCancelled {
+            do {
+                try await Task.sleep(for: .seconds(5))
+            } catch { return }
+            guard context == observedContext else { return }
+            await model.refresh(context: observedContext) {
+                try await appState.currentMarmotClient().isFollowing(
+                    accountRef: observedContext.accountRef,
+                    userRef: observedContext.peerAccountIdHex
+                )
+            }
         }
     }
 
