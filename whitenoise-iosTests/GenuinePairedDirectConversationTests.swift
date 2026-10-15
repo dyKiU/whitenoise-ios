@@ -70,10 +70,11 @@
                 for _ in 0..<3 {
                     let found = try await client.existingDirectConversation(
                         accountRef: account.label, peerAccountId: fixture.peer)
-                    let destination = try XCTUnwrap(found, "paired-direct-adapter-destination")
-                    guard case .pairedSource(let observed) = destination else {
+                    guard let destination = found, case .pairedSource(let observed) = destination else {
+                        try await client.marmot.shutdownAndClose()
+                        try writeObservation(["runtime_closed": true], named: "paired-direct-closed.json", bridge: bridge)
                         XCTFail("paired-direct-adapter-destination")
-                        throw PairedDirectFixtureError.invalidFixture
+                        return
                     }
                     XCTAssertEqual(observed, source)
                     XCTAssertEqual(destination.groupIdHex, fixture.group)
