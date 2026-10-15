@@ -32,6 +32,9 @@ struct ChatsListView: View {
     @ScaledMetric(relativeTo: .body) private var selectionActionDiameter = 44.0
     @Environment(AppState.self) private var appState
     @State private var viewModel: ChatsListViewModel?
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        @State private var automaticChats: AccountChatListViewModel?
+    #endif
     @State private var showNewChat = false
     @State private var showSettings = false
     @State private var path: [ChatNavigationTarget] = []
@@ -333,6 +336,14 @@ struct ChatsListView: View {
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
             }
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                .task(id: appState.automaticChatOwner) {
+                    automaticChats = nil
+                    guard let model = try? appState.makeAutomaticChatListModel() else { return }
+                    automaticChats = model
+                    model.start()
+                }
+            #endif
             .task(id: subscriptionScope) {
                 // The inbox needs the block list so a direct chat with a
                 // blocked peer can say so instead of previewing their message.
@@ -549,9 +560,9 @@ struct ChatsListView: View {
         viewModel: ChatsListViewModel,
         rows: [ChatsListViewModel.Item]
     ) -> some View {
-        if viewModel.isLoading && rows.isEmpty {
+        if viewModel.isLoading && rows.isEmpty && !hasAutomaticRows {
             ProgressView()
-        } else if let error = viewModel.loadError {
+        } else if let error = viewModel.loadError, !hasAutomaticRows {
             ContentUnavailableView(
                 "Couldn't load chats",
                 systemImage: "exclamationmark.triangle",
@@ -565,14 +576,6 @@ struct ChatsListView: View {
             let otherRows = groupsPinnedRows ? rows.filter { !$0.isPinned } : []
 
             List {
-                #if WN_EXPERIMENTAL_DEVICE_SYNC
-                    if scope == .active, !selectionMode {
-                        AutomaticChatListSection(
-                            model: appState.accountStore.automaticChats?.list,
-                            searchText: search.query, excludedGroupIds: Set(rows.map(\.id)),
-                            select: { group in path.append(ChatNavigationTarget(groupIdHex: group)) })
-                    }
-                #endif
                 if viewModel.windowSnapshot?.hasMoreBefore == true {
                     windowPageButton(.backward, viewModel: viewModel)
                     Button("Return to newest chats") {
@@ -604,16 +607,15 @@ struct ChatsListView: View {
                 if let error = viewModel.pageError {
                     Text(error).foregroundStyle(.secondary)
                 }
+                #if WN_EXPERIMENTAL_DEVICE_SYNC
+                    AutomaticChatListSection(model: automaticChats, rows: automaticRows) { groupId in
+                        path.append(ChatNavigationTarget(groupIdHex: groupId))
+                    }
+                #endif
             }
             .onScrollPhaseChange { _, phase in
                 #if WN_EXPERIMENTAL_DEVICE_SYNC
-                    if scope == .active, !selectionMode {
-                        if phase == .interacting {
-                            Task { await appState.accountStore.automaticChats?.list.pairedUserScrollChanged(true) }
-                        } else if phase == .idle {
-                            Task { await appState.accountStore.automaticChats?.list.pairedUserScrollChanged(false) }
-                        }
-                    }
+                    Task { await automaticChats?.pairedUserScrollChanged(phase == .interacting) }
                 #endif
                 if phase == .idle, let id = listViewport.visibleAnchor() {
                     viewModel.setVisibleWindowAnchor(id)
@@ -623,15 +625,7 @@ struct ChatsListView: View {
             .listStyle(.plain)
             .compatibleBottomScrollEdgeEffect()
             .overlay {
-                #if WN_EXPERIMENTAL_DEVICE_SYNC
-                    if rows.isEmpty,
-                        scope != .active || appState.accountStore.automaticChats?.list.pairedRows.isEmpty != false
-                    {
-                        emptyState
-                    }
-                #else
-                    if rows.isEmpty { emptyState }
-                #endif
+                if rows.isEmpty && !hasAutomaticRows { emptyState }
             }
             .refreshable {
                 if case .window = viewModel.listMode {
@@ -643,6 +637,23 @@ struct ChatsListView: View {
             }
         }
     }
+
+    private var hasAutomaticRows: Bool {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            !automaticRows.isEmpty
+        #else
+            false
+        #endif
+    }
+
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private var automaticRows: [PairedChatSummaryFfi] {
+            guard scope == .active, !selectionMode else { return [] }
+            return AutomaticChatListPresentation.rows(
+                automaticChats?.pairedRows ?? [], excluding: Set(viewModel?.items.map(\.id) ?? []),
+                query: search.query)
+        }
+    #endif
 
     private func windowPageButton(
         _ direction: ChatListPageDirectionFfi, viewModel: ChatsListViewModel
@@ -1739,6 +1750,24 @@ private struct ChatDestination: View {
             }
     }
 
+    private var hasPairedDestination: Bool {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            appState.accountStore.automaticChatListModel?.pairedRows.contains {
+                $0.groupIdHex == target.groupIdHex
+            } == true
+        #else
+            false
+        #endif
+    }
+
+    @ViewBuilder private var pairedDestination: some View {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            AutomaticConversationScreen(groupIdHex: target.groupIdHex)
+        #else
+            EmptyView()
+        #endif
+    }
+
     @ViewBuilder private var destination: some View {
         if let item {
             ConversationView(
@@ -1767,24 +1796,9 @@ private struct ChatDestination: View {
             .onAppear {
                 HostActionPerformance.conversationBecameVisible(groupIdHex: target.groupIdHex)
             }
-        } else {
-            #if WN_EXPERIMENTAL_DEVICE_SYNC
-                if let owner = appState.accountStore.automaticChats, owner.isLive,
-                    owner.list.pairedRows.contains(where: { $0.groupIdHex == target.groupIdHex })
-                {
-                    AutomaticConversationDestination(owner: owner, groupIdHex: target.groupIdHex)
-                } else {
-                    missingOrdinaryDestination()
-                }
-            #else
-                missingOrdinaryDestination()
-            #endif
-        }
-    }
-
-    @ViewBuilder
-    private func missingOrdinaryDestination() -> some View {
-        if timedOut {
+        } else if hasPairedDestination {
+            pairedDestination
+        } else if timedOut {
             // A slow network can take longer than the spin-wait to deliver the
             // chat-list row. Offer Retry instead of a dead end so the user can
             // wait out another window rather than being told the chat is gone (#71).

@@ -458,9 +458,6 @@ final class ChatsListViewModel {
         guard !Task.isCancelled else { return }
         guard let appState, appState.canUseRuntimeForForegroundWork else { return }
         currentAccount = accountRef
-        #if WN_EXPERIMENTAL_DEVICE_SYNC
-            _ = appState.automaticChatOwner()
-        #endif
         isLoading = true
         startLiveUpdates(accountRef: accountRef)
     }

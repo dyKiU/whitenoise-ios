@@ -43,12 +43,6 @@ final class AccountStore {
     }
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
-        private(set) var automaticChats: AutomaticChatAccountOwner?
-
-        func holdAutomaticChats(_ owner: AutomaticChatAccountOwner) {
-            automaticChats?.invalidate()
-            automaticChats = owner
-        }
 
         private(set) var historyConsentReviewModel: HistoryConsentReviewModel?
         func holdHistoryConsentReview(_ model: HistoryConsentReviewModel) {
@@ -62,6 +56,25 @@ final class AccountStore {
             accountChatSharingModel?.invalidate()
             accountChatSharingModel = model
         }
+        private(set) var automaticChatListModel: AccountChatListViewModel?
+        private(set) var automaticConversationModels: [String: AccountConversationViewModel] = [:]
+
+        func holdAutomaticChatList(_ model: AccountChatListViewModel) {
+            automaticChatListModel?.invalidate()
+            automaticChatListModel = model
+        }
+        func holdAutomaticConversation(_ model: AccountConversationViewModel, groupIdHex: String) throws {
+            guard automaticConversationModels[groupIdHex] != nil || automaticConversationModels.count < 16
+            else { throw AutomaticChatPresentationError.unavailable }
+            automaticConversationModels[groupIdHex]?.invalidate()
+            automaticConversationModels[groupIdHex] = model
+        }
+        func releaseAutomaticConversation(_ model: AccountConversationViewModel, groupIdHex: String) {
+            guard automaticConversationModels[groupIdHex] === model else { return }
+            model.invalidate()
+            automaticConversationModels.removeValue(forKey: groupIdHex)
+        }
+
         private(set) var synchronizedHistoryModels: [String: SynchronizedHistoryViewModel] = [:]
 
         func holdSynchronizedHistory(_ model: SynchronizedHistoryViewModel, groupIdHex: String) {
@@ -274,8 +287,10 @@ final class AccountStore {
         private func retireDeviceLinkingScope() {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
-            automaticChats?.invalidate()
-            automaticChats = nil
+            automaticChatListModel?.invalidate()
+            automaticChatListModel = nil
+            for model in automaticConversationModels.values { model.invalidate() }
+            automaticConversationModels.removeAll()
             for reader in synchronizedHistoryModels.values { reader.invalidate() }
             synchronizedHistoryModels.removeAll()
             historyConsentReviewModel?.invalidate()

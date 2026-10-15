@@ -26,8 +26,11 @@ import Observation
         private var pageStarts: [String?] = [nil]
         @ObservationIgnored private var retired = false
         @ObservationIgnored private let isCurrent: @MainActor () -> Bool
+        var isCurrentOwner: Bool { !retired && isCurrent() }
 
-        init(accountRef: String, runtime: any AccountChatObserving, isCurrent: @escaping @MainActor () -> Bool) {
+        init(
+            accountRef: String, runtime: any AccountChatObserving, isCurrent: @escaping @MainActor () -> Bool = { true }
+        ) {
             self.isCurrent = isCurrent
             self.accountRef = accountRef
             self.runtime = runtime
@@ -35,14 +38,15 @@ import Observation
 
         /// Reads the one bounded visible lane, never concatenates the ordinary metadata rows.
         var pairedRows: [PairedChatSummaryFfi] {
-            snapshot?.rows.compactMap { row in
+            guard isCurrentOwner else { return [] }
+            return snapshot?.rows.compactMap { row in
                 if case .pairedSource(let value) = row { return value }
                 return nil
             } ?? []
         }
 
         func start() {
-            guard !retired, isCurrent(), task == nil else { return }
+            guard isCurrentOwner, task == nil else { return }
             isLoading = true
             task = Task { [weak self] in await self?.observe() }
         }
@@ -92,15 +96,19 @@ import Observation
         }
 
         private func requestPairedPage(after cursor: String?, backwards: Bool) async {
-            guard !retired, isCurrent(), pageTicket == nil, let original = owner, let current = snapshot else { return }
+            guard isCurrentOwner, pageTicket == nil, let original = owner, let current = snapshot else { return }
             let ticket = UUID()
             pageTicket = ticket
             defer { if pageTicket == ticket { pageTicket = nil } }
             do {
                 let replacement = try await original.pairedPage(sequence: current.sequence, afterGroupIdHex: cursor)
-                guard !retired, isCurrent(), !Task.isCancelled, owner === original else { return }
-                guard snapshot?.sequence == current.sequence || snapshot?.sequence == replacement.sequence else { return }
-                guard replacement.sequence > current.sequence else { throw AutomaticChatPresentationError.invalidSnapshot }
+                guard isCurrentOwner, !Task.isCancelled, owner === original else { return }
+                guard snapshot?.sequence == current.sequence || snapshot?.sequence == replacement.sequence else {
+                    return
+                }
+                guard replacement.sequence > current.sequence else {
+                    throw AutomaticChatPresentationError.invalidSnapshot
+                }
                 try install(replacement)
                 if backwards {
                     pageStarts.removeLast()
@@ -110,15 +118,15 @@ import Observation
                     pageStarts.append(cursor)
                 }
             } catch {
-                guard !retired, isCurrent(), owner === original, snapshot?.sequence == current.sequence else { return }
+                guard isCurrentOwner, owner === original, snapshot?.sequence == current.sequence else { return }
                 refuse(original)
             }
         }
 
         private func observe() async {
-            while !retired, isCurrent(), !Task.isCancelled {
+            while isCurrentOwner, !Task.isCancelled {
                 await observeOnce()
-                guard !retired, isCurrent(), !Task.isCancelled else { return }
+                guard isCurrentOwner, !Task.isCancelled else { return }
                 do { try await Task.sleep(for: .seconds(1)) } catch { return }
             }
         }
@@ -126,7 +134,7 @@ import Observation
         private func observeOnce() async {
             do {
                 let original = try await runtime.openAccountChatList(accountRef: accountRef, initialRows: 128)
-                guard !retired, isCurrent(), !Task.isCancelled else {
+                guard isCurrentOwner, !Task.isCancelled else {
                     original.cancel()
                     return
                 }
@@ -135,16 +143,16 @@ import Observation
                 guard let initial = original.snapshot() else { throw AutomaticChatPresentationError.invalidSnapshot }
                 try install(initial)
                 while let replacement = try await original.next() {
-                    guard !retired, isCurrent(), !Task.isCancelled, owner === original else {
+                    guard isCurrentOwner, !Task.isCancelled, owner === original else {
                         original.cancel()
                         return
                     }
                     try install(replacement)
                 }
-                guard !retired, isCurrent(), owner === original else { return }
+                guard isCurrentOwner, owner === original else { return }
                 refuse(original)
             } catch {
-                guard !retired, isCurrent(), !Task.isCancelled else { return }
+                guard isCurrentOwner, !Task.isCancelled else { return }
                 if let original = owner {
                     refuse(original)
                 } else {

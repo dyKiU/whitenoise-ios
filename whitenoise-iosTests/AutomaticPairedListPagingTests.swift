@@ -78,15 +78,16 @@ import Testing
             -> any AccountConversationObserving
         { throw CancellationError() }
     }
-    @MainActor @Suite struct AutomaticPairedListPagingTests {
+    @MainActor @Suite struct IOSAutomaticPairedListPagingTests {
         private func page(sequence: UInt64, start: Int, cursor: String?) -> AccountChatListWindowSnapshotFfi {
             let source = PairedChatSourceFfi(
                 deviceHex: String(repeating: "b", count: 64), policyDigestHex: String(repeating: "c", count: 64),
                 protectedGeneration: 1, sourceEpoch: 1, sourceSequence: sequence,
                 sourceDigestHex: String(repeating: "d", count: 64))
             let rows = (start..<(start + 64)).map { index in
-                AccountChatRowFfi.pairedSource(row: PairedChatSummaryFfi(
-                    groupIdHex: String(format: "%04x", index), name: "Synthetic", description: "", source: source))
+                AccountChatRowFfi.pairedSource(
+                    row: PairedChatSummaryFfi(
+                        groupIdHex: String(format: "%04x", index), name: "Synthetic", description: "", source: source))
             }
             return AccountChatListWindowSnapshotFfi(
                 generation: "synthetic-generation", sequence: sequence,
@@ -106,7 +107,8 @@ import Testing
         }
         private func ready() async -> (AccountChatListViewModel, PagingList) {
             let original = PagingList(page(sequence: 1, start: 0, cursor: "003f"))
-            let model = AccountChatListViewModel(accountRef: "synthetic-account", runtime: PagingFactory(original: original), isCurrent: { true })
+            let model = AccountChatListViewModel(
+                accountRef: "synthetic-account", runtime: PagingFactory(original: original))
             model.start()
             #expect(await waitFor { model.snapshot != nil && original.hasUpdateWaiter })
             return (model, original)

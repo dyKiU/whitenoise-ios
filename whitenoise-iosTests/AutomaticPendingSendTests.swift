@@ -12,46 +12,75 @@ import Testing
             var calls = 0
             var blocked = false
             var entered = false
-            var admission: CheckedContinuation<Void, Never>?
-            var holdAdmission = false
         }
         private let state = Mutex(State())
         private let release = DispatchSemaphore(value: 0)
         let eventId = String(repeating: "a", count: 64)
         var callCount: Int { state.withLock { $0.calls } }
         var isWaiting: Bool { state.withLock { $0.entered } }
-        var admissionIsWaiting: Bool { state.withLock { $0.admission != nil } }
-        func holdNextAdmission() { state.withLock { $0.holdAdmission = true } }
-        func releaseAdmission() {
-            let continuation = state.withLock { state in
-                state.holdAdmission = false
-                let continuation = state.admission
-                state.admission = nil
-                return continuation
-            }
-            continuation?.resume()
-        }
-        func waitForAdmission() async {
-            await withCheckedContinuation { continuation in
-                let held = state.withLock { state in
-                    if !state.holdAdmission { return false }
-                    state.admission = continuation
-                    return true
-                }
-                if !held { continuation.resume() }
-            }
-        }
         func reject() { state.withLock { $0.value = .rejected } }
         func holdNextStatus() { state.withLock { $0.blocked = true } }
         func finishStatus() { release.signal() }
         func status() throws -> LocalSendStatusFfi {
-            let held = state.withLock { state in
-                state.calls += 1
-                state.entered = state.blocked
-                return state.blocked
+            let held = state.withLock { value in
+                value.calls += 1
+                value.entered = value.blocked
+                return value.blocked
             }
             if held, release.wait(timeout: .now() + 5) != .success { throw CancellationError() }
             return state.withLock { $0.value }
+        }
+    }
+
+    nonisolated private final class PendingSender: PairedConversationSending {
+        nonisolated private struct Gate: Sendable {
+            var enabled = false
+            var reached = false
+            var waiter: CheckedContinuation<Void, Never>?
+        }
+        private let gate = Mutex(Gate())
+        private let state: PendingSendState
+        init(state: PendingSendState) { self.state = state }
+        var messageActionGateEnabled: Bool {
+            get { gate.withLock { $0.enabled } }
+            set { gate.withLock { $0.enabled = newValue } }
+        }
+        var didReachMessageActionGate: Bool { gate.withLock { $0.reached } }
+        func releaseMessageActionGate() {
+            let waiter = gate.withLock { value in
+                value.enabled = false
+                let waiter = value.waiter
+                value.waiter = nil
+                return waiter
+            }
+            waiter?.resume()
+        }
+        func sendTextWithClientToken(accountRef: String, groupIdHex: String, text: String, clientToken: String)
+            async throws -> LocalSendAcceptanceFfi
+        {
+            await withCheckedContinuation { reply in
+                let immediate = gate.withLock { value in
+                    guard value.enabled else { return true }
+                    value.reached = true
+                    value.waiter = reply
+                    return false
+                }
+                if immediate { reply.resume() }
+            }
+            return .init(clientToken: clientToken, messageIdHex: state.eventId)
+        }
+        func replyWithClientToken(
+            accountRef: String, groupIdHex: String, targetMessageId: String,
+            text: String, clientToken: String
+        ) async throws -> LocalSendAcceptanceFfi {
+            try await sendTextWithClientToken(
+                accountRef: accountRef, groupIdHex: groupIdHex,
+                text: text, clientToken: clientToken)
+        }
+        func localSendStatus(accountRef: String, groupIdHex: String, clientToken: String) async throws
+            -> LocalSendStatusFfi?
+        {
+            try await Task.detached { [state] in try state.status() }.value
         }
     }
 
@@ -67,32 +96,34 @@ import Testing
         func snapshot() -> AccountConversationWindowSnapshotFfi? { initial }
         func next() async throws -> AccountConversationWindowSnapshotFfi? {
             try await withCheckedThrowingContinuation { reply in
-                let ready = state.withLock { state -> (Bool, AccountConversationWindowSnapshotFfi?) in
-                    if state.cancelled { return (true, nil) }
-                    if !state.queue.isEmpty { return (true, state.queue.removeFirst()) }
-                    state.pending = reply
+                let immediate = state.withLock { value -> (Bool, AccountConversationWindowSnapshotFfi?) in
+                    if value.cancelled { return (true, nil) }
+                    if !value.queue.isEmpty { return (true, value.queue.removeFirst()) }
+                    value.pending = reply
                     return (false, nil)
                 }
-                if ready.0 { reply.resume(returning: ready.1) }
+                if immediate.0 { reply.resume(returning: immediate.1) }
             }
         }
-        func emit(_ value: AccountConversationWindowSnapshotFfi) {
-            let reply = state.withLock { state in
-                let reply = state.pending
-                state.pending = nil
-                if reply == nil { state.queue.append(value) }
+        func emit(_ replacement: AccountConversationWindowSnapshotFfi) {
+            let reply: CheckedContinuation<AccountConversationWindowSnapshotFfi?, Error>? = state.withLock { value in
+                guard !value.cancelled else { return nil }
+                let reply = value.pending
+                value.pending = nil
+                if reply == nil { value.queue.append(replacement) }
                 return reply
             }
-            reply?.resume(returning: value)
+            reply?.resume(returning: replacement)
         }
         func olderPage(sequence: UInt64, before: PairedChatMessageCursorFfi?) async throws
             -> AccountConversationWindowSnapshotFfi
         { throw CancellationError() }
         func cancel() {
-            let reply = state.withLock { state in
-                state.cancelled = true
-                let reply = state.pending
-                state.pending = nil
+            let reply = state.withLock { value in
+                value.cancelled = true
+                value.queue = []
+                let reply = value.pending
+                value.pending = nil
                 return reply
             }
             reply?.resume(returning: nil)
@@ -105,26 +136,11 @@ import Testing
             throw CancellationError()
         }
         func openAccountConversation(accountRef: String, groupIdHex: String, initialRows: UInt32) async throws
-            -> any AccountConversationObserving { original }
+            -> any AccountConversationObserving
+        { original }
     }
 
-    nonisolated private struct PendingSender: AccountChatSending {
-        let state: PendingSendState
-        func sendTextWithClientToken(accountRef: String, groupIdHex: String, text: String, clientToken: String)
-            async throws -> LocalSendAcceptanceFfi {
-            let acceptance = LocalSendAcceptanceFfi(clientToken: clientToken, messageIdHex: state.eventId)
-            await state.waitForAdmission()
-            return acceptance
-        }
-        func replyWithClientToken(accountRef: String, groupIdHex: String, targetMessageId: String,
-                                  text: String, clientToken: String) async throws -> LocalSendAcceptanceFfi {
-            .init(clientToken: clientToken, messageIdHex: state.eventId)
-        }
-        func localSendStatus(accountRef: String, groupIdHex: String, clientToken: String)
-            async throws -> LocalSendStatusFfi? { try await Task.detached { try state.status() }.value }
-    }
-
-    @MainActor @Suite struct AutomaticPendingSendTests {
+    @MainActor @Suite struct IOSAutomaticPendingSendTests {
         private let group = "0102"
         private func snapshot(sequence: UInt64, eventId: String? = nil) -> AccountConversationWindowSnapshotFfi {
             let source = PairedChatSourceFfi(
@@ -132,13 +148,19 @@ import Testing
                 protectedGeneration: 1, sourceEpoch: 1, sourceSequence: sequence,
                 sourceDigestHex: String(repeating: "d", count: 64))
             let header = PairedChatSummaryFfi(groupIdHex: group, name: "Synthetic", description: "", source: source)
-            let rows: [AccountConversationRowFfi] = eventId.map { id in
-                [.pairedSource(row: PairedChatMessageFfi(
-                    kind: 9, canonicalChat: true, messageIdHex: id, authorHex: String(repeating: "e", count: 64),
-                    createdAt: 1, expiresAt: nil, deleted: false, content: "Synthetic message",
-                    contentTokens: MarkdownDocumentFfi(blocks: [], truncated: false, blankLinesBefore: Data()),
-                    tags: [], mediaAttachments: [], source: source))]
-            } ?? []
+            let rows: [AccountConversationRowFfi] =
+                eventId.map { id in
+                    [
+                        .pairedSource(
+                            row: PairedChatMessageFfi(
+                                kind: 9, canonicalChat: true, messageIdHex: id,
+                                authorHex: String(repeating: "e", count: 64),
+                                createdAt: 1, expiresAt: nil, deleted: false, content: "Synthetic message",
+                                contentTokens: MarkdownDocumentFfi(
+                                    blocks: [], truncated: false, blankLinesBefore: Data()),
+                                tags: [], mediaAttachments: [], source: source))
+                    ]
+                } ?? []
             return AccountConversationWindowSnapshotFfi(
                 generation: "synthetic-generation", sequence: sequence, header: .pairedSource(header: header),
                 rows: rows, nextBefore: nil)
@@ -156,8 +178,9 @@ import Testing
             let original = PendingConversation(snapshot(sequence: 1))
             let state = PendingSendState()
             let runtime = PendingSender(state: state)
-            let model = AccountConversationViewModel(accountRef: "synthetic-account", groupIdHex: group, runtime: runtime,
-                observations: PendingFactory(original: original), isCurrent: { true })
+            let model = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: runtime,
+                observations: PendingFactory(original: original))
             model.start()
             #expect(await waitFor { model.snapshot != nil })
             return (model, original, state)
@@ -166,24 +189,25 @@ import Testing
         @Test func observedCanonicalRowBeforeAdmissionReturnsDoesNotLeaveDuplicatePendingBubble() async throws {
             let original = PendingConversation(snapshot(sequence: 1))
             let state = PendingSendState()
-            state.holdNextAdmission()
+            let runtime = PendingSender(state: state)
+            runtime.messageActionGateEnabled = true
             let model = AccountConversationViewModel(
-                accountRef: "synthetic-account", groupIdHex: group, runtime: PendingSender(state: state),
-                observations: PendingFactory(original: original), isCurrent: { true })
+                accountRef: "synthetic-account", groupIdHex: group, runtime: runtime,
+                observations: PendingFactory(original: original))
             model.start()
             defer {
-                state.releaseAdmission()
+                runtime.releaseMessageActionGate()
                 model.invalidate()
             }
             #expect(await waitFor { model.snapshot != nil })
             let sending = Task { try await model.sendText("Synthetic message") }
-            #expect(await waitFor { state.admissionIsWaiting })
+            #expect(await waitFor { runtime.didReachMessageActionGate })
             let token = try #require(model.pendingTexts.keys.first)
             #expect(model.pendingTexts[token]?.acceptedMessageIdHex == nil)
             original.emit(snapshot(sequence: 2, eventId: state.eventId))
             #expect(await waitFor { model.snapshot?.sequence == 2 })
             #expect(model.pairedMessages.map(\.messageIdHex) == [state.eventId])
-            state.releaseAdmission()
+            runtime.releaseMessageActionGate()
             let acceptance = try await sending.value
             #expect(acceptance.clientToken == token)
             #expect(acceptance.messageIdHex == state.eventId)
@@ -216,10 +240,11 @@ import Testing
             original.emit(snapshot(sequence: 2))
             #expect(await waitFor { model.snapshot?.sequence == 2 })
             #expect(await waitFor { state.callCount > calls })
-            #expect(await waitFor {
-                if case .rejected? = model.pendingTexts.values.first?.status { return true }
-                return false
-            })
+            #expect(
+                await waitFor {
+                    if case .rejected? = model.pendingTexts.values.first?.status { return true }
+                    return false
+                })
             #expect(model.pairedMessages.isEmpty)
         }
 
@@ -237,5 +262,26 @@ import Testing
             #expect(model.pendingTexts.isEmpty)
             #expect(model.error == nil)
         }
+
+        @Test func accountSwitchClearsQueuedTextAndTheOldConversationWindow() async throws {
+            let name = "automatic-conversation-owner-" + UUID().uuidString
+            let defaults = try #require(UserDefaults(suiteName: name))
+            defer { defaults.removePersistentDomain(forName: name) }
+            let store = AccountStore(defaults: defaults)
+            store.activeAccountRef = "synthetic-account"
+            let (model, original, state) = try await ready()
+            try store.holdAutomaticConversation(model, groupIdHex: group)
+            _ = try await model.sendText("Synthetic message")
+            #expect(!model.pendingTexts.isEmpty)
+            store.activeAccountRef = "another-account"
+            #expect(store.automaticConversationModels.isEmpty)
+            #expect(!model.isCurrentOwner)
+            #expect(model.snapshot == nil)
+            #expect(model.pendingTexts.isEmpty)
+            original.emit(snapshot(sequence: 2, eventId: state.eventId))
+            await Task.yield()
+            #expect(model.pairedMessages.isEmpty)
+        }
+
     }
 #endif

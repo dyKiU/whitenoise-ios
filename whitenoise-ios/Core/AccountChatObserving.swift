@@ -23,36 +23,48 @@ import MarmotKit
             -> any AccountConversationObserving
     }
 
-    nonisolated protocol AccountChatSending: Sendable {
+    nonisolated protocol PairedConversationSending: Sendable {
         func sendTextWithClientToken(accountRef: String, groupIdHex: String, text: String, clientToken: String)
             async throws -> LocalSendAcceptanceFfi
         func replyWithClientToken(
             accountRef: String, groupIdHex: String, targetMessageId: String,
             text: String, clientToken: String
         ) async throws -> LocalSendAcceptanceFfi
-        func localSendStatus(accountRef: String, groupIdHex: String, clientToken: String)
-            async throws -> LocalSendStatusFfi?
+        func localSendStatus(accountRef: String, groupIdHex: String, clientToken: String) async throws
+            -> LocalSendStatusFfi?
     }
 
-    extension MarmotClient: AccountChatSending {}
+    extension MarmotClient: PairedConversationSending {}
 
     /// Retains the exact generated native owner. The host never recreates it from metadata.
-    private final class NativeAccountChatList: AccountChatListObserving {
+    nonisolated private final class NativeAccountChatList: AccountChatListObserving {
         private let original: AccountChatListWindowSubscription
         init(_ original: AccountChatListWindowSubscription) { self.original = original }
         func snapshot() -> AccountChatListWindowSnapshotFfi? { original.snapshot() }
-        func next() async throws -> AccountChatListWindowSnapshotFfi? { try await original.next() }
+        func next() async throws -> AccountChatListWindowSnapshotFfi? {
+            try await withTaskCancellationHandler {
+                try await original.next()
+            } onCancel: {
+                self.original.cancel()
+            }
+        }
         func pairedPage(sequence: UInt64, afterGroupIdHex: String?) async throws -> AccountChatListWindowSnapshotFfi {
             try await original.pairedPage(sequence: sequence, afterGroupIdHex: afterGroupIdHex)
         }
         func cancel() { original.cancel() }
     }
 
-    private final class NativeAccountConversation: AccountConversationObserving {
+    nonisolated private final class NativeAccountConversation: AccountConversationObserving {
         private let original: AccountConversationWindowSubscription
         init(_ original: AccountConversationWindowSubscription) { self.original = original }
         func snapshot() -> AccountConversationWindowSnapshotFfi? { original.snapshot() }
-        func next() async throws -> AccountConversationWindowSnapshotFfi? { try await original.next() }
+        func next() async throws -> AccountConversationWindowSnapshotFfi? {
+            try await withTaskCancellationHandler {
+                try await original.next()
+            } onCancel: {
+                self.original.cancel()
+            }
+        }
         func olderPage(sequence: UInt64, before: PairedChatMessageCursorFfi?) async throws
             -> AccountConversationWindowSnapshotFfi
         {

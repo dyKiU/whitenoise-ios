@@ -589,6 +589,9 @@ struct ConversationView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ConversationViewModel?
     @State private var isConversationOnScreen = false
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        @State private var automaticConversation: AccountConversationViewModel?
+    #endif
     @State private var draft: String = ""
     @State private var didRestorePersistedDraft = false
     @State private var composerChangedBeforeDraftRestore = false
@@ -628,10 +631,6 @@ struct ConversationView: View {
     @State private var rowFrames = RowFrameStore()
     @State private var conversationViewport = ChatListViewport()
     @State private var blockedUsers = BlockedUsersModel()
-    #if WN_EXPERIMENTAL_DEVICE_SYNC
-        @State private var automaticConversation: AccountConversationViewModel?
-        @State private var automaticOwner: AutomaticChatAccountOwner?
-    #endif
     @State private var timelineVisibility = TimelineVisibilityStore()
     @State private var measuredActionRowFrameKey: String?
     @State private var pendingActionsPresentation: PendingActionsPresentation?
@@ -1226,63 +1225,27 @@ struct ConversationView: View {
             )
     }
 
-    @ViewBuilder
-    private func ordinaryTimelineRow(
-        _ item: TimelineItem, viewModel: ConversationViewModel,
-        dayHeaders: [String: TimelineDateHeading], showsSenderIdentity: Bool
-    ) -> some View {
-        if let heading = dayHeaders[item.id] {
-            TimelineInlineDateHeader(heading: heading)
-        }
-        if TimelineUnreadDivider.shouldShow(
-            before: item,
-            firstUnreadMessageIdHex: suppressesInitialUnreadDivider
-                ? nil
-                : viewModel.initialWindowUnreadMessageId
-        ) {
-            UnreadMessagesDivider()
-                .id(unreadDividerID(for: viewModel.initialWindowUnreadMessageId ?? ""))
-        }
-        row(
-            for: item,
-            viewModel: viewModel,
-            showsSenderIdentity: showsSenderIdentity
-        )
-        .background {
-            searchMatchHighlight(for: item, viewModel: viewModel)
-            ChatListRowAnchor(
-                groupId: item.id,
-                sequence: viewModel.conversationWindow?.revision.sequence ?? 0,
-                viewport: conversationViewport)
-        }
-        .modifier(
-            TimelineRowVisibilityModifier(
-                rowKey: item.rowFrameKey,
-                store: timelineVisibility,
-                onBecameVisible: {
-                    markCurrentlyVisibleMessagesRead(viewModel: viewModel)
-                    clearPassedDownArrowStops(viewModel: viewModel)
-                },
-                onBecameHidden: {
-                    clearPassedDownArrowStops(viewModel: viewModel)
-                },
-                onVisibilityChange: { isVisible in
-                    viewModel.setTimestampRowVisible(item.rowFrameKey, isVisible: isVisible)
-                }
-            ))
-
-    }
-
-    private var hasPairedObservations: Bool {
-        #if WN_EXPERIMENTAL_DEVICE_SYNC
-            !(automaticConversation?.pairedMessages.isEmpty ?? true)
-        #else
-            false
-        #endif
-    }
-
     private var conversationRuntimeTasks: some View {
         conversationAttachmentSheets
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                .task(id: appState.automaticChatOwner) {
+                    if let automaticConversation {
+                        appState.releaseAutomaticConversationModel(automaticConversation, groupIdHex: chat.groupIdHex)
+                    }
+                    automaticConversation = nil
+                    guard let model = try? appState.makeAutomaticConversationModel(groupIdHex: chat.groupIdHex) else {
+                        return
+                    }
+                    automaticConversation = model
+                    model.start()
+                }
+                .onDisappear {
+                    if let automaticConversation {
+                        appState.releaseAutomaticConversationModel(automaticConversation, groupIdHex: chat.groupIdHex)
+                    }
+                    automaticConversation = nil
+                }
+            #endif
             .task(
                 id: ConversationRuntimeStartToken(
                     accountRef: appState.activeAccountRef,
@@ -1317,19 +1280,6 @@ struct ConversationView: View {
                 }
                 reconcileDraftMediaUploads()
                 await viewModel?.start()
-                #if WN_EXPERIMENTAL_DEVICE_SYNC
-                    guard !Task.isCancelled else { return }
-                    let owner = appState.automaticChatOwner()
-                    automaticOwner = owner
-                    automaticConversation = owner?.selectConversation(groupIdHex: chat.groupIdHex)
-                #endif
-            }
-            .onDisappear {
-                #if WN_EXPERIMENTAL_DEVICE_SYNC
-                    if let automaticConversation { automaticOwner?.releaseConversation(automaticConversation) }
-                    automaticConversation = nil
-                    automaticOwner = nil
-                #endif
             }
             .task(id: blockedPeerSubscriptionKey) {
                 // Groups subscribe too: a blocked member's messages are
@@ -1866,6 +1816,105 @@ struct ConversationView: View {
 
     // MARK: - Timeline
 
+    private var hasAutomaticMessages: Bool {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            !AutomaticTranscriptPresentation.rows(
+                ordinary: [], paired: automaticConversation?.pairedMessages ?? [],
+                blockedAuthors: blockedUsers.blockedAccountIds,
+                now: UInt64(max(0, Date().timeIntervalSince1970))
+            ).isEmpty
+        #else
+            false
+        #endif
+    }
+
+    private func renderedTimelineTail(_ viewModel: ConversationViewModel) -> String? {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            automaticTimelineRows(viewModel).last?.id
+        #else
+            viewModel.timeline.last?.id
+        #endif
+    }
+
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private func automaticTimelineRows(_ viewModel: ConversationViewModel) -> [AutomaticTranscriptRow] {
+            AutomaticTranscriptPresentation.rows(
+                ordinary: viewModel.timeline, paired: automaticConversation?.pairedMessages ?? [],
+                blockedAuthors: blockedUsers.blockedAccountIds,
+                now: UInt64(max(0, Date().timeIntervalSince1970)))
+        }
+    #endif
+
+    @ViewBuilder
+    private func renderedTimelineRows(
+        viewModel: ConversationViewModel, showsSenderIdentity: Bool, dayHeaders: [String: TimelineDateHeading]
+    ) -> some View {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            ForEach(automaticTimelineRows(viewModel)) { entry in
+                switch entry {
+                case .ordinary(let item):
+                    ordinaryTimelineRow(
+                        item, viewModel: viewModel,
+                        showsSenderIdentity: showsSenderIdentity, dayHeaders: dayHeaders)
+                case .paired(let message):
+                    AutomaticPairedMessageRow(message: message)
+                }
+            }
+        #else
+            ForEach(viewModel.timeline) { item in
+                ordinaryTimelineRow(
+                    item, viewModel: viewModel,
+                    showsSenderIdentity: showsSenderIdentity, dayHeaders: dayHeaders)
+            }
+        #endif
+    }
+
+    @ViewBuilder
+    private func ordinaryTimelineRow(
+        _ item: TimelineItem, viewModel: ConversationViewModel,
+        showsSenderIdentity: Bool, dayHeaders: [String: TimelineDateHeading]
+    ) -> some View {
+        if let heading = dayHeaders[item.id] {
+            TimelineInlineDateHeader(heading: heading)
+        }
+        if TimelineUnreadDivider.shouldShow(
+            before: item,
+            firstUnreadMessageIdHex: suppressesInitialUnreadDivider
+                ? nil
+                : viewModel.initialWindowUnreadMessageId
+        ) {
+            UnreadMessagesDivider()
+                .id(unreadDividerID(for: viewModel.initialWindowUnreadMessageId ?? ""))
+        }
+        row(
+            for: item,
+            viewModel: viewModel,
+            showsSenderIdentity: showsSenderIdentity
+        )
+        .background {
+            searchMatchHighlight(for: item, viewModel: viewModel)
+            ChatListRowAnchor(
+                groupId: item.id,
+                sequence: viewModel.conversationWindow?.revision.sequence ?? 0,
+                viewport: conversationViewport)
+        }
+        .modifier(
+            TimelineRowVisibilityModifier(
+                rowKey: item.rowFrameKey,
+                store: timelineVisibility,
+                onBecameVisible: {
+                    markCurrentlyVisibleMessagesRead(viewModel: viewModel)
+                    clearPassedDownArrowStops(viewModel: viewModel)
+                },
+                onBecameHidden: {
+                    clearPassedDownArrowStops(viewModel: viewModel)
+                },
+                onVisibilityChange: { isVisible in
+                    viewModel.setTimestampRowVisible(item.rowFrameKey, isVisible: isVisible)
+                }
+            ))
+    }
+
     @ViewBuilder
     private var timeline: some View {
         if let viewModel {
@@ -1884,7 +1933,7 @@ struct ConversationView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(.rect)
                     .simultaneousGesture(TapGesture().onEnded { dismissKeyboard() })
-            } else if viewModel.timeline.isEmpty && !hasPairedObservations {
+            } else if viewModel.timeline.isEmpty && !hasAutomaticMessages {
                 let hasWindow = viewModel.conversationWindow != nil
                 let loading = viewModel.isLoading
                 emptyTimeline(viewModel: viewModel)
@@ -1904,7 +1953,7 @@ struct ConversationView: View {
                 let dayHeaders = Dictionary(
                     dateHeadings.map { ($0.id, $0) },
                     uniquingKeysWith: { first, _ in first })
-                let renderedTailID = viewModel.timeline.last?.id
+                let renderedTailID = renderedTimelineTail(viewModel)
                 let hasWindow = viewModel.conversationWindow != nil
                 let loading = viewModel.isLoading
                 ScrollViewReader { proxy in
@@ -1913,68 +1962,11 @@ struct ConversationView: View {
                             VStack(spacing: 0) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     olderTimelineTrigger(viewModel: viewModel)
-                                    #if WN_EXPERIMENTAL_DEVICE_SYNC
-                                        let merged = SourceQualifiedConversationRow.rows(
-                                            ordinary: viewModel.timeline,
-                                            paired: automaticConversation?.pairedMessages ?? [],
-                                            blockedAuthors: blockedUsers.blockedAccountIds,
-                                            now: UInt64(max(0, Date.now.timeIntervalSince1970)))
-                                        ForEach(merged) { sourceRow in
-                                            switch sourceRow {
-                                            case .paired(let message):
-                                                PairedChatMessageRow(message: message)
-                                            case .ordinary(let item):
-                                                ordinaryTimelineRow(
-                                                    item, viewModel: viewModel,
-                                                    dayHeaders: dayHeaders, showsSenderIdentity: showsSenderIdentity)
-                                            }
-                                        }
-                                        .padding(.bottom, 4)
-                                    #else
-                                        ForEach(viewModel.timeline) { item in
-                                            if let heading = dayHeaders[item.id] {
-                                                TimelineInlineDateHeader(heading: heading)
-                                            }
-                                            if TimelineUnreadDivider.shouldShow(
-                                                before: item,
-                                                firstUnreadMessageIdHex: suppressesInitialUnreadDivider
-                                                    ? nil
-                                                    : viewModel.initialWindowUnreadMessageId
-                                            ) {
-                                                UnreadMessagesDivider()
-                                                    .id(
-                                                        unreadDividerID(
-                                                            for: viewModel.initialWindowUnreadMessageId ?? ""))
-                                            }
-                                            row(
-                                                for: item,
-                                                viewModel: viewModel,
-                                                showsSenderIdentity: showsSenderIdentity
-                                            )
-                                            .background {
-                                                searchMatchHighlight(for: item, viewModel: viewModel)
-                                                ChatListRowAnchor(
-                                                    groupId: item.id,
-                                                    sequence: viewModel.conversationWindow?.revision.sequence ?? 0,
-                                                    viewport: conversationViewport)
-                                            }
-                                            .modifier(TimelineRowVisibilityModifier(
-                                                rowKey: item.rowFrameKey,
-                                                store: timelineVisibility,
-                                                onBecameVisible: {
-                                                    markCurrentlyVisibleMessagesRead(viewModel: viewModel)
-                                                    clearPassedDownArrowStops(viewModel: viewModel)
-                                                },
-                                                onBecameHidden: {
-                                                    clearPassedDownArrowStops(viewModel: viewModel)
-                                                },
-                                                onVisibilityChange: { isVisible in
-                                                    viewModel.setTimestampRowVisible(item.rowFrameKey, isVisible: isVisible)
-                                                }
-                                            ))
-                                        }
-                                        .padding(.bottom, 4)
-                                    #endif
+                                    renderedTimelineRows(
+                                        viewModel: viewModel, showsSenderIdentity: showsSenderIdentity,
+                                        dayHeaders: dayHeaders
+                                    )
+                                    .padding(.bottom, 4)
                                     newerTimelineTrigger(viewModel: viewModel)
                                     // Keep spacing before the target so it ends at the actual content edge.
                                     ForEach([Self.timelineBottomID], id: \.self) { _ in
@@ -2111,7 +2103,7 @@ struct ConversationView: View {
                                 maintainInitialTimelinePosition(viewModel: viewModel)
                             }
                         }
-                        .onChange(of: viewModel.timeline.last?.id) { _, newId in
+                        .onChange(of: renderedTailID) { _, newId in
                             guard newId != nil else { return }
                             if performInitialScrollIfNeeded(viewModel: viewModel) {
                                 return

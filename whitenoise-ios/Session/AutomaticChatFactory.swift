@@ -1,24 +1,60 @@
 #if WN_EXPERIMENTAL_DEVICE_SYNC
-    import MarmotKit
+    import Foundation
+
+    struct AutomaticChatOwner: Hashable {
+        let accountRef: String?
+        let generation: Int
+        let epoch: UUID
+        let ready: Bool
+    }
 
     @MainActor extension AppState {
-        /// Captures account epoch and runtime generation; neither account strings nor rows are authority.
-        func automaticChatOwner() -> AutomaticChatAccountOwner? {
+        var automaticChatOwner: AutomaticChatOwner {
+            AutomaticChatOwner(
+                accountRef: activeAccountRef, generation: runtimeGeneration,
+                epoch: accountStore.deviceLinkingOwnershipIdentity,
+                ready: runtimeEventsGeneration != nil && canUseRuntimeForForegroundWork && isAppSceneActive
+                    && !isAccountExitInProgress && !isErasingAppData)
+        }
+
+        func makeAutomaticChatListModel() throws -> AccountChatListViewModel {
+            let (client, account, current) = try automaticChatContext()
+            if let held = accountStore.automaticChatListModel, held.isCurrentOwner { return held }
+            let model = AccountChatListViewModel(accountRef: account, runtime: client, isCurrent: current)
+            accountStore.holdAutomaticChatList(model)
+            return model
+        }
+
+        func makeAutomaticConversationModel(groupIdHex: String) throws -> AccountConversationViewModel {
+            let (client, account, current) = try automaticChatContext()
+            if let held = accountStore.automaticConversationModels[groupIdHex], held.isCurrentOwner { return held }
+            let model = AccountConversationViewModel(
+                accountRef: account, groupIdHex: groupIdHex,
+                runtime: client, observations: client, isCurrent: current)
+            do { try accountStore.holdAutomaticConversation(model, groupIdHex: groupIdHex) } catch {
+                model.invalidate()
+                throw error
+            }
+            return model
+        }
+
+        func releaseAutomaticConversationModel(_ model: AccountConversationViewModel, groupIdHex: String) {
+            accountStore.releaseAutomaticConversation(model, groupIdHex: groupIdHex)
+        }
+
+        private func automaticChatContext() throws -> (MarmotClient, String, @MainActor () -> Bool) {
             guard let client, let account = activeAccountRef, let generation = runtimeEventsGeneration,
-                isAppSceneActive, !isAccountExitInProgress, !isErasingAppData
-            else { return nil }
-            if let held = accountStore.automaticChats, held.isLive { return held }
+                canUseRuntimeForForegroundWork, isAppSceneActive, !isAccountExitInProgress, !isErasingAppData
+            else { throw AutomaticChatPresentationError.unavailable }
             let epoch = accountStore.deviceLinkingOwnershipIdentity
             let current: @MainActor () -> Bool = { [weak self, weak client] in
                 guard let self, let client else { return false }
                 return self.client === client && self.runtimeEventsGeneration == generation
                     && self.activeAccountRef == account && self.accountStore.deviceLinkingOwnershipIdentity == epoch
-                    && self.isAppSceneActive && !self.isAccountExitInProgress && !self.isErasingAppData
+                    && self.canUseRuntimeForForegroundWork && self.isAppSceneActive
+                    && !self.isAccountExitInProgress && !self.isErasingAppData
             }
-            let owner = AutomaticChatAccountOwner(accountRef: account, client: client, isCurrent: current)
-            accountStore.holdAutomaticChats(owner)
-            owner.start()
-            return owner
+            return (client, account, current)
         }
     }
 #endif

@@ -22,16 +22,17 @@ import Observation
         private(set) var isLoading = false
         private(set) var error: AutomaticChatPresentationError?
         @ObservationIgnored private let observations: any AccountChatObserving
-        @ObservationIgnored private let runtime: any AccountChatSending
+        @ObservationIgnored private let runtime: any PairedConversationSending
         @ObservationIgnored private var task: Task<Void, Never>?
         @ObservationIgnored private var owner: (any AccountConversationObserving)?
         @ObservationIgnored private var retired = false
         @ObservationIgnored private let isCurrent: @MainActor () -> Bool
+        var isCurrentOwner: Bool { !retired && isCurrent() }
 
         init(
-            accountRef: String, groupIdHex: String, runtime: any AccountChatSending,
+            accountRef: String, groupIdHex: String, runtime: any PairedConversationSending,
             observations: any AccountChatObserving,
-            isCurrent: @escaping @MainActor () -> Bool
+            isCurrent: @escaping @MainActor () -> Bool = { true }
         ) {
             self.isCurrent = isCurrent
             self.accountRef = accountRef
@@ -41,19 +42,20 @@ import Observation
         }
 
         var pairedHeader: PairedChatSummaryFfi? {
-            guard let snapshot, case .pairedSource(let header) = snapshot.header else { return nil }
+            guard isCurrentOwner, let snapshot, case .pairedSource(let header) = snapshot.header else { return nil }
             return header
         }
 
         var pairedMessages: [PairedChatMessageFfi] {
-            snapshot?.rows.compactMap { row in
+            guard isCurrentOwner else { return [] }
+            return snapshot?.rows.compactMap { row in
                 if case .pairedSource(let value) = row { return value }
                 return nil
             } ?? []
         }
 
         func start() {
-            guard !retired, isCurrent(), task == nil else { return }
+            guard isCurrentOwner, task == nil else { return }
             isLoading = true
             task = Task { [weak self] in await self?.observe() }
         }
@@ -71,14 +73,15 @@ import Observation
         }
 
         func loadOlder() async {
-            guard !retired, isCurrent(), let original = owner, let current = snapshot, let cursor = current.nextBefore
-            else { return }
+            guard isCurrentOwner, let original = owner, let current = snapshot, let cursor = current.nextBefore else {
+                return
+            }
             do {
                 let replacement = try await original.olderPage(sequence: current.sequence, before: cursor)
-                guard !retired, isCurrent(), !Task.isCancelled, owner === original else { return }
+                guard isCurrentOwner, !Task.isCancelled, owner === original else { return }
                 try install(replacement)
             } catch {
-                guard !retired, isCurrent(), owner === original else { return }
+                guard isCurrentOwner, owner === original else { return }
                 refuse(original)
             }
         }
@@ -86,7 +89,7 @@ import Observation
         /// The normal client-token admission route performs Core authorization. No direct SDK send.
         @discardableResult
         func sendText(_ text: String, replyingTo messageIdHex: String? = nil) async throws -> LocalSendAcceptanceFfi {
-            guard !retired, isCurrent(), !Task.isCancelled, pairedHeader != nil, let original = owner,
+            guard isCurrentOwner, !Task.isCancelled, pairedHeader != nil, let original = owner,
                 pendingTexts.count < 128
             else { throw AutomaticChatPresentationError.retired }
             let token = UUID().uuidString.lowercased()
@@ -101,7 +104,7 @@ import Observation
                     accepted = try await runtime.sendTextWithClientToken(
                         accountRef: accountRef, groupIdHex: groupIdHex, text: text, clientToken: token)
                 }
-                guard !retired, isCurrent(), !Task.isCancelled, owner === original else {
+                guard isCurrentOwner, !Task.isCancelled, owner === original else {
                     throw AutomaticChatPresentationError.retired
                 }
                 guard accepted.clientToken == token else { throw AutomaticChatPresentationError.invalidSnapshot }
@@ -116,7 +119,7 @@ import Observation
         }
 
         func refreshPendingStatus() async {
-            guard !retired, isCurrent(), let original = owner else { return }
+            guard isCurrentOwner, let original = owner else { return }
             let account = accountRef
             let group = groupIdHex
             let client = runtime
@@ -124,19 +127,19 @@ import Observation
                 do {
                     let status = try await client.localSendStatus(
                         accountRef: account, groupIdHex: group, clientToken: token)
-                    guard !retired, isCurrent(), !Task.isCancelled, owner === original else { return }
+                    guard isCurrentOwner, !Task.isCancelled, owner === original else { return }
                     pendingTexts[token]?.status = status
                 } catch {
-                    guard !retired, isCurrent(), owner === original else { return }
+                    guard isCurrentOwner, owner === original else { return }
                     self.error = .unavailable
                 }
             }
         }
 
         private func observe() async {
-            while !retired, isCurrent(), !Task.isCancelled {
+            while isCurrentOwner, !Task.isCancelled {
                 await observeOnce()
-                guard !retired, isCurrent(), !Task.isCancelled else { return }
+                guard isCurrentOwner, !Task.isCancelled else { return }
                 do { try await Task.sleep(for: .seconds(1)) } catch { return }
             }
         }
@@ -145,7 +148,7 @@ import Observation
             do {
                 let original = try await observations.openAccountConversation(
                     accountRef: accountRef, groupIdHex: groupIdHex, initialRows: 128)
-                guard !retired, isCurrent(), !Task.isCancelled else {
+                guard isCurrentOwner, !Task.isCancelled else {
                     original.cancel()
                     return
                 }
@@ -154,17 +157,17 @@ import Observation
                 try install(initial)
                 await refreshPendingStatus()
                 while let replacement = try await original.next() {
-                    guard !retired, isCurrent(), !Task.isCancelled, owner === original else {
+                    guard isCurrentOwner, !Task.isCancelled, owner === original else {
                         original.cancel()
                         return
                     }
                     try install(replacement)
                     await refreshPendingStatus()
                 }
-                guard !retired, isCurrent(), owner === original else { return }
+                guard isCurrentOwner, owner === original else { return }
                 refuse(original)
             } catch {
-                guard !retired, isCurrent(), !Task.isCancelled else { return }
+                guard isCurrentOwner, !Task.isCancelled else { return }
                 if let original = owner {
                     refuse(original)
                 } else {

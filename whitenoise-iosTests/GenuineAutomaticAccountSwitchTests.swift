@@ -105,50 +105,55 @@ import XCTest
         try await app.refreshAccounts()
         XCTAssertEqual(app.accounts.count, 2)
         XCTAssertNotEqual(firstAccount.accountIdHex, secondAccount.accountIdHex)
-        let firstOwner = try XCTUnwrap(app.automaticChatOwner())
-        try await eventually { !firstOwner.list.pairedRows.isEmpty }
-        let group = try XCTUnwrap(firstOwner.list.pairedRows.first).groupIdHex
-        let firstConversation = try XCTUnwrap(firstOwner.selectConversation(groupIdHex: group))
+        let firstOwner = try app.makeAutomaticChatListModel()
+        firstOwner.start()
+        try await eventually { !firstOwner.pairedRows.isEmpty }
+        let group = try XCTUnwrap(firstOwner.pairedRows.first).groupIdHex
+        let firstConversation = try app.makeAutomaticConversationModel(groupIdHex: group)
+        firstConversation.start()
         try await eventually { !firstConversation.pairedMessages.isEmpty }
         let observedEvent = try XCTUnwrap(firstConversation.pairedMessages.first).messageIdHex
         XCTAssertEqual(observedEvent.utf8.count, 64)
         await app.activateAccount(secondAccount.label)
         XCTAssertEqual(app.activeAccountRef, secondAccount.label)
-        XCTAssertFalse(firstOwner.isLive)
-        XCTAssertNil(firstOwner.list.snapshot)
-        XCTAssertTrue(firstOwner.list.pairedRows.isEmpty)
-        XCTAssertNil(firstOwner.selectConversation(groupIdHex: group))
+        XCTAssertFalse(firstOwner.isCurrentOwner)
+        XCTAssertNil(firstOwner.snapshot)
+        XCTAssertTrue(firstOwner.pairedRows.isEmpty)
+        XCTAssertFalse(firstConversation.isCurrentOwner)
         await refusesSend(firstConversation)
-        let secondOwner = try XCTUnwrap(app.automaticChatOwner())
+        let secondOwner = try app.makeAutomaticChatListModel()
+        secondOwner.start()
         XCTAssertFalse(secondOwner === firstOwner)
         XCTAssertEqual(secondOwner.accountRef, secondAccount.label)
-        try await eventually { secondOwner.list.snapshot != nil }
-        XCTAssertTrue(secondOwner.list.pairedRows.isEmpty)
-        let foreignConversation = try XCTUnwrap(secondOwner.selectConversation(groupIdHex: group))
+        try await eventually { secondOwner.snapshot != nil }
+        XCTAssertTrue(secondOwner.pairedRows.isEmpty)
+        let foreignConversation = try app.makeAutomaticConversationModel(groupIdHex: group)
+        foreignConversation.start()
         try await eventually { !foreignConversation.isLoading }
         XCTAssertNil(foreignConversation.pairedHeader)
         await refusesSend(foreignConversation)
         await app.activateAccount(firstAccount.label)
         XCTAssertEqual(app.activeAccountRef, firstAccount.label)
-        XCTAssertFalse(secondOwner.isLive)
-        XCTAssertNil(secondOwner.list.snapshot)
-        let returnedOwner = try XCTUnwrap(app.automaticChatOwner())
+        XCTAssertFalse(secondOwner.isCurrentOwner)
+        XCTAssertNil(secondOwner.snapshot)
+        let returnedOwner = try app.makeAutomaticChatListModel()
+        returnedOwner.start()
         XCTAssertFalse(returnedOwner === firstOwner)
-        try await eventually { returnedOwner.list.pairedRows.contains { $0.groupIdHex == group } }
-        let returnedConversation = try XCTUnwrap(
-          returnedOwner.selectConversation(groupIdHex: group))
+        try await eventually { returnedOwner.pairedRows.contains { $0.groupIdHex == group } }
+        let returnedConversation = try app.makeAutomaticConversationModel(groupIdHex: group)
+        returnedConversation.start()
         XCTAssertFalse(returnedConversation === firstConversation)
         try await eventually {
           returnedConversation.pairedMessages.contains { $0.messageIdHex == observedEvent }
         }
         await refusesSend(firstConversation)
         app.setAppSceneActive(false)
-        XCTAssertFalse(returnedOwner.isLive)
-        XCTAssertNil(app.automaticChatOwner())
+        XCTAssertFalse(returnedOwner.isCurrentOwner)
+        XCTAssertThrowsError(try app.makeAutomaticChatListModel())
         await app.startRuntimeSuspension().value
         XCTAssertNil(app.client)
         XCTAssertTrue(client.marmot.storageIsClosed())
-        XCTAssertNil(returnedOwner.list.snapshot)
+        XCTAssertNil(returnedOwner.snapshot)
         await refusesSend(returnedConversation)
       } catch {
         app.setAppSceneActive(false)
