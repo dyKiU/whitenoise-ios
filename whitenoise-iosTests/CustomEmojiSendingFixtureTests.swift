@@ -22,6 +22,22 @@ struct CustomEmojiSendingFixtureTests {
         try await client.startRuntime()
         let watchdog = MarmotFixtureWatchdog.start("Custom emoji send fixture exceeded its deadline", breaking: client)
         defer { watchdog.cancel() }
+        // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+        enum DiagnosticStage: String {
+            case setup, readinessSend = "readiness-send", readinessWait = "readiness-wait"
+            case readinessComplete = "readiness-complete", upload
+            case firstTagged = "first-tagged", firstSDKSend = "first-sdk-send"
+            case firstReadback = "first-readback", secondTagged = "second-tagged"
+            case secondSDKSend = "second-sdk-send", secondReadback = "second-readback", closed
+        }
+        var diagnosticStage = DiagnosticStage.setup
+        var diagnosticSends = 0
+        func observe(_ stage: DiagnosticStage) {
+            diagnosticStage = stage
+            print("custom-emoji-diagnostic stage=\(stage.rawValue)")
+        }
+        observe(.setup)
+        // CUSTOM_EMOJI_DIAGNOSTIC_END
         do {
             let account = try await client.marmot.createIdentityWithProfile(
                 defaultRelays: ["wss://relay.invalid.test"], bootstrapRelays: ["wss://relay.invalid.test"]
@@ -37,10 +53,19 @@ struct CustomEmojiSendingFixtureTests {
             }
             // The fixture's cold worker must process a genuine ordinary send before
             // the epoch-pinned legacy media operation; admission alone is not readiness.
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.readinessSend)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             let readiness = try await client.sendTextWithClientToken(accountRef: account.label,
                 groupIdHex: group.groupIdHex, text: "Emoji fixture readiness", clientToken: UUID().uuidString)
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.readinessWait)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             try await MarmotLocalSendFixtureReadiness.waitForCompletion(client: client,
                 accountRef: account.label, groupIdHex: group.groupIdHex, token: readiness.clientToken)
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.readinessComplete)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             var snapshot = try await readSnapshot()
             let epoch = try await client.marmot.groupMlsState(accountRef: account.label, groupIdHex: group.groupIdHex).epoch
             let groupSubscription = try await client.subscribeGroupState(accountRef: account.label, groupIdHex: group.groupIdHex)
@@ -95,6 +120,9 @@ struct CustomEmojiSendingFixtureTests {
                     return payload
                 },
                 upload: { _, request in
+                    // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+                    observe(.upload)
+                    // CUSTOM_EMOJI_DIAGNOSTIC_END
                     uploadCount += 1
                     let ciphertext = Self.hex(Data("cipher".utf8) + request.plaintext)
                     uploadedURL = "https://blossom.example.com/\(ciphertext)"
@@ -106,17 +134,27 @@ struct CustomEmojiSendingFixtureTests {
                         dim: request.dim, thumbhash: request.thumbhash)
                 },
                 sendMessage: { scope, caption, attachments, tags in
+                    // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+                    diagnosticSends += 1
+                    observe(diagnosticSends == 1 ? .firstSDKSend : .secondSDKSend)
+                    // CUSTOM_EMOJI_DIAGNOSTIC_END
                     _ = try await client.sendTaggedMedia(accountRef: scope.accountRef, groupIdHex: scope.groupIdHex,
                                                          attachments: attachments, caption: caption, tags: tags)
                 }
             )
 
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.firstTagged)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             try await sender.sendMessage(text: "yay :party: :celebrate: :party-time:", replyTargetId: nil, emoji: emoji)
             #expect(uploadCount == 1)
 
             // MDK stored a kind-9 carrying the caption, the emoji tag naming our
             // upload, and that upload as an attachment; the resolver draws it
             // inline and leaves nothing for the media grid.
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.firstReadback)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             var readBack = try await readSnapshot()
             let sent = try #require(readBack.messages.first {
                 $0.timeline.direction == "sent" && $0.timeline.kind == MessageSemantics.kindChat
@@ -137,8 +175,14 @@ struct CustomEmojiSendingFixtureTests {
             #expect(resolution.gridItems.isEmpty)
 
             // A second message reuses the uploaded reference: no second upload.
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.secondTagged)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             try await sender.sendMessage(text: "again :party:", replyTargetId: nil, emoji: [emoji[0]])
             #expect(uploadCount == 1)
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.secondReadback)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             readBack = try await readSnapshot()
             #expect(readBack.messages.filter {
                 $0.timeline.tags.contains(MessageTagFfi(values: ["emoji", "party", uploadedURL]))
@@ -155,7 +199,22 @@ struct CustomEmojiSendingFixtureTests {
             #expect(model.customEmoji(for: item).shortcodes == [party, celebrate])
             #expect(model.mediaItems(for: item).isEmpty)
             try await client.marmot.shutdownAndClose()
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            observe(.closed)
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
         } catch {
+            // CUSTOM_EMOJI_DIAGNOSTIC_BEGIN
+            let category: String
+            switch error {
+            case MarmotLocalSendFixtureReadiness.Failure.rejected: category = "readiness-rejected"
+            case MarmotLocalSendFixtureReadiness.Failure.missingSubmission: category = "readiness-missing"
+            case MarmotLocalSendFixtureReadiness.Failure.timedOut: category = "readiness-timeout"
+            case is CancellationError: category = "cancelled"
+            case is MarmotKitError: category = "sdk-error"
+            default: category = "other"
+            }
+            print("custom-emoji-diagnostic failure-stage=\(diagnosticStage.rawValue) category=\(category)")
+            // CUSTOM_EMOJI_DIAGNOSTIC_END
             try? await client.marmot.shutdownAndClose()
             throw error
         }

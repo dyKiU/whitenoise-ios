@@ -1,6 +1,13 @@
 name: Tests
 
 on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        type: choice
+        options: [custom-emoji-rejection]
+        required: true
+        default: custom-emoji-rejection
   pull_request:
     paths:
       - "whitenoise-ios/**"
@@ -52,6 +59,10 @@ jobs:
         with:
           xcode-version: "26"
 
+      - name: Custom emoji diagnostic source parser and console CLI preflight
+        if: github.event_name == 'workflow_dispatch'
+        run: python3 scripts/custom-emoji-rejection-diagnostic.py --mode preflight
+
       # Extracting the compiler cache ran out of disk alongside the image's
       # unused Xcodes, simulator runtimes and toolchains, so drop them first.
       - name: Free runner disk
@@ -72,6 +83,7 @@ jobs:
         run: python3 scripts/check-marmotkit-bindings.py
 
       - name: Test release configuration checks
+        if: github.event_name != 'workflow_dispatch'
         run: python3 -m unittest discover -s scripts/tests
 
       # The MarmotKit binary target is a 74 MB download that unpacks to 254 MB.
@@ -115,7 +127,12 @@ jobs:
       - name: Run tests
         # End the step before the job deadline so failure artifacts can upload.
         timeout-minutes: 40
-        run: ./scripts/test-with-relay.sh
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            python3 scripts/custom-emoji-rejection-diagnostic.py --mode run
+          else
+            ./scripts/test-with-relay.sh
+          fi
 
       - name: Export native test execution counts
         if: always()
@@ -176,6 +193,14 @@ jobs:
           path: build/TestResults-summary.json
           if-no-files-found: warn
 
+      - name: Upload compact custom emoji diagnostic
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: CustomEmoji-diagnostic
+          path: build/CustomEmoji-diagnostic.json
+          if-no-files-found: error
+
       - name: Save compilation cache
         if: always() && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v4
@@ -184,7 +209,7 @@ jobs:
           key: cas-${{ runner.os }}-xcode26-${{ github.sha }}
 
       - name: Upload test results
-        if: failure()
+        if: failure() && github.event_name != 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: TestResults
