@@ -34,6 +34,18 @@ import Testing
         private var calls: [String] = []
         private var received: [Data] = []
         private var rejected = false
+        private var holdSharing = false
+        private var pendingSharing: CheckedContinuation<Void, Never>?
+        var isSharingWaiting: Bool { lock.withLock { pendingSharing != nil } }
+        func pauseSharing() { lock.withLock { holdSharing = true } }
+        func finishSharing() {
+            let continuation = lock.withLock {
+                let result = pendingSharing
+                pendingSharing = nil
+                return result
+            }
+            continuation?.resume()
+        }
         private var pause = false
         private var pending: CheckedContinuation<Data, Never>?
         var actions: [String] { lock.withLock { calls } }
@@ -46,6 +58,15 @@ import Testing
         }
         override func continueLinking(displayedRevision: UInt64) async throws {
             lock.withLock { calls.append("continue:\(displayedRevision)") }
+            if lock.withLock({ rejected }) { throw MarmotKitError.DeviceLinkingStaleRevision }
+        }
+        override func continueLinkingAndShareChats(displayedRevision: UInt64) async throws {
+            lock.withLock { calls.append("share:\(displayedRevision)") }
+            if lock.withLock({ holdSharing }) {
+                await withCheckedContinuation { continuation in
+                    lock.withLock { pendingSharing = continuation }
+                }
+            }
             if lock.withLock({ rejected }) { throw MarmotKitError.DeviceLinkingStaleRevision }
         }
         override func enrollmentPacket(displayedRevision: UInt64) async throws -> Data {
@@ -96,7 +117,9 @@ import Testing
         var isWaiting: Bool { lock.withLock { pending != nil } }
         override func snapshot() async throws -> DeviceLinkingApprovalSnapshotFfi {
             if lock.withLock({ pause }) {
-                return await withCheckedContinuation { continuation in lock.withLock { pending = continuation } }
+                return await withCheckedContinuation { continuation in
+                    lock.withLock { pending = continuation }
+                }
             }
             return DeviceLinkingApprovalSnapshotFfi(revision: 7, phase: lock.withLock { phase })
         }
@@ -124,13 +147,15 @@ import Testing
                 pending = nil
                 return result
             }
-            continuation?.resume(returning: DeviceLinkingApprovalSnapshotFfi(revision: 7, phase: .awaitingApproval))
+            continuation?.resume(
+                returning: DeviceLinkingApprovalSnapshotFfi(revision: 7, phase: .awaitingApproval))
         }
     }
 
     @MainActor @Suite struct DeviceEnrollmentViewModelTests {
         private func withApp(_ operation: (AppState) async throws -> Void) async throws {
-            let root = FileManager.default.temporaryDirectory.appendingPathComponent("EnrollmentModel-\(UUID())")
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent(
+                "EnrollmentModel-\(UUID())")
             defer { try? FileManager.default.removeItem(at: root) }
             let client = try MarmotClient(rootPath: root.path, relayUrls: ["wss://relay.example.invalid"])
             let app = AppState.test(
@@ -166,6 +191,51 @@ import Testing
             await waitFor { scope.latestSnapshot != nil }
             try #require(scope.latestSnapshot != nil)
             return try app.makeDeviceEnrollmentModel()
+        }
+        @Test(arguments: [false, true])
+        func sharingProgressRequiresSuccessfulOriginalApproval(reject: Bool) async throws {
+            try await withApp { app in
+                let original = EnrollmentSession(noPointer: .init())
+                let held = try await app.adoptDeviceLinkingFactory { _, _ in original }
+                let model = DeviceEnrollmentViewModel(
+                    original: held, isCurrent: { app.accountStore.deviceLinkingScope === held },
+                    cancel: { try await app.accountStore.cancelDeviceLinking() }, enrollmentSupported: true)
+                #expect(!model.sharingApprovalSubmitted)
+                if reject { original.rejectRevision() }
+                do {
+                    try await model.performTransportAction(.shareChats, displayedRevision: 7)
+                    #expect(!reject)
+                } catch {
+                    #expect(reject)
+                    #expect(model.transportError != nil)
+                }
+                #expect(model.sharingApprovalSubmitted == !reject)
+                #expect(original.actions == ["share:7"])
+                model.invalidate()
+                #expect(!model.sharingApprovalSubmitted)
+            }
+        }
+        @Test func lateSharingApprovalCannotPresentProgressOnRetiredOwner() async throws {
+            try await withApp { app in
+                let original = EnrollmentSession(noPointer: .init())
+                let held = try await app.adoptDeviceLinkingFactory { _, _ in original }
+                let model = DeviceEnrollmentViewModel(
+                    original: held, isCurrent: { app.accountStore.deviceLinkingScope === held },
+                    cancel: { try await app.accountStore.cancelDeviceLinking() }, enrollmentSupported: true)
+                original.pauseSharing()
+                let action = Task {
+                    try await model.performTransportAction(.shareChats, displayedRevision: 7)
+                }
+                defer { original.finishSharing() }
+                await waitFor { original.isSharingWaiting }
+                try #require(original.isSharingWaiting)
+                #expect(model.isWorking)
+                #expect(!model.sharingApprovalSubmitted)
+                model.invalidate()
+                original.finishSharing()
+                await #expect(throws: MarmotKitError.DeviceLinkingClosed) { try await action.value }
+                #expect(!model.sharingApprovalSubmitted)
+            }
         }
         @Test func transportActionsUseOriginalRevisionAndBoundedOpaqueBytes() async throws {
             try await withApp { app in
@@ -206,7 +276,9 @@ import Testing
             }
         }
 
-        @Test(arguments: [false, true]) func lateTransportExportCannotPopulateRetiredOwner(suspend: Bool) async throws {
+        @Test(arguments: [false, true]) func lateTransportExportCannotPopulateRetiredOwner(
+            suspend: Bool
+        ) async throws {
             try await withApp { app in
                 let original = EnrollmentSession(noPointer: .init())
                 let held = try await app.adoptDeviceLinkingFactory { _, _ in original }
@@ -214,9 +286,12 @@ import Testing
                     original: held,
                     isCurrent: {
                         app.accountStore.deviceLinkingScope === held && app.isAppSceneActive
-                    }, cancel: { try await app.accountStore.cancelDeviceLinking() }, enrollmentSupported: true)
+                    }, cancel: { try await app.accountStore.cancelDeviceLinking() }, enrollmentSupported: true
+                )
                 original.pauseExport()
-                let operation = Task { try? await model.performTransportAction(.exportPacket, displayedRevision: 7) }
+                let operation = Task {
+                    try? await model.performTransportAction(.exportPacket, displayedRevision: 7)
+                }
                 await waitFor { original.isWaiting }
                 try #require(original.isWaiting)
                 if suspend {
@@ -247,7 +322,9 @@ import Testing
                 #expect(original.actions.isEmpty)
                 try await model.performTransportAction(.exportPacket, displayedRevision: 7)
                 original.failCancellation(true)
-                await #expect(throws: MarmotKitError.DeviceLinkingRuntimeUnavailable) { try await model.cancel() }
+                await #expect(throws: MarmotKitError.DeviceLinkingRuntimeUnavailable) {
+                    try await model.cancel()
+                }
                 #expect(model.outgoingPacket == nil && model.cleanupError != nil && !model.isActive)
                 original.failCancellation(false)
                 try await model.cancel()
@@ -268,7 +345,9 @@ import Testing
 
         @Test func modelRequiresAlreadyHeldOriginal() async throws {
             try await withApp { app in
-                #expect(throws: MarmotKitError.DeviceLinkingNotReady) { try app.makeDeviceEnrollmentModel() }
+                #expect(throws: MarmotKitError.DeviceLinkingNotReady) {
+                    try app.makeDeviceEnrollmentModel()
+                }
             }
         }
         @Test func explicitSessionActionsForwardCapturedRevisionBytesAndError() async throws {
@@ -308,7 +387,9 @@ import Testing
                 }
             }
         }
-        @Test(arguments: [false, true]) func delayedPacketCannotEscapeSuspensionOrSameAccountRestart(restart: Bool)
+        @Test(arguments: [false, true]) func delayedPacketCannotEscapeSuspensionOrSameAccountRestart(
+            restart: Bool
+        )
             async throws
         {
             try await withApp { app in
@@ -375,7 +456,9 @@ import Testing
                 let original = EnrollmentSession(noPointer: .init())
                 let model = try await sessionModel(app, original: original)
                 original.failCancellation(true)
-                await #expect(throws: MarmotKitError.DeviceLinkingRuntimeUnavailable) { try await model.cancel() }
+                await #expect(throws: MarmotKitError.DeviceLinkingRuntimeUnavailable) {
+                    try await model.cancel()
+                }
                 #expect(!model.isActive && model.snapshot == nil)
                 original.failCancellation(false)
                 try await model.cancel()

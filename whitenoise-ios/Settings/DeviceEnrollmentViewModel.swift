@@ -14,7 +14,12 @@
         private(set) var outgoingPacket: String?
         private(set) var isWorking = false
         private(set) var transportError: Error?
-        enum TransportAction { case continueLinking, shareChats, exportPacket, receivePacket, finalizeLinking }
+        private var sharingApprovalAccepted = false
+        // Presentation only: completion and permission still come from the original SDK session.
+        var sharingApprovalSubmitted: Bool { isActive && sharingApprovalAccepted }
+        enum TransportAction {
+            case continueLinking, shareChats, exportPacket, receivePacket, finalizeLinking
+        }
         var isActive: Bool { !retired && isCurrent() }
         var snapshot: DeviceLinkingSnapshotFfi? { isActive ? original.latestSnapshot : nil }
 
@@ -42,6 +47,7 @@
             try checkActive()
             try await original.continueLinkingAndShareChats(displayedRevision: displayedRevision)
             try checkActive()
+            sharingApprovalAccepted = true
         }
         func enrollmentPacket(displayedRevision: UInt64) async throws -> Data {
             try checkActive()
@@ -53,7 +59,8 @@
         func receiveEnrollmentPacket(displayedRevision: UInt64, packet: Data) async throws {
             try checkActive()
             try DeviceEnrollmentPacketInput.check(packet)
-            try await original.receiveEnrollmentPacket(displayedRevision: displayedRevision, packet: packet)
+            try await original.receiveEnrollmentPacket(
+                displayedRevision: displayedRevision, packet: packet)
             try checkActive()
         }
         func finalizeLinking(displayedRevision: UInt64) async throws {
@@ -79,7 +86,9 @@
                 throw error
             }
         }
-        func performTransportAction(_ action: TransportAction, displayedRevision: UInt64, input: String = "")
+        func performTransportAction(
+            _ action: TransportAction, displayedRevision: UInt64, input: String = ""
+        )
             async throws
         {
             try checkActive()
@@ -89,7 +98,8 @@
             defer { isWorking = false }
             do {
                 switch action {
-                case .shareChats: try await continueLinkingAndShareChats(displayedRevision: displayedRevision)
+                case .shareChats:
+                    try await continueLinkingAndShareChats(displayedRevision: displayedRevision)
                 case .continueLinking: try await continueLinking(displayedRevision: displayedRevision)
                 case .exportPacket:
                     let packet = try await enrollmentPacket(displayedRevision: displayedRevision)
@@ -106,6 +116,7 @@
         }
         func invalidate() {
             retired = true
+            sharingApprovalAccepted = false
             outgoingPacket = nil
         }
     }

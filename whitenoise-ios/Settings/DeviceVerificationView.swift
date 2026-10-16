@@ -84,15 +84,18 @@
                         snapshot.phase == .comparisonAvailable || snapshot.phase == .awaitingPeerVerification
                     {
                         Section {
-                            Text(String(format: "%04d · %04d · %04d", decimals.first, decimals.second, decimals.third))
-                                .font(.title2.monospaced())
-                                .textSelection(.enabled)
-                                .accessibilityLabel(Text("Compare these numbers on both devices before confirming."))
-                                .accessibilityValue(
-                                    Text(
-                                        String(
-                                            format: "%04d · %04d · %04d", decimals.first, decimals.second,
-                                            decimals.third)))
+                            Text(
+                                String(
+                                    format: "%04d · %04d · %04d", decimals.first, decimals.second, decimals.third)
+                            )
+                            .font(.title2.monospaced())
+                            .textSelection(.enabled)
+                            .accessibilityLabel(Text("Compare these numbers on both devices before confirming."))
+                            .accessibilityValue(
+                                Text(
+                                    String(
+                                        format: "%04d · %04d · %04d", decimals.first, decimals.second,
+                                        decimals.third)))
                             Text("Compare these numbers on both devices before confirming.")
                             WNButton(title: "The numbers match", size: .standard) {
                                 // The action retains this rendered snapshot, never a newer revision.
@@ -106,14 +109,19 @@
                             Text(
                                 "Pairing shares all existing and future chats, chat history, and messaging between these devices."
                             )
-                            WNButton(title: "Pair and share all chats", size: .standard, isLoading: isWorking) {
+                            WNButton(
+                                title: "Pair and share all chats", size: .standard,
+                                isLoading: isWorking || enrollment?.sharingApprovalSubmitted == true
+                            ) {
                                 perform {
                                     let original = try model.enrollmentTransport()
                                     enrollment = original
                                     try await original.performTransportAction(
                                         .shareChats, displayedRevision: snapshot.revision)
+                                    Self.diagnostics.notice("Pairing sharing approval accepted")
                                 }
-                            }.disabled(isWorking || !model.isActive)
+                            }.disabled(
+                                isWorking || !model.isActive || enrollment?.sharingApprovalSubmitted == true)
                         } else {
                             Text("Verification complete. Enrollment remains unavailable.")
                         }
@@ -125,7 +133,9 @@
                             || snapshot.phase == .failed
                         {
                             Text("Verification action failed. Retry or cancel.").foregroundStyle(.red)
-                        } else if snapshot.decimals == nil && snapshot.phase != .verificationCompleteEnrollmentPending {
+                        } else if snapshot.decimals == nil
+                            && snapshot.phase != .verificationCompleteEnrollmentPending
+                        {
                             ProgressView(L10n.string("Waiting"))
                         }
                     }
@@ -142,7 +152,9 @@
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $scanning) {
                 DevicePairingScannerSheet { packet in
-                    guard scanning, scenePhase == .active, model.isActive, !model.cleanupRequired else { return }
+                    guard scanning, scenePhase == .active, model.isActive, !model.cleanupRequired else {
+                        return
+                    }
                     scanning = false
                     perform { try await model.scanAndSync(request: decodedPacket(packet)) }
                 }
@@ -162,6 +174,9 @@
             .onDisappear { actionTask?.cancel() }
             .onChange(of: model.isActive) { _, active in if !active { clearPackets() } }
             .onChange(of: model.snapshot?.phase) { _, phase in
+                if let phase {
+                    Self.diagnostics.notice("Pairing phase=\(String(describing: phase), privacy: .public)")
+                }
                 if phase == .cancelled || phase == .expired || phase == .failed { setup = "" }
             }
             .onChange(of: scenePhase) { _, phase in if phase != .active { scanning = false } }
