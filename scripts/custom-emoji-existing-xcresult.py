@@ -21,6 +21,7 @@ SOURCE='68fcd9a8fa6449bc4f610316ea650982b2f0fe9d'
 CASE='CustomEmojiSendingFixtureTests/taggedMessageRoundTripsThroughTheRuntime()'
 ALLOWED={CASE,'whitenoise-iosTests/'+CASE}
 OUT=Path('build/CustomEmoji-existing-export.json')
+OWN_REASONS={'remote-only','source-identity','only-exporter-workflow-change','source-pristine','one-exact-known-case','known-case-positive','known-case-negative','runner-disk-reserve','immutable-artifact-provenance','archive-digest','uncompressed-bound','archive-safe-path','one-existing-bundle-layout','summary-command','native-schema','tests-tree-command'}
 
 def ensure(ok,reason):
     if not ok:raise ValueError(reason)
@@ -99,14 +100,31 @@ def main():
         with tempfile.TemporaryDirectory(prefix='emoji-existing-',dir=os.environ['RUNNER_TEMP']) as temp:
             root=Path(temp);archive=root/'result.zip'
             with archive.open('wb') as stream:subprocess.run(['gh','api',f'repos/dyKiU/whitenoise-ios/actions/artifacts/{ARTIFACT}/zip'],stdout=stream,stderr=subprocess.DEVNULL,check=True,timeout=300)
-            ensure(archive.stat().st_size==93363955 and hashlib.sha256(archive.read_bytes()).hexdigest()==ARTIFACT_SHA,'archive-digest')
+            report['archive_size_matches']=archive.stat().st_size==93363955
+            report['archive_digest_matches']=hashlib.sha256(archive.read_bytes()).hexdigest()==ARTIFACT_SHA
+            save();ensure(report['archive_size_matches'] and report['archive_digest_matches'],'archive-digest')
+            extracted=root/'extracted';extracted.mkdir()
             with zipfile.ZipFile(archive) as zipped:
-                ensure(sum(entry.file_size for entry in zipped.infolist())<=2*1024**3,'uncompressed-bound')
+                report['archive_uncompressed_within_bound']=sum(entry.file_size for entry in zipped.infolist())<=2*1024**3
+                save();ensure(report['archive_uncompressed_within_bound'],'uncompressed-bound')
                 for entry in zipped.infolist():
-                    target=(root/entry.filename).resolve()
-                    ensure(target.is_relative_to(root.resolve()) and not stat.S_ISLNK(entry.external_attr>>16),'archive-safe-path')
-                zipped.extractall(root)
-            bundles=list(root.rglob('*.xcresult'));ensure(len(bundles)==1,'one-existing-bundle');bundle=str(bundles[0])
+                    target=(extracted/entry.filename).resolve()
+                    ensure(target.is_relative_to(extracted.resolve()) and not stat.S_ISLNK(entry.external_attr>>16),'archive-safe-path')
+                zipped.extractall(extracted)
+            report['unwrapped_info_present']=(extracted/'Info.plist').is_file()
+            report['unwrapped_data_present']=(extracted/'Data').is_dir()
+            wrapped=[candidate for candidate in extracted.rglob('*.xcresult') if candidate.is_dir() and (candidate/'Info.plist').is_file() and (candidate/'Data').is_dir()]
+            report['nonempty_wrapped_bundle_count']=len(wrapped)
+            candidates=wrapped+([extracted] if report['unwrapped_info_present'] and report['unwrapped_data_present'] else [])
+            report['valid_bundle_root_count']=len(candidates);save()
+            ensure(len(candidates)==1,'one-existing-bundle-layout')
+            # GitHub directory uploads may omit the .xcresult wrapper. Restore
+            # only that container name, leaving every archived bundle byte intact.
+            owned=root/'inspection.xcresult';owned.mkdir()
+            for child in candidates[0].iterdir():shutil.move(str(child),owned/child.name)
+            report['owned_bundle_info_present']=(owned/'Info.plist').is_file()
+            report['owned_bundle_data_present']=(owned/'Data').is_dir();save()
+            bundle=str(owned)
             summary=command(['xcrun','xcresulttool','get','test-results','summary','--path',bundle]);report['summary_exit']=summary.returncode;save();ensure(summary.returncode==0,'summary-command')
             native=json.loads(summary.stdout);keys=['totalTestCount','passedTests','failedTests','skippedTests']
             ensure(all(type(native.get(k)) is int and native[k]>=0 for k in keys),'native-schema')
@@ -136,7 +154,9 @@ def main():
             report['original_failure_cause_established']=False
             report['inspection_complete']=True;save()
         report['ephemeral_archive_removed']=True
-    except Exception as error:report['controller_exception']=type(error).__name__
+    except Exception as error:
+        report['controller_exception']=type(error).__name__
+        if isinstance(error,ValueError) and str(error) in OWN_REASONS:report['closed_failure_reason']=str(error)
     finally:
         try:
             after=guard();report['final_source_guard']=after;report['inputs_pristine']=before==after
