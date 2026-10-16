@@ -6,10 +6,14 @@
 
     struct DeviceVerificationDestinationView: View {
         @Environment(AppState.self) private var appState
+        @Environment(\.dismiss) private var dismiss
+        @State private var cancellation = DeviceVerificationCancellation()
         var body: some View {
             Group {
                 if let generation = appState.runtimeEventsGeneration {
-                    DeviceVerificationView(model: appState.makeDeviceVerificationViewModel())
+                    DeviceVerificationView(
+                        model: appState.makeDeviceVerificationViewModel(),
+                        cancellation: cancellation, onCancelled: { dismiss() })
                         .id(generation)
                         .id(appState.accountStore.deviceLinkingOwnershipIdentity)
                 } else {
@@ -27,14 +31,25 @@
         @State private var approval: DeviceEnrollmentApprovalViewModel?
         @State private var setup = ""
         @State private var actionFailed = false
-        @State private var isWorking = false
+        @State private var isPerformingAction = false
+        @State private var cancellation: DeviceVerificationCancellation
+        private let onCancelled: @MainActor () -> Void
+        private var isWorking: Bool { isPerformingAction || cancellation.isWorking }
         @State private var actionTask: Task<Void, Never>?
         private static let diagnostics = Logger(
             subsystem: Bundle.main.bundleIdentifier ?? "dev.ipf.whitenoise.ios",
             category: "device-verification"
         )
 
-        init(model: DeviceVerificationViewModel) { _model = State(initialValue: model) }
+        init(
+            model: DeviceVerificationViewModel,
+            cancellation: DeviceVerificationCancellation? = nil,
+            onCancelled: @escaping @MainActor () -> Void = {}
+        ) {
+            _model = State(initialValue: model)
+            _cancellation = State(initialValue: cancellation ?? DeviceVerificationCancellation())
+            self.onCancelled = onCancelled
+        }
 
         var body: some View {
             Form {
@@ -89,15 +104,18 @@
                         snapshot.phase == .comparisonAvailable || snapshot.phase == .awaitingPeerVerification
                     {
                         Section {
-                            Text(String(format: "%04d · %04d · %04d", decimals.first, decimals.second, decimals.third))
-                                .font(.title2.monospaced())
-                                .textSelection(.enabled)
-                                .accessibilityLabel(Text("Compare these numbers on both devices before confirming."))
-                                .accessibilityValue(
-                                    Text(
-                                        String(
-                                            format: "%04d · %04d · %04d", decimals.first, decimals.second,
-                                            decimals.third)))
+                            Text(
+                                String(
+                                    format: "%04d · %04d · %04d", decimals.first, decimals.second, decimals.third)
+                            )
+                            .font(.title2.monospaced())
+                            .textSelection(.enabled)
+                            .accessibilityLabel(Text("Compare these numbers on both devices before confirming."))
+                            .accessibilityValue(
+                                Text(
+                                    String(
+                                        format: "%04d · %04d · %04d", decimals.first, decimals.second,
+                                        decimals.third)))
                             Text("Compare these numbers on both devices before confirming.")
                             WNButton(title: "The numbers match", size: .standard) {
                                 // The action retains this rendered snapshot, never a newer revision.
@@ -111,14 +129,19 @@
                             Text(
                                 "Pairing shares all existing and future chats, chat history, and messaging between these devices."
                             )
-                            WNButton(title: "Pair and share all chats", size: .standard, isLoading: isWorking) {
+                            WNButton(
+                                title: "Pair and share all chats", size: .standard,
+                                isLoading: isWorking || enrollment?.sharingApprovalSubmitted == true
+                            ) {
                                 perform {
                                     let original = try model.enrollmentTransport()
                                     enrollment = original
                                     try await original.performTransportAction(
                                         .shareChats, displayedRevision: snapshot.revision)
+                                    Self.diagnostics.notice("Pairing sharing approval accepted")
                                 }
-                            }.disabled(isWorking || !model.isActive)
+                            }.disabled(
+                                isWorking || !model.isActive || enrollment?.sharingApprovalSubmitted == true)
                         } else {
                             Text("Verification complete. Enrollment remains unavailable.")
                         }
@@ -130,14 +153,17 @@
                             || snapshot.phase == .failed
                         {
                             Text("Verification action failed. Retry or cancel.").foregroundStyle(.red)
-                        } else if snapshot.decimals == nil && snapshot.phase != .verificationCompleteEnrollmentPending {
+                        } else if snapshot.decimals == nil
+                            && snapshot.phase != .verificationCompleteEnrollmentPending
+                        {
                             ProgressView(L10n.string("Waiting"))
                         }
                     }
                     Section {
                         Button("Cancel", action: cancel)
-                            .disabled(!model.isActive)
-                        if actionFailed || model.cleanupRequired {
+                            .disabled(!model.isActive || cancellation.isWorking)
+                        if cancellation.isWorking { ProgressView(L10n.string("Waiting")) }
+                        if actionFailed || model.cleanupRequired || cancellation.failure != nil {
                             Text("Verification action failed. Retry or cancel.").foregroundStyle(.red)
                         }
                     }
@@ -160,6 +186,9 @@
             .onDisappear { actionTask?.cancel() }
             .onChange(of: model.isActive) { _, active in if !active { clearPackets() } }
             .onChange(of: model.snapshot?.phase) { _, phase in
+                if let phase {
+                    Self.diagnostics.notice("Pairing phase=\(String(describing: phase), privacy: .public)")
+                }
                 if phase == .cancelled || phase == .expired || phase == .failed { setup = "" }
             }
         }
@@ -180,17 +209,18 @@
         private func cancel() {
             actionTask?.cancel()
             clearPackets()
-            actionTask = Task {
-                do { try await model.cancel() } catch { if !Task.isCancelled { actionFailed = true } }
+            // Cleanup outlives the ownership change that rebuilds this child view.
+            Task {
+                await cancellation.cancel(operation: { try await model.cancel() }, onCancelled: onCancelled)
             }
         }
 
         private func perform(_ action: @escaping @MainActor () async throws -> Void) {
             guard !isWorking else { return }
             actionFailed = false
-            isWorking = true
+            isPerformingAction = true
             actionTask = Task {
-                defer { isWorking = false }
+                defer { isPerformingAction = false }
                 do { try await action() } catch {
                     if !Task.isCancelled, model.isActive {
                         actionFailed = true

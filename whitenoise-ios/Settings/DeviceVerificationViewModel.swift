@@ -3,6 +3,29 @@
     import MarmotKit
     import Observation
 
+    /// Retained by the destination while cancellation replaces the account-owned verification model.
+    @MainActor @Observable
+    final class DeviceVerificationCancellation {
+        private(set) var isWorking = false
+        private(set) var failure: DeviceVerificationFailure?
+
+        func cancel(
+            operation: @MainActor () async throws -> Void,
+            onCancelled: @MainActor () -> Void
+        ) async {
+            guard !isWorking else { return }
+            isWorking = true
+            failure = nil
+            defer { isWorking = false }
+            do {
+                try await operation()
+                onCancelled()
+            } catch {
+                failure = DeviceVerificationFailure(error)
+            }
+        }
+    }
+
     @MainActor @Observable
     final class DeviceVerificationViewModel {
         @ObservationIgnored private let beginOriginal: @MainActor () async throws -> any DeviceVerificationSession
