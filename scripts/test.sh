@@ -71,7 +71,7 @@ if [ -n "${WN_TEST_COMPILATION_CACHE:-}" ]; then
 fi
 
 run() {
-  if command -v xcbeautify >/dev/null 2>&1; then
+  if [ "${WN_TEST_RAW_OUTPUT:-0}" != "1" ] && command -v xcbeautify >/dev/null 2>&1; then
     xcodebuild "$@" | xcbeautify
   else
     xcodebuild "$@"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remote-only fixed-taxonomy observation of one unchanged published fixture."""
+"""Remote-only fixed-taxonomy observation of an unchanged published fixture under native load."""
 import argparse
 import hashlib
 import json
@@ -13,6 +13,7 @@ BASE = '68fcd9a8fa6449bc4f610316ea650982b2f0fe9d'
 FILE = 'whitenoise-iosTests/CustomEmojiSendingFixtureTests.swift'
 SELF = 'scripts/custom-emoji-rejection-diagnostic.py'
 WORKFLOW = '.github/workflows/tests.yml'
+TEST_SCRIPT = 'scripts/test.sh'
 SELECTOR = 'whitenoise-iosTests/CustomEmojiSendingFixtureTests'
 EXPECTED_CASES = {'CustomEmojiSendingFixtureTests/taggedMessageRoundTripsThroughTheRuntime()', 'whitenoise-iosTests/CustomEmojiSendingFixtureTests/taggedMessageRoundTripsThroughTheRuntime()'}
 STAGES = ['setup', 'readiness-send', 'readiness-wait', 'readiness-complete', 'first-tagged', 'upload', 'first-sdk-send', 'first-readback', 'second-tagged', 'second-sdk-send', 'second-readback', 'closed']
@@ -66,19 +67,38 @@ def parse_test_identifiers(raw):
     ensure(unknown==0 and len(identifiers)==1,'exact-native-case-identity')
     return identifiers
 
+def known_case(raw):
+    rows=[]
+    def visit(value):
+        if isinstance(value,list):
+            for child in value:visit(child)
+        elif isinstance(value,dict):
+            identifier=value.get('nodeIdentifier',value.get('testIdentifier'))
+            if value.get('nodeType')=='Test Case' and identifier in EXPECTED_CASES:
+                status=value.get('result',value.get('status'))
+                rows.append({'identifier':identifier,'status':status if status in ['Passed','Failed','Skipped'] else 'unknown'})
+            for child in value.values():
+                if isinstance(child,(dict,list)):visit(child)
+    visit(json.loads(raw));ensure(len(rows)==1,'one-known-native-case');return rows[0]
+
 def source_guard():
     ensure(os.environ.get('GITHUB_ACTIONS')=='true','remote-only')
     head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     ensure(head==os.environ.get('GITHUB_SHA'),'exact-source')
     changed=subprocess.check_output(['git','diff','--name-only',BASE],text=True).splitlines()
-    ensure(set(changed)<={FILE,SELF,WORKFLOW},'unreviewed-input-change')
+    ensure(set(changed)<={FILE,SELF,WORKFLOW,TEST_SCRIPT},'unreviewed-input-change')
     original=subprocess.check_output(['git','show',BASE+':'+FILE])
     current=Path(FILE).read_bytes()
     pattern=rb'(?m)^[ \t]*// CUSTOM_EMOJI_DIAGNOSTIC_BEGIN\n.*?^[ \t]*// CUSTOM_EMOJI_DIAGNOSTIC_END\n'
     ensure(current.count(b'CUSTOM_EMOJI_DIAGNOSTIC_BEGIN')==current.count(b'CUSTOM_EMOJI_DIAGNOSTIC_END')==12,'bounded-passive-blocks')
     ensure(re.sub(pattern,b'',current,flags=re.S)==original,'fixture-after-strip-not-exact')
+    old_script=subprocess.check_output(['git','show',BASE+':'+TEST_SCRIPT])
+    old_condition=b'  if command -v xcbeautify >/dev/null 2>&1; then'
+    new_condition=b'  if [ "${WN_TEST_RAW_OUTPUT:-0}" != "1" ] && command -v xcbeautify >/dev/null 2>&1; then'
+    script=Path(TEST_SCRIPT).read_bytes()
+    ensure(script.count(new_condition)==1 and script.replace(new_condition,old_condition,1)==old_script,'only-reviewed-raw-output-condition')
     ensure(subprocess.run(['git','diff','--quiet','HEAD']).returncode==0,'pristine')
-    return {'source':head,'tree':subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip(),'baseline':BASE,'original_fixture_exact_after_strip':True,'all_other_product_tests_sdk_config_exact':True,'fixture_sha256':hashlib.sha256(current).hexdigest(),'published_manifest_sha256':hashlib.sha256(Path('Packages/MarmotKit/Package.swift').read_bytes()).hexdigest(),'selector':SELECTOR,'qualification_passed':False}
+    return {'source':head,'tree':subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip(),'baseline':BASE,'original_fixture_exact_after_strip':True,'all_other_product_tests_sdk_config_exact':True,'fixture_sha256':hashlib.sha256(current).hexdigest(),'test_script_sha256':hashlib.sha256(script).hexdigest(),'published_manifest_sha256':hashlib.sha256(Path('Packages/MarmotKit/Package.swift').read_bytes()).hexdigest(),'selector':SELECTOR,'qualification_passed':False}
 
 def preflight():
     OUT.parent.mkdir(exist_ok=True)
@@ -93,12 +113,22 @@ def preflight():
         ensure(all(not parse_console(raw)['observation_complete'] for raw in negatives),'negative-console-parser')
         # Verify installed syntax before compilation. No installation or fallback guessing.
         help_result=subprocess.run(['xcrun','xcresulttool','get','log','--help'],capture_output=True,text=True)
-        ensure(help_result.returncode==0 and all(flag in help_result.stdout for flag in ['--path','--type']) and 'console' in help_result.stdout,'installed-console-command-unsupported')
+        report['console_cli_available']=help_result.returncode==0 and all(flag in help_result.stdout for flag in ['--path','--type']) and 'console' in help_result.stdout
         tests_help=subprocess.run(['xcrun','xcresulttool','get','test-results','tests','--help'],capture_output=True,text=True)
         ensure(tests_help.returncode==0 and '--path' in tests_help.stdout,'installed-tests-command-unsupported')
         for expected in EXPECTED_CASES:
             ensure(parse_test_identifiers(json.dumps({'testNodes':[{'nodeType':'Test Case','nodeIdentifier':expected}]}))==[expected],'positive-native-case-parser')
-        report.update(parser_positive=2,parser_negative=len(negatives),native_identity_positive=len(EXPECTED_CASES),console_cli_supported=True,tests_cli_supported=True,actual_bodies=0)
+        ensure(known_case(json.dumps({'testNodes':[{'nodeType':'Test Case','nodeIdentifier':'OtherSuite/other()'},{'nodeType':'Test Case','nodeIdentifier':next(iter(EXPECTED_CASES)),'result':'Passed'}]}))['status']=='Passed','positive-full-native-case')
+        identity_negatives=0
+        for nodes in [[],[{'nodeType':'Test Case','nodeIdentifier':'OtherSuite/other()'}],[{'nodeType':'Test Case','nodeIdentifier':next(iter(EXPECTED_CASES))}]*2]:
+            rejected=False
+            try:known_case(json.dumps({'testNodes':nodes}))
+            except ValueError:rejected=True
+            ensure(rejected,'negative-full-native-case');identity_negatives+=1
+        syntax=subprocess.run(['bash','-n',TEST_SCRIPT],capture_output=True,text=True)
+        ensure(syntax.returncode==0,'test-script-syntax')
+        report.update(full_case_positive=1,full_case_negative=identity_negatives)
+        report.update(parser_positive=2,parser_negative=len(negatives),native_identity_positive=len(EXPECTED_CASES),tests_cli_supported=True,actual_bodies=0)
         report['preflight_passed']=True
     except Exception as error:
         report['preflight_exception']=type(error).__name__
@@ -107,41 +137,68 @@ def preflight():
         OUT.write_text(json.dumps(report,indent=2)+'\n')
     return report
 
-def run():
-    report=preflight();report.update(actual_outcome='unknown',diagnostic_complete=False)
+def run(full=False):
+    report=preflight();report.update(mode='full-underload' if full else 'isolated',actual_outcome='unknown',diagnostic_complete=False,console_export_qualified=False)
     def save(): OUT.write_text(json.dumps(report,indent=2)+'\n')
-    save();started=time.monotonic()
+    command=['./scripts/test-with-relay.sh']+([] if full else ['-only-testing:'+SELECTOR])
+    report.update(test_command=command,raw_xcodebuild_output=full);save();started=time.monotonic();raw=''
     try:
-        result=subprocess.run(['./scripts/test-with-relay.sh','-only-testing:'+SELECTOR],capture_output=True,text=True,timeout=2400)
-        report.update(test_command_exit=result.returncode,seconds=time.monotonic()-started)
-        # Never export xcodebuild output, arbitrary errors, log JSON or console payloads.
-        report['test_execution_marker']='failed' if '** TEST EXECUTE FAILED **' in result.stdout else 'passed' if '** TEST EXECUTE SUCCEEDED **' in result.stdout else 'unknown'
+        env=dict(os.environ)
+        if full:env['WN_TEST_RAW_OUTPUT']='1'
+        try:
+            result=subprocess.run(command,capture_output=True,text=True,timeout=2400,env=env)
+            raw=result.stdout+result.stderr;report['test_command_exit']=result.returncode
+        except subprocess.TimeoutExpired as error:
+            def text(value):return value.decode(errors='replace') if isinstance(value,bytes) else value or ''
+            raw=text(error.stdout)+text(error.stderr);report['watchdog_triggered']=True
+        report['seconds']=time.monotonic()-started
+        report['test_execution_marker']='failed' if '** TEST EXECUTE FAILED **' in raw else 'passed' if '** TEST EXECUTE SUCCEEDED **' in raw else 'unknown'
+        report['test_build_marker']='failed' if '** TEST BUILD FAILED **' in raw else 'passed' if '** TEST BUILD SUCCEEDED **' in raw else 'unknown'
         save()
-        console=subprocess.run(['xcrun','xcresulttool','get','log','--path','build/TestResults.xcresult','--type','console'],capture_output=True,text=True,timeout=60)
-        report['console_export_exit']=console.returncode;save()
-        ensure(console.returncode==0,'console-export-failed')
-        report['observations']=parse_console(console.stdout)
-        summary=subprocess.run(['xcrun','xcresulttool','get','test-results','summary','--path','build/TestResults.xcresult'],capture_output=True,text=True,timeout=60)
-        ensure(summary.returncode==0,'native-summary-unavailable')
-        native=json.loads(summary.stdout)
-        keys=['totalTestCount','passedTests','failedTests','skippedTests']
-        ensure(all(type(native.get(key)) is int and native[key]>=0 for key in keys),'native-count-schema')
-        report['native_counts']={key:native[key] for key in keys}; save()
-        tests=subprocess.run(['xcrun','xcresulttool','get','test-results','tests','--path','build/TestResults.xcresult'],capture_output=True,text=True,timeout=60)
-        ensure(tests.returncode==0,'native-tests-tree-unavailable')
-        report['actual_native_case_identifiers']=parse_test_identifiers(tests.stdout)
-        report['actual_outcome']='passed' if result.returncode==0 and native['passedTests']==1 and native['failedTests']==0 else 'failed'
-        report['diagnostic_complete']=report['observations']['observation_complete'] and native['totalTestCount']==1 and native['passedTests']+native['failedTests']==1 and native['skippedTests']==0
-    except Exception as error: report['controller_exception']=type(error).__name__
+        # Persist direct markers before touching XCResult. No raw output is saved.
+        try:report['direct_observations']=parse_console(raw)
+        except Exception as error:report['direct_parser_exception']=type(error).__name__
+        save();del raw
+        # Each export is independent: exporter failure never erases actual results.
+        try:
+            summary=subprocess.run(['xcrun','xcresulttool','get','test-results','summary','--path','build/TestResults.xcresult'],capture_output=True,text=True,timeout=60)
+            report['summary_export_exit']=summary.returncode;save()
+            ensure(summary.returncode==0,'native-summary-unavailable')
+            native=json.loads(summary.stdout);keys=['totalTestCount','passedTests','failedTests','skippedTests']
+            ensure(all(type(native.get(key)) is int and native[key]>=0 for key in keys),'native-count-schema')
+            report['native_counts']={key:native[key] for key in keys}
+            report['native_summary_consistent']=native['totalTestCount']==sum(native[key] for key in ['passedTests','failedTests','skippedTests'])
+            report['actual_outcome']='passed' if report.get('test_command_exit')==0 and native['failedTests']==0 and native['passedTests']>0 else 'failed'
+        except Exception as error:report['summary_exception']=type(error).__name__
+        save()
+        try:
+            tests=subprocess.run(['xcrun','xcresulttool','get','test-results','tests','--path','build/TestResults.xcresult'],capture_output=True,text=True,timeout=60)
+            report['tests_export_exit']=tests.returncode;save();ensure(tests.returncode==0,'native-tests-tree-unavailable')
+            report['known_native_case']=known_case(tests.stdout)
+        except Exception as error:report['tests_tree_exception']=type(error).__name__
+        save()
+        if not report.get('direct_observations',{}).get('observation_complete') and report.get('console_cli_available'):
+            try:
+                console=subprocess.run(['xcrun','xcresulttool','get','log','--path','build/TestResults.xcresult','--type','console'],capture_output=True,text=True,timeout=60)
+                report['console_export_exit']=console.returncode
+                if console.returncode==0:
+                    report['console_export_qualified']=True;report['console_observations']=parse_console(console.stdout)
+            except Exception as error:report['console_exception']=type(error).__name__
+        observation=report.get('direct_observations',{})
+        if not observation.get('observation_complete'):observation=report.get('console_observations',{})
+        report['marker_coverage']='complete' if observation.get('observation_complete') else 'unknown-or-partial'
+        report['diagnostic_complete']=bool(observation.get('observation_complete') and report.get('native_summary_consistent') is True and report.get('known_native_case',{}).get('status') in ['Passed','Failed'] and not report.get('watchdog_triggered'))
+        save()
+    except Exception as error:report['controller_exception']=type(error).__name__
     finally:
         try:
-            final=source_guard(); report['final_source_guard']=final
-            report['inputs_pristine']=all(final[key]==report[key] for key in ['source','tree','fixture_sha256','published_manifest_sha256'])
+            final=source_guard();report['final_source_guard']=final
+            report['inputs_pristine']=all(final[key]==report[key] for key in ['source','tree','fixture_sha256','published_manifest_sha256','test_script_sha256'])
         except Exception as error:report.update(inputs_pristine=False,final_guard_exception=type(error).__name__)
         save()
-    raise SystemExit(0 if report['diagnostic_complete'] and report['inputs_pristine'] and report['actual_outcome']=='passed' else 1)
+    raise SystemExit(0 if report['diagnostic_complete'] and report.get('inputs_pristine') and report['actual_outcome']=='passed' else 1)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['preflight','run'],required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['preflight','run','full'],required=True);args=parser.parse_args()
     if args.mode=='preflight':preflight()
-    else:run()
+    else:run(full=args.mode=='full')

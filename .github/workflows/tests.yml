@@ -5,7 +5,7 @@ on:
     inputs:
       scope:
         type: choice
-        options: [custom-emoji-rejection]
+        options: [custom-emoji-rejection, custom-emoji-full-underload]
         required: true
         default: custom-emoji-rejection
   pull_request:
@@ -130,7 +130,11 @@ jobs:
         timeout-minutes: 40
         run: |
           if [ "${{ github.event_name }}" = workflow_dispatch ]; then
-            python3 scripts/custom-emoji-rejection-diagnostic.py --mode run
+            if [ "${{ inputs.scope }}" = custom-emoji-full-underload ]; then
+              python3 scripts/custom-emoji-rejection-diagnostic.py --mode full
+            else
+              python3 scripts/custom-emoji-rejection-diagnostic.py --mode run
+            fi
           else
             ./scripts/test-with-relay.sh
           fi
