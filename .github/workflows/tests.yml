@@ -5,7 +5,7 @@ on:
     inputs:
       scope:
         type: choice
-        options: [custom-emoji-rejection]
+        options: [custom-emoji-rejection, custom-emoji-export-existing]
         required: true
         default: custom-emoji-rejection
   pull_request:
@@ -32,6 +32,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: tests-${{ github.ref }}
@@ -39,6 +40,7 @@ concurrency:
 
 jobs:
   test:
+    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'custom-emoji-rejection'
     runs-on: macos-15
     # Cold compilation can take 18 minutes before the test suite starts.
     timeout-minutes: 45
@@ -216,3 +218,26 @@ jobs:
           name: TestResults
           path: build/TestResults.xcresult
           if-no-files-found: warn
+
+  custom-emoji-existing-export:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'custom-emoji-export-existing'
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26"
+      - name: Inspect immutable existing XCResult without build or test
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/custom-emoji-existing-xcresult.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CustomEmoji-existing-export
+          path: build/CustomEmoji-existing-export.json
+          if-no-files-found: error
