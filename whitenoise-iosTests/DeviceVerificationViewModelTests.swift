@@ -76,6 +76,41 @@ import Testing
             }
         }
 
+        @Test func cancellationDismissesOnlyAfterCleanupAndSurvivesOwnerRetirement() async throws {
+            let cancellation = DeviceVerificationCancellation()
+            var cleanup: CheckedContinuation<Void, Never>?
+            var current = true
+            var dismissed = false
+            let model = DeviceVerificationViewModel(
+                isCurrent: { current },
+                cancel: {
+                    current = false
+                    await withCheckedContinuation { cleanup = $0 }
+                })
+            let task = Task {
+                await cancellation.cancel(operation: { try await model.cancel() }, onCancelled: { dismissed = true })
+            }
+            await waitFor { cleanup != nil }
+            #expect(cancellation.isWorking && !model.isActive && !dismissed)
+            var duplicateStarted = false
+            await cancellation.cancel(operation: { duplicateStarted = true }, onCancelled: { dismissed = true })
+            #expect(!duplicateStarted && !dismissed)
+            cleanup?.resume()
+            await task.value
+            #expect(dismissed && !cancellation.isWorking && cancellation.failure == nil)
+        }
+
+        @Test func failedCancellationStaysVisibleAndCanRetryCleanup() async {
+            let cancellation = DeviceVerificationCancellation()
+            var dismissed = false
+            await cancellation.cancel(
+                operation: { throw MarmotKitError.DeviceLinkingRuntimeUnavailable },
+                onCancelled: { dismissed = true })
+            #expect(!dismissed && !cancellation.isWorking && cancellation.failure == .runtimeUnavailable)
+            await cancellation.cancel(operation: {}, onCancelled: { dismissed = true })
+            #expect(dismissed && cancellation.failure == nil)
+        }
+
         @Test func accountReplacementRetiresDisplayAndRejectsDelayedPackets() async throws {
             let store = AccountStore(defaults: IsolatedAccountDefaults.make())
             store.activeAccountRef = "original"

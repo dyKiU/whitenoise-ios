@@ -6,10 +6,14 @@
 
     struct DeviceVerificationDestinationView: View {
         @Environment(AppState.self) private var appState
+        @Environment(\.dismiss) private var dismiss
+        @State private var cancellation = DeviceVerificationCancellation()
         var body: some View {
             Group {
                 if let generation = appState.runtimeEventsGeneration {
-                    DeviceVerificationView(model: appState.makeDeviceVerificationViewModel())
+                    DeviceVerificationView(
+                        model: appState.makeDeviceVerificationViewModel(),
+                        cancellation: cancellation, onCancelled: { dismiss() })
                         .id(generation)
                         .id(appState.accountStore.deviceLinkingOwnershipIdentity)
                 } else {
@@ -27,7 +31,10 @@
         @State private var approval: DeviceEnrollmentApprovalViewModel?
         @State private var setup = ""
         @State private var actionFailed = false
-        @State private var isWorking = false
+        @State private var isPerformingAction = false
+        @State private var cancellation: DeviceVerificationCancellation
+        private let onCancelled: @MainActor () -> Void
+        private var isWorking: Bool { isPerformingAction || cancellation.isWorking }
         @State private var actionTask: Task<Void, Never>?
         @State private var scanning = false
         private static let diagnostics = Logger(
@@ -35,7 +42,15 @@
             category: "device-verification"
         )
 
-        init(model: DeviceVerificationViewModel) { _model = State(initialValue: model) }
+        init(
+            model: DeviceVerificationViewModel,
+            cancellation: DeviceVerificationCancellation? = nil,
+            onCancelled: @escaping @MainActor () -> Void = {}
+        ) {
+            _model = State(initialValue: model)
+            _cancellation = State(initialValue: cancellation ?? DeviceVerificationCancellation())
+            self.onCancelled = onCancelled
+        }
 
         var body: some View {
             Form {
@@ -141,8 +156,9 @@
                     }
                     Section {
                         Button("Cancel", action: cancel)
-                            .disabled(!model.isActive)
-                        if actionFailed || model.cleanupRequired {
+                            .disabled(!model.isActive || cancellation.isWorking)
+                        if cancellation.isWorking { ProgressView(L10n.string("Waiting")) }
+                        if actionFailed || model.cleanupRequired || cancellation.failure != nil {
                             Text("Verification action failed. Retry or cancel.").foregroundStyle(.red)
                         }
                     }
@@ -199,17 +215,18 @@
         private func cancel() {
             actionTask?.cancel()
             clearPackets()
-            actionTask = Task {
-                do { try await model.cancel() } catch { if !Task.isCancelled { actionFailed = true } }
+            // Cleanup outlives the ownership change that rebuilds this child view.
+            Task {
+                await cancellation.cancel(operation: { try await model.cancel() }, onCancelled: onCancelled)
             }
         }
 
         private func perform(_ action: @escaping @MainActor () async throws -> Void) {
             guard !isWorking else { return }
             actionFailed = false
-            isWorking = true
+            isPerformingAction = true
             actionTask = Task {
-                defer { isWorking = false }
+                defer { isPerformingAction = false }
                 do { try await action() } catch {
                     if !Task.isCancelled, model.isActive {
                         actionFailed = true
