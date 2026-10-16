@@ -40,6 +40,7 @@ def command(args):
 def cli_category(result):
     if result.returncode==0:return 'success'
     text=result.stderr.lower()
+    if '--test-id' in text and any(word in text for word in ['required','missing','expected']):return 'missing-required-test-id'
     if '--id' in text and any(word in text for word in ['required','missing','expected']):return 'missing-required-id'
     if 'console' in text and any(word in text for word in ['invalid','unexpected','unrecognized']):return 'console-type-not-supported'
     if any(word in text for word in ['not found','does not exist','unable to find']):return 'object-not-found'
@@ -76,6 +77,27 @@ def console_log_reference(details):
     visit(details)
     unique=set(references)
     return next(iter(unique)) if len(unique)==1 else None
+
+def bounded_failure_details(details):
+    # Only explicit structured failure text/category and repository test sites.
+    # These fixed values cannot distinguish readiness rejection from SDK errors.
+    rejected=False;locations=set()
+    allowed_files={'CustomEmojiSendingFixtureTests.swift','MarmotLocalSendFixtureReadiness.swift'}
+    def visit(value):
+        nonlocal rejected
+        if isinstance(value,list):
+            for child in value:visit(child)
+        elif isinstance(value,dict):
+            for key in ['failureText','message']:
+                if value.get(key)=='Caught error: rejected':rejected=True
+            filename=value.get('fileName');line=value.get('lineNumber')
+            if isinstance(filename,str) and type(line) is int and 0<line<100000:
+                leaf=filename.rsplit('/',1)[-1]
+                if leaf in allowed_files:locations.add((leaf,line))
+            for child in value.values():
+                if isinstance(child,(dict,list)):visit(child)
+    visit(details)
+    return {'closed_error_category':'caught-rejected-untyped' if rejected else 'unknown','known_test_locations':[{'file':file,'line':line} for file,line in sorted(locations)[:8]],'location_overflow':len(locations)>8,'typed_rejection_origin':'unknown'}
 
 def main():
     OUT.parent.mkdir(exist_ok=True)
@@ -132,7 +154,7 @@ def main():
             tests=command(['xcrun','xcresulttool','get','test-results','tests','--path',bundle]);report['tests_tree_exit']=tests.returncode;save();ensure(tests.returncode==0,'tests-tree-command')
             case=known_case(json.loads(tests.stdout));report['known_case']=case;save()
             help_result=command(['xcrun','xcresulttool','get','log','--help'])
-            report['console_help']={'exit':help_result.returncode,'supports_id':'--id' in help_result.stdout,'supports_path':'--path' in help_result.stdout,'mentions_console':'console' in help_result.stdout};save()
+            report['console_help']={'exit':help_result.returncode,'supports_id':'--id' in help_result.stdout,'supports_test_id':'--test-id' in help_result.stdout,'supports_path':'--path' in help_result.stdout,'mentions_console':'console' in help_result.stdout,'static_flag_inventory':sorted(set(re.findall(r'--[a-z][a-z0-9-]*',help_result.stdout)))[:32]};save()
             old=command(['xcrun','xcresulttool','get','log','--path',bundle,'--type','console'])
             report['original_console_invocation']={'exit':old.returncode,'category':cli_category(old)};save()
             details_help=command(['xcrun','xcresulttool','get','test-results','test-details','--help'])
@@ -142,10 +164,16 @@ def main():
                 details=command(['xcrun','xcresulttool','get','test-results','test-details','--path',bundle,'--test-id',case['identifier']])
                 report['known_case_details']={'exit':details.returncode,'category':cli_category(details)};save()
                 if details.returncode==0:
-                    reference=console_log_reference(json.loads(details.stdout))
+                    detail_tree=json.loads(details.stdout)
+                    reference=console_log_reference(detail_tree)
+                    report['bounded_failure_details']=bounded_failure_details(detail_tree);save()
             report['typed_log_reference_available']=reference is not None
             report['console_export_qualified']=old.returncode==0
-            if reference is not None and report['console_help']['supports_id']:
+            if help_result.returncode==0 and report['console_help']['supports_test_id']:
+                scoped=command(['xcrun','xcresulttool','get','log','--path',bundle,'--type','console','--test-id',case['identifier']])
+                report['verified_case_console_invocation']={'exit':scoped.returncode,'category':cli_category(scoped)}
+                report['console_export_qualified'] |= scoped.returncode==0
+            elif reference is not None and report['console_help']['supports_id']:
                 scoped=command(['xcrun','xcresulttool','get','log','--path',bundle,'--type','console','--id',reference])
                 report['referenced_console_invocation']={'exit':scoped.returncode,'category':cli_category(scoped)}
                 report['console_export_qualified'] |= scoped.returncode==0
