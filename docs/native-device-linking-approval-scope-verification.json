@@ -1,0 +1,142 @@
+{
+  "base": "2344344f2b25ea582d8335d577d8fe488a185386",
+  "sdk": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+  "sdk_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+  "preserved_source_stashes": {
+    "red_six": "49f488a05404224e30ed62567729f35488cbd718",
+    "initial_green_six": "1e62a26a906dae660f67dbdafb046b608ec112cc",
+    "cross_owner_red_ten": "fd57a8ff9cda3b38e9aa27056cf2514fb1e9d2a2",
+    "local_sdk_four": "f9f8e86afff63edf234e3708f2cc07b2c4f43e7c",
+    "m5_sdk_four": "28066292656a71156ec521347e428981f58ad136"
+  },
+  "source_proof": "Exact four owned files checked against frozen manifests and preserved stash trees; new files are in stash third parents. Final and affected share identical798-input manifest.",
+  "owned_source_sha256": {
+    "whitenoise-ios/Core/AccountStore.swift": "343981e0bc7be61ed5460ca054faf28e7b4b04d635c31d16581349db98608f79",
+    "whitenoise-ios/Session/DeviceLinkingFactory.swift": "68e193984a6af91a4926bd3fa1612b770a1b4b319350eb7dd07dcb83ef816429",
+    "whitenoise-ios/Session/DeviceLinkingApprovalScope.swift": "90f98995f23473f22164f3bb52ae47e004fa7582e541c15f2ad5d1826e425859",
+    "whitenoise-iosTests/DeviceLinkingApprovalScopeTests.swift": "a2e7191321b2abda95a2ece9669db9429d80f02b51834ad6e472917f9d23fad3"
+  },
+  "runs": {
+    "default_deny_red": {
+      "source_base": "2344344f2b25ea582d8335d577d8fe488a185386",
+      "source_inputs": 798,
+      "input_manifest_sha256": "a9c1be0a7f207ea91948d7b31385096daa64d84a1edaaa60a4c32382fd122ddb",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 98.04,
+      "log_sha256": "8f9f6f57e5dbe26b2867171735b62ef5352453026f3811f3eaee7b644bfc3bc0",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 6,
+        "passedTests": 0,
+        "failedTests": 6,
+        "skippedTests": 0
+      }
+    },
+    "initial_green_six": {
+      "source_base": "2344344f2b25ea582d8335d577d8fe488a185386",
+      "source_inputs": 798,
+      "input_manifest_sha256": "911730a79e0d4e933c58bf30e777e06966199b7bb752d1f06491726b79892cc2",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 64.56,
+      "log_sha256": "078f9e520d0dd90331bde7a218813d8054fc64b24ed88d1e6aad0ceca692ff90",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 6,
+        "passedTests": 6,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    },
+    "empty_function_selector": {
+      "source_base": "2344344f2b25ea582d8335d577d8fe488a185386",
+      "source_inputs": 798,
+      "input_manifest_sha256": "c3b13ff7bd29c67e6de553fba2fde12a7f8881ad942ebf8d60aad00454bac4be",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 16.22,
+      "log_sha256": "46d6a05954c8873b9712bb583634df18fda5a061cf69fe9b440dc59753fd1479",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "unknown",
+        "totalTestCount": 0,
+        "passedTests": 0,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    },
+    "cross_owner_red": {
+      "source_base": "2344344f2b25ea582d8335d577d8fe488a185386",
+      "source_inputs": 798,
+      "input_manifest_sha256": "c3b13ff7bd29c67e6de553fba2fde12a7f8881ad942ebf8d60aad00454bac4be",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 7.36,
+      "log_sha256": "ab29d876a4eaa46843bc80d06a0791e817d3921aae96e786364f257d1e54fce7",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 1,
+        "passedTests": 0,
+        "failedTests": 1,
+        "skippedTests": 0
+      }
+    },
+    "final_ten": {
+      "source_base": "2344344f2b25ea582d8335d577d8fe488a185386",
+      "source_inputs": 798,
+      "input_manifest_sha256": "67c70c1f17306d26cb383af7e13c7f35bf14ac6b554d3829c9229c9f76a34209",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 63.82,
+      "log_sha256": "01ee51a0e4eddcb354e8a17320c67f872aa99d614e3cee61838a498b3f3d66a6",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 10,
+        "passedTests": 10,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    },
+    "affected_forty": {
+      "source_base": "2344344f2b25ea582d8335d577d8fe488a185386",
+      "source_inputs": 798,
+      "input_manifest_sha256": "67c70c1f17306d26cb383af7e13c7f35bf14ac6b554d3829c9229c9f76a34209",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 7.93,
+      "log_sha256": "361c05b00d3c73f79ff39ad7690e150f06e8cc8c7f5b26db4c7be05809adac26",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 40,
+        "passedTests": 40,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    }
+  },
+  "checks": {
+    "strict_scoped_swiftlint": "0.63.2 exit0",
+    "scoped_swift_format": "6.2.3 exit0; Mac four-space/120-column configuration",
+    "git_diff_check": "exit0"
+  },
+  "sdk_alias_contract": "Matching e6 ApprovalState Drop closes and schedules original cancellation; registry is Weak and bounded128. Native multiple-pending refusal retains original batch rather than dropping it.",
+  "limits": "Generated original-handle doubles and actual AccountStore/RuntimeLifecycle controls; no actual SDK approval/enrollment, pairing/chat/full-PR claim. Verification UI/protocol and advertised capability unchanged. No physical phone, production app or manual simulator adoption; hosted Staging tests may install/launch their test host."
+}

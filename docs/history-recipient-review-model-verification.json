@@ -1,0 +1,93 @@
+{
+  "base": "7d4d6d94d63288caf5fcddbdd42f67403e51cb8b",
+  "sdk": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "branch": "codex/ios-history-recipient-review",
+  "source_candidates": {
+    "red": "47c748d9d701366be431da628d3fb98dc8c920a8",
+    "initial_green": "cc60f6e58b6c1ca3fb00dd8c46e598bc7210cbe9",
+    "final": "78095fd7e976a0830311d094b0685b2f7ad9363c"
+  },
+  "source_sha256": {
+    "whitenoise-ios/Settings/HistoryConsentReviewModel.swift": "49ce5416086da1518ab438737b80acd04388d2fde0814c47260f5a4cfff9cc10",
+    "whitenoise-ios/Session/HistoryConsentFactory.swift": "fea1b4aa422d5e67ea19181d953ac95d3dc3774d8fed1a979de765fd43e5e084",
+    "whitenoise-ios/Core/AccountStore.swift": "076a02d47a0056316b3783de0e71d95a54dc33f030e6c31b0664dd9d0db1f1ac",
+    "whitenoise-iosTests/HistoryConsentReviewModelTests.swift": "381d2085cd5da14b19a97ce73416f35122118be72a20f15edeaaa1b8e05b3bf5"
+  },
+  "runs": {
+    "red-v1": {
+      "prefix": "ios-history-recipient-review-red-v1",
+      "manifest_sha256": "af2c851ffff1a34f561a75a5e6599648d293a6547c077be31cb93e415828b7f9",
+      "log_sha256": "51a1ba25e33f669323c67a8f5f2981520581b3ec12fd27286aefeedaec941fac",
+      "exit_code": 65,
+      "seconds": 79.03,
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 3,
+        "passedTests": 0,
+        "failedTests": 3,
+        "skippedTests": 0
+      },
+      "source_inputs": 850
+    },
+    "green-v1": {
+      "prefix": "ios-history-recipient-review-green-v1",
+      "manifest_sha256": "f9d60aded8da69c76ce33482e9a5d64247245dd9036b0364e58336e64df896f2",
+      "log_sha256": "d6a04b957e1a574aed0ca3fe4d3955b8a7031103df42821e81384eda9e21fdaa",
+      "exit_code": 0,
+      "seconds": 69.41,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 3,
+        "passedTests": 3,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "source_inputs": 850
+    },
+    "green-v2": {
+      "prefix": "ios-history-recipient-review-green-v2",
+      "manifest_sha256": "67ba13742b5d277fe8f5dbb0aebfe1370718596fc748486aa49e67a70ca29972",
+      "log_sha256": "2b8628c0644f10ac80c42cd180d618bf9f64f8f1e50b496d596885d2e3fd0342",
+      "exit_code": 0,
+      "seconds": 16.5,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 7,
+        "passedTests": 7,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "source_inputs": 850
+    },
+    "affected-v2": {
+      "prefix": "ios-history-recipient-review-affected-v2",
+      "manifest_sha256": "67ba13742b5d277fe8f5dbb0aebfe1370718596fc748486aa49e67a70ca29972",
+      "log_sha256": "7b81c1f3bc3942108a38cecb58116eb32bc1514ca3c2587c2dce428fd6c02539",
+      "exit_code": 0,
+      "seconds": 7.88,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 99,
+        "passedTests": 99,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "source_inputs": 850
+    }
+  },
+  "raw_local_directory": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results",
+  "raw_m5_directory": "/Users/pj/project/build/results",
+  "checks": {
+    "strict_swiftlint_0_63_2": 0,
+    "canonical_scoped_swift_format": 0,
+    "git_diff_check": 0
+  },
+  "scope": [
+    "Missing host composition default-deny semanticRED0/3, unchanged initial assertions GREEN3/3, appended stale/foreign/errors/malformed-noise/late controls7/7; final affected99/99.",
+    "Read-only row refresh never approves. A row UUID selects only a held original scope; no metadata or selector reconstructs a native handle.",
+    "Actual account replacement invalidates presentation synchronously; original lifetime custody remains independently AccountStore-owned.",
+    "Malformed rows clear metadata and cannot prevent reviewing another held original. SDK errors clear selected display but preserve exact cancel action.",
+    "This is presentation-model/isolated lifecycle qualification, not installed pane or actual imported-history UI acceptance. Pane/localization/fullPR remain next.",
+    "Only this proof added after source freeze; SDK4 unchanged and source_picker query not added."
+  ]
+}

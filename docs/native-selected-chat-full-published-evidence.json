@@ -1,0 +1,120 @@
+{
+  "source_sha": "8f311aebe907ea263e66966cfb42a901af2aa99b",
+  "profile": "canonical published MarmotKit0.12.0; WN_EXPERIMENTAL_DEVICE_SYNC0; unfiltered scripts/test.sh",
+  "phases": [
+    {
+      "source_base": "8f311aebe907ea263e66966cfb42a901af2aa99b",
+      "source_inputs": 825,
+      "input_manifest_sha256": "28ecd7b14cc1d88fa5f29b8779fbf7befdda0df591e6e6b512515d54b4c23b0a",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 5.7,
+      "log_sha256": "048806908d290802b8c1cd2ec365f362ad1b0f3ab856785f2c2fde43d52adf8b",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed8f311ae with canonical publishedSDK; no experimental native crypto acceptance",
+      "prefix": "ios-selected-chat-8f311ae-full-published-v1"
+    },
+    {
+      "source_base": "8f311aebe907ea263e66966cfb42a901af2aa99b",
+      "source_inputs": 825,
+      "input_manifest_sha256": "28ecd7b14cc1d88fa5f29b8779fbf7befdda0df591e6e6b512515d54b4c23b0a",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 8.43,
+      "log_sha256": "832bae6da48b3154f1d8ca55ccf26eeb8222cbeccc0c2bd38a0f838574f54094",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed8f311ae with canonical publishedSDK; no experimental native crypto acceptance",
+      "prefix": "ios-selected-chat-8f311ae-full-published-v2"
+    },
+    {
+      "source_base": "8f311aebe907ea263e66966cfb42a901af2aa99b",
+      "source_inputs": 825,
+      "input_manifest_sha256": "28ecd7b14cc1d88fa5f29b8779fbf7befdda0df591e6e6b512515d54b4c23b0a",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 11.57,
+      "log_sha256": "fe1b7453544c85ed6b0d279c5728c0d2f82b1ab68b02cc6a5ca536db3cb97be2",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed8f311ae with canonical publishedSDK; no experimental native crypto acceptance",
+      "prefix": "ios-selected-chat-8f311ae-full-published-v3"
+    },
+    {
+      "source_base": "8f311aebe907ea263e66966cfb42a901af2aa99b",
+      "source_inputs": 825,
+      "input_manifest_sha256": "28ecd7b14cc1d88fa5f29b8779fbf7befdda0df591e6e6b512515d54b4c23b0a",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 272.42,
+      "log_sha256": "304918e32c2aa537462bfaf6146a828067eb84019b9eee6c291fbddadee8472f",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed8f311ae with canonical publishedSDK; no experimental native crypto acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2704,
+        "passedTests": 2702,
+        "failedTests": 0,
+        "skippedTests": 2
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-8f311ae-full-published-v4"
+    }
+  ],
+  "canonical_source_verification": {
+    "source_sha": "8f311aebe907ea263e66966cfb42a901af2aa99b",
+    "matched_paths": 825,
+    "mismatches": [],
+    "symlink_semantics": "CLAUDE.md is committed symlink to AGENTS.md; manifest hashes resolved content",
+    "full_log_sha256": "304918e32c2aa537462bfaf6146a828067eb84019b9eee6c291fbddadee8472f"
+  },
+  "preserved_candidate": {
+    "LOCAL_BUILD_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+    "artifact_symlinks": {},
+    "preserved_sdk4_stash": "978b8352e855f193e27c18857311667b099f6281"
+  },
+  "narrow_cache_repairs": [
+    {
+      "diagnostic_log": "ios-selected-chat-8f311ae-full-published-v1.log",
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "bytes": 545224,
+      "sha256": "0de93574b693aa55885443854dc5e79d2e9bc58b8b4191cdaf1cafa4cd82e361",
+      "iOS_cache_idle": true,
+      "scope": "only compiler-named stale UniFFI PCM; source/artifacts/metadata unchanged"
+    },
+    {
+      "diagnostic_log": "ios-selected-chat-8f311ae-full-published-v2.log",
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "bytes": 545176,
+      "sha256": "267ac1bd201035e3c9e3c36e85aa020202227241e8bd75c1c0053fbc5dc1695f",
+      "iOS_cache_idle": true,
+      "scope": "only compiler-named stale UniFFI PCM; source/artifacts/metadata unchanged"
+    },
+    {
+      "diagnostic_log": "ios-selected-chat-8f311ae-full-published-v3.log",
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "bytes": 545176,
+      "sha256": "d61e164ff2b36446982f00236358b67a8ebe91e56ca7656bfeb5a20257474a95",
+      "iOS_cache_idle": true,
+      "scope": "only compiler-named stale UniFFI PCM; source/artifacts/metadata unchanged"
+    }
+  ],
+  "hosted_test_effect": {
+    "source_sha": "8f311aebe907ea263e66966cfb42a901af2aa99b",
+    "profile": "published0.12/flag0 hosted test staging",
+    "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+    "app_bundle": "/Users/pj/Library/Developer/CoreSimulator/Devices/3F79E967-EE79-4A0E-BCF6-BCC4FE4A2ECC/data/Containers/Bundle/Application/CCC0E3B2-EBD1-4400-93A6-7D359B4A0093/whitenoise-ios.app",
+    "executable_sha256": "abd91f35b248a7514606629de59e1276e2641e8d7e3151d92bba42b940097b6f",
+    "effect": "xcodebuild hosted tests stage simulator app; no manual install/launch or physical/production changes",
+    "account_data_read": false
+  },
+  "limits": [
+    "v1/v2/v3 zero tests: exact stale UniFFI PCM diagnostics from SDK switch, not product behavioral failures.",
+    "v4 full2704 total =2702 passed, zero failed, two existing skips.",
+    "825 canonical input paths match signed tree (CLAUDE symlink manifest uses resolved AGENTS bytes).",
+    "Published feature-off PR qualification does not qualify new experimental SDK/native cryptographic selected-chat acceptance.",
+    "Four tracked SDK files canonical, ignored3fab metadata/artifact symlink unchanged; named978 stash retained for rollback. No manual simulator/physical/production install or publication."
+  ]
+}

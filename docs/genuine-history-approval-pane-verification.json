@@ -1,0 +1,119 @@
+{
+  "source_base": "fce2b584e3b48c1b55913ffd7a55a09eb2086a7b",
+  "tested_stash": "63d710c9400c415e45f9e3a416ae280b359131cf",
+  "tested_source_sha256": {
+    "whitenoise-ios/Settings/HistoryConsentReviewView.swift": "d64fbc43b8e1c932a2aaabf57b71da95c737bdbe46aeb4acbec117d5c68568f4",
+    "whitenoise-iosTests/GenuineImportedHistoryPaneTests.swift": "7ca8219e25e1e780a7b7ef7222219ab6becfb88bed30d6f1e345f4be8802d94f",
+    "whitenoise-iosTests/GenuineHistoryApprovalPaneTests.swift": "3867de2e5951a1aa9e670475751e170677cad1a1bfe2cd2ed7dfb51249270e03",
+    "whitenoise-iosUITests/HostedHistoryApprovalUITests.swift": "0f4732f5a85a2688bc4eddffdb4757c5a4a8a4cbbcd1c84813a128380783bc6a"
+  },
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "sdk_original_m5_stash": "05a8cf8bdbcce73342a05be414aa8994fbb21fbf",
+  "ui_provisioning_checkpoint": "fce2b584e3b48c1b55913ffd7a55a09eb2086a7b",
+  "controller_current_revision_checkpoint": "e90e118",
+  "build": {
+    "exit_code": 0,
+    "seconds": 23.76,
+    "source_inputs": 867,
+    "log_sha256": "ceaef8be39d5c11c53b420bd0888e68dd264433b2857af973fb706aeda3f27a8",
+    "scope": "Actual history approval fixture plus public UI driver build only; no runtime success implied"
+  },
+  "immutable_input_manifest_sha256": "53ebed5a8e3c3832235c67efe5bff024601c7857a9723f97634bece596ee7444",
+  "actual_app_and_ui_driver": {
+    "unit_exit_code": 0,
+    "driver_exit_code": 0,
+    "seconds": 20.34,
+    "driver_install": "Normal simulator installation: attach-only UI test with no launch call; actual host lifetime asserted",
+    "logs": {
+      "unit": "542e38c42bb5f308e7f06fab6a19c2aba2698695a4915c66ff0e02767b0c6f73",
+      "driver": "1976aa478f580e8b808f7ab05bb98b41da7b31013c8a4a2ec14ba3f80f944e02"
+    },
+    "unit": {
+      "result": "Passed",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "unit_failures": [],
+    "driver": {
+      "result": "Passed",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "driver_failures": []
+  },
+  "native_fixture": {
+    "gate": "native-original-history",
+    "passed": 1,
+    "failed": 0,
+    "seconds": 52.67,
+    "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+    "binary_sha256": "67d00f845c885ecd570ec67655f677a390908c66b1948560621ac138af1f0b38",
+    "scope": "Actual iOS simulator SDK peer plus M1/M5; not installed application UI acceptance",
+    "simulator_device": "3F79E967-EE79-4A0E-BCF6-BCC4FE4A2ECC",
+    "simulator_role": "recipient",
+    "history_counts": {
+      "native_three_device_phases": {
+        "coordinator": "enrollmentComplete",
+        "joining": "enrollmentComplete",
+        "sibling": "settled"
+      },
+      "source_complete": true,
+      "recipient_complete": true,
+      "app_imported_records": 1
+    }
+  },
+  "native_result_sha256": "a11f68e18537e791f62f2c30285cf6d793ae28f8b512b78fbee278b99ee482c5",
+  "affected": {
+    "source_base": "fce2b584e3b48c1b55913ffd7a55a09eb2086a7b",
+    "source_inputs": 867,
+    "input_manifest_sha256": "53ebed5a8e3c3832235c67efe5bff024601c7857a9723f97634bece596ee7444",
+    "profile": "local-history84113/experimentalflag1/Staging",
+    "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+    "exit_code": 0,
+    "seconds": 13.98,
+    "log_sha256": "2690745f1f2cdc1996eb7db914b053a08bbbe961d092067711fd8d2c4ab12743",
+    "physical_phone_changed": false,
+    "scope": "Affected original lifetime/model/pane/callback controls and previously committed real imported reader; live approval gate recorded separately",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 105,
+      "passedTests": 105,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "test_failures": []
+  },
+  "failure_source_candidates": {
+    "atomic_status_v2": "f13b32e4735f987452c08c76b60eebb71805b772",
+    "error_teardown_v4": "ff3cec5e1739fccf4413f93c862e786dcf88530a",
+    "public_UIKit_missing_v5": "906480439a689c9ee1fb2d24a85a8db9e7e36250",
+    "public_driver_v6": "63d710c9400c415e45f9e3a416ae280b359131cf"
+  },
+  "failures_retained": [
+    "v1 hosted-owner SwiftUI graph teardown crash; no pass",
+    "v2/v3 native third-device settlement failed before app handoff; no app run",
+    "v4/v5 actual pending review reached; public UIKit AX traversal could not activate SwiftUI button; no approval",
+    "v6 external public button tap1/1 and app approved original, but controller reused stale A source revision; unit0/1 deadline/native0/1; fixed only controller current-original snapshot"
+  ],
+  "scope": "Fresh real SDK/MLS/WebSocket A/B/C plus selected D setup; standalone B closes ACK+exit0; actual AppState reopens same synthetic B root using explicit read-only SecretStore; pending genuine original discovered/held by account-owned review model; actual HistoryConsentReviewView button tapped externally through public XCTest identifier; exact displayed revision approved; A same original continues with refreshed current revision; committed imported1 verified through actual account-owned reader; suspension retires original/model/reader; C nonrecipient archive remains empty",
+  "qualification_limits": [
+    "Hosted test pane/action, not installed-app navigation acceptance",
+    "Imported record is nonexpiring, undeleted, no media; ordered media/retention/deletion controls remain separate",
+    "Imported reader hosted visual has prior4216 checkpoint; live approval test queries reader after committed import",
+    "Physical phone install deferred; ready artifact unchanged",
+    "No SDK/protocol/model API changes or account/Keychain copies",
+    "Full PR required before merge"
+  ],
+  "checks": [
+    "strict scoped swift-format",
+    "strict scoped SwiftLint",
+    "git diff --check"
+  ],
+  "visual_attachments": {
+    "ios-genuine-history-approval-public-v7-visual/2ACA8B71-5154-46FF-8E5C-1D6C79D21161.png": "16d95930b6d3ff1eafdf35314bf1e08f5a63ef5a0743343a5d8dcff791e32044"
+  }
+}

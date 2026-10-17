@@ -1,0 +1,59 @@
+{
+  "base_commit": "b7d37f98e9f96f347275c9ab60fe8101626e85a0",
+  "sdk_source": "de38be1295618728ef541e43bfc00ffb6cdb6a86",
+  "sdk_artifact_manifest_sha256": "0b5b3d3bb93b47ebc74065e735504ffc928fd06d0424a3ccb5d07fe58ca18bd4",
+  "tested_capture": "60138ad034a29e6b33939b67d7d2232127e07aa7",
+  "test_source_sha256": "488e027bdedc197950871dfcecf4408619b1f11d01c2e10c085d2696e27a68bc",
+  "gate": {
+    "prefix": "/Users/pj/project/build/results/automatic-host-switch-ios-v1",
+    "exit_code": 0,
+    "seconds": 287.03,
+    "actual_passed": 36,
+    "actual_failed": 0,
+    "actual_skipped": 0,
+    "actual_native_account_switch_tests": 1,
+    "source_inputs": 942,
+    "inputs_unchanged": true,
+    "command": [
+      "/opt/homebrew/bin/bash",
+      "scripts/test.sh",
+      "-only-testing:whitenoise-iosTests/GenuineAutomaticAccountSwitchTests",
+      "-only-testing:whitenoise-iosTests/RuntimeOwnershipTests",
+      "-only-testing:whitenoise-iosTests/AutomaticChatOwnershipTests",
+      "-only-testing:whitenoise-iosTests/SourceQualifiedTimelineUnionTests",
+      "-only-testing:whitenoise-iosTests/AutomaticPendingSendTests",
+      "-only-testing:whitenoise-iosTests/AutomaticPairedListPagingTests"
+    ],
+    "artifacts": {
+      "build/results/automatic-host-switch-ios-v1-inputs.json": "acea779bd86732cac6abefb8a714c34d5f53cdff94c3c59fedd162c2af3562c7",
+      "build/results/automatic-host-switch-ios-v1-results.json": "6e4836b50e12e141562c252e8dd66eb06f76b3eafac4974ceeb43d3aa9a385db",
+      "build/results/automatic-host-switch-ios-v1-summary.json": "bd4d3c1027e48bb6b9a36256555e94eea588bba5d2149c4e31107a5301c22a38",
+      "build/results/automatic-host-switch-ios-v1.log": "81bb5d40b2d4b3da26f52a6d59eafcff80fae6a5daa02ff990997a3baf496c66"
+    }
+  },
+  "static_checks": {
+    "pinned_swiftlint": "0.63.2 strict, one changed Swift file, passed",
+    "swift_parse": "passed",
+    "git_diff_check": "passed"
+  },
+  "qualified_behavior": [
+    "Two real Marmot native accounts, listed by the SDK, selected through actual AppState.activateAccount A\u2192B\u2192A with isolated UserDefaults.",
+    "Real paired row and canonical message appear under A, disappear from retired models on replacement, and return only through a fresh account-owned model.",
+    "B native list contains no paired rows; opening A observed group supplies no paired header/messages and cannot admit a send.",
+    "Retired original A and scene-retired returned A models refuse sends and retain no pending texts.",
+    "Actual setAppSceneActive(false) and startRuntimeSuspension clear client and close native storage, verified by storageIsClosed."
+  ],
+  "fixture": {
+    "native_prerequisite": "build/results/automatic-host-switch-native-v1/result.json",
+    "native_passed": 1,
+    "native_failed": 0,
+    "native_positive_worker_closures": 5,
+    "root": "/Users/pj/project/build/automatic-host-switch-v1-c",
+    "credentials": "Original encrypted task callback read-only; fresh second native identity credentials retained only in checked Mutex memory. No Keychain or credential output."
+  },
+  "limits": [
+    "AppState/account-owned model acceptance, not public buttons or installed UI.",
+    "No restart claim for the memory-only second account.",
+    "Test-only source; prior product full cohorts retained. Final SDK/runtime promotion waits withdrawal fix and required final qualification."
+  ]
+}

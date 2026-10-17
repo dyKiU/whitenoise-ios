@@ -1,0 +1,96 @@
+{
+  "base": "803d58b0fa87ece048b183b490ecdf67326421bd",
+  "sdk_source": "3fab3184d8cc089c7a3d24988443ff2d38ee93a5",
+  "red_stash": "39067ba9ff04c1d5879ac037f1bed50a9282aff2",
+  "green_stash": "83e3c8e1787663b97803202c5c62f614d475951e",
+  "sdk4_stashes": {
+    "local": "844ee802f88635efe4dfe8e1b8e2fdb6b8e24624",
+    "remote": "978b8352e855f193e27c18857311667b099f6281"
+  },
+  "phases": [
+    {
+      "prefix": "ios-selected-chat-pane-red-v1",
+      "source_base": "803d58b0fa87ece048b183b490ecdf67326421bd",
+      "source_inputs": 821,
+      "input_manifest_sha256": "e3373e54ba42703869eaa06996fe3b6182ae46e8f61891c0abef5d0ecf0f2748",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 87.05,
+      "log_sha256": "28cc0babd5af7292e4727ebed3266a28481cfc1ae7d8a1cd588c7b8977e0d94d",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 1,
+        "passedTests": 0,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Caught error: .SelectedChatCopyNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "SelectedChatPresentationTests/actualAccountCompositionOwnsAndRetiresTransferAcrossReturn()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatPresentationTests/actualAccountCompositionOwnsAndRetiresTransferAcrossReturn()",
+          "testName": "actualAccountCompositionOwnsAndRetiresTransferAcrossReturn()"
+        }
+      ]
+    },
+    {
+      "prefix": "ios-selected-chat-pane-green-v1",
+      "source_base": "803d58b0fa87ece048b183b490ecdf67326421bd",
+      "source_inputs": 821,
+      "input_manifest_sha256": "07c08bbb8383598c769ef01a2793fa1c38423b1e8189d61d3b6a97398469f87e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 82.92,
+      "log_sha256": "2b4f9e6a3f5b44997f94413983b87d80affc766ec53acbccfa8fbe73b95e444c",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 18,
+        "passedTests": 18,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "prefix": "ios-selected-chat-pane-affected-v1",
+      "source_base": "803d58b0fa87ece048b183b490ecdf67326421bd",
+      "source_inputs": 821,
+      "input_manifest_sha256": "07c08bbb8383598c769ef01a2793fa1c38423b1e8189d61d3b6a97398469f87e",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 8.54,
+      "log_sha256": "01c44674ec39c039b1c5433673440d4d4b398a4e82c5aaac92daada842733a8c",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 99,
+        "passedTests": 99,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  ],
+  "checks": [
+    "strict canonical four-file swift-format",
+    "SwiftLint0.63.2 strict fourfiles:0 violations",
+    "git diff --check"
+  ],
+  "limits": [
+    "Original selected-chat account composition only; no UI yet.",
+    "Actual isolated AppState owner/SDK missing-account error path plus generated original-handle models; no real native cryptographic transfer acceptance.",
+    "Target read and packet decoding do not approve or export; original Core factory remains authority.",
+    "Historical runner scope label says approval; actual classes/filters/input bytes above are preserved.",
+    "No SDK, capability, install/publication/fullPR changes."
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "base": "c58106916f12722d7f5751a8685b9799a4cfed73",
+  "sdk_source": "3fab3184d8cc089c7a3d24988443ff2d38ee93a5",
+  "red_stash": "21f9d661c4b4ace693e95bc810850ca55e09f103",
+  "green_stash": "dcd3fd05eea45637a414a83b4dee3c5a5ba40132",
+  "local_sdk4_stash": "42bc5a1a1f4d830e73339db7862c98777baffa05",
+  "remote_sdk4_stash": "d5bd263f5b1aa46b32ca4cd46f6efcd0ccbdd63e",
+  "phases": [
+    {
+      "prefix": "ios-selected-chat-scope-red-v1",
+      "source_base": "c58106916f12722d7f5751a8685b9799a4cfed73",
+      "source_inputs": 812,
+      "input_manifest_sha256": "8ad1f764babf771bd753e2aca287892d99cb5fbef00fe9ffe4238920a1450dd4",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 73,
+      "seconds": 159.64,
+      "log_sha256": "d6e94bd126a4a2b9387cdc06da3d49f25e5d320038b76813b67cdf58fa52f295",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 11,
+        "passedTests": 4,
+        "failedTests": 7,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Testing was canceled",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 3,
+          "testIdentifierString": "SelectedChatScopeTests/delayedConsentPacketCannotEscapeCancellation()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/delayedConsentPacketCannotEscapeCancellation()",
+          "testName": "delayedConsentPacketCannotEscapeCancellation()"
+        },
+        {
+          "failureText": "Testing was canceled",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 7,
+          "testIdentifierString": "SelectedChatScopeTests/delayedRequestPacketCannotEscapeRetirement()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/delayedRequestPacketCannotEscapeRetirement()",
+          "testName": "delayedRequestPacketCannotEscapeRetirement()"
+        },
+        {
+          "failureText": "Expectation failed: expected error \".SelectedChatCopyRuntimeUnavailable\" of type MarmotKitError, but \".SelectedChatCopyNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.SelectedChatCopyRuntimeUnavailable",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "SelectedChatScopeTests/recipientFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/recipientFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testName": "recipientFactoryPreservesMissingAccountWithoutCreatingIdentity()"
+        },
+        {
+          "failureText": "Caught error: .SelectedChatCopyNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 5,
+          "testIdentifierString": "SelectedChatScopeTests/recipientReadDoesNotApproveAndExplicitActionUsesOriginalRevision()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/recipientReadDoesNotApproveAndExplicitActionUsesOriginalRevision()",
+          "testName": "recipientReadDoesNotApproveAndExplicitActionUsesOriginalRevision()"
+        },
+        {
+          "failureText": "Expectation failed: expected error \".SelectedChatCopyRuntimeUnavailable\" of type MarmotKitError, but \".SelectedChatCopyNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.SelectedChatCopyRuntimeUnavailable",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 9,
+          "testIdentifierString": "SelectedChatScopeTests/requestFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/requestFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testName": "requestFactoryPreservesMissingAccountWithoutCreatingIdentity()"
+        },
+        {
+          "failureText": "Caught error: .SelectedChatCopyNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 6,
+          "testIdentifierString": "SelectedChatScopeTests/requestForwardsExactOriginalRevisionAndOpaquePackets()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/requestForwardsExactOriginalRevisionAndOpaquePackets()",
+          "testName": "requestForwardsExactOriginalRevisionAndOpaquePackets()"
+        },
+        {
+          "failureText": "Expectation failed: expected error \".SelectedChatCopyStaleRevision\" of type MarmotKitError, but \".SelectedChatCopyNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.SelectedChatCopyStaleRevision",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 8,
+          "testIdentifierString": "SelectedChatScopeTests/staleDisplayedRevisionPassesThroughWithoutImplicitRefreshOrApproval()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/staleDisplayedRevisionPassesThroughWithoutImplicitRefreshOrApproval()",
+          "testName": "staleDisplayedRevisionPassesThroughWithoutImplicitRefreshOrApproval()"
+        }
+      ]
+    },
+    {
+      "prefix": "ios-selected-chat-scope-red-v2",
+      "source_base": "c58106916f12722d7f5751a8685b9799a4cfed73",
+      "source_inputs": 812,
+      "input_manifest_sha256": "8ad1f764babf771bd753e2aca287892d99cb5fbef00fe9ffe4238920a1450dd4",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 7.48,
+      "log_sha256": "53670ef28c13c5267f792711f2e718a373587fa5a8cf30139e2fc64e85a80f5c",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 4,
+        "passedTests": 0,
+        "failedTests": 4,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: expected error \".SelectedChatCopyRuntimeUnavailable\" of type MarmotKitError, but \".SelectedChatCopyNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.SelectedChatCopyRuntimeUnavailable",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 4,
+          "testIdentifierString": "SelectedChatScopeTests/recipientFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/recipientFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testName": "recipientFactoryPreservesMissingAccountWithoutCreatingIdentity()"
+        },
+        {
+          "failureText": "Caught error: .SelectedChatCopyNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 3,
+          "testIdentifierString": "SelectedChatScopeTests/recipientReadDoesNotApproveAndExplicitActionUsesOriginalRevision()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/recipientReadDoesNotApproveAndExplicitActionUsesOriginalRevision()",
+          "testName": "recipientReadDoesNotApproveAndExplicitActionUsesOriginalRevision()"
+        },
+        {
+          "failureText": "Expectation failed: expected error \".SelectedChatCopyRuntimeUnavailable\" of type MarmotKitError, but \".SelectedChatCopyNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.SelectedChatCopyRuntimeUnavailable",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 2,
+          "testIdentifierString": "SelectedChatScopeTests/requestFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/requestFactoryPreservesMissingAccountWithoutCreatingIdentity()",
+          "testName": "requestFactoryPreservesMissingAccountWithoutCreatingIdentity()"
+        },
+        {
+          "failureText": "Caught error: .SelectedChatCopyNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "SelectedChatScopeTests/requestForwardsExactOriginalRevisionAndOpaquePackets()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatScopeTests/requestForwardsExactOriginalRevisionAndOpaquePackets()",
+          "testName": "requestForwardsExactOriginalRevisionAndOpaquePackets()"
+        }
+      ]
+    },
+    {
+      "prefix": "ios-selected-chat-scope-green-v2",
+      "source_base": "c58106916f12722d7f5751a8685b9799a4cfed73",
+      "source_inputs": 812,
+      "input_manifest_sha256": "d0b7acc2725fa39dea0dd13e560f436f5a7a4d465407796a1b90881ca814fa8a",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 17.92,
+      "log_sha256": "5e037b7f59cfc7e7540a069dfe1b6d4c9e94ed5b774cb4de4808535bce59fa8b",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 11,
+        "passedTests": 11,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "prefix": "ios-selected-chat-scope-affected-v2",
+      "source_base": "c58106916f12722d7f5751a8685b9799a4cfed73",
+      "source_inputs": 812,
+      "input_manifest_sha256": "d0b7acc2725fa39dea0dd13e560f436f5a7a4d465407796a1b90881ca814fa8a",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 8.0,
+      "log_sha256": "e5b93a93fb2095869357baa92bcdc0fe138d6247f4a5061878e336d541f70937",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 74,
+        "passedTests": 74,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  ],
+  "final_owned_hashes": {
+    "whitenoise-ios/Core/MarmotClient.swift": "a86980a2c18524a4f541d450384ec24c1dea948ed4a1f3053354654b1c566b61",
+    "whitenoise-ios/Session/SelectedChatScope.swift": "dfe42028ad2d5898f8ac0db38c6d31038e07a5a5a133525706d5fd80f9467f02",
+    "whitenoise-iosTests/SelectedChatScopeTests.swift": "c8b19e8b2353e8023f4425ffb514bd85dea10a6342e165c6f95e39ec50074dbc"
+  },
+  "scope": "Thin concrete MarmotClient factories and custody of original SDK request/consent handles; exact revision/bytes and before/after lifetime checks, independent explicit chat approval, failed exact cleanup retained for retry. No new runtime protocol or Fake abstraction in iOS.",
+  "checks": "Strict SwiftLint0.63.2 three modified Swift files; canonical swift-format and git diff --check pass.",
+  "harness": "First11 run interrupted:4passed/7failed incl2 cancelled delayed controls whose checkpoint default-deny stub cannot reach. Preserved exit73/full logs. Exact four direct positive/factory tests then semantic RED0/4; GREEN11/11 and affected74/74.",
+  "limits": "Generated original-handle controls and real isolated SDK missing-account refusal, not real chat delivery or consent acceptance. Account/runtime factories are next separate slice; published default/full PR gates pending. No Cargo/SDK artifacts, native UI, accounts, manual installation or publication changed."
+}

@@ -1,0 +1,99 @@
+{
+  "base": "b7734b6a73063297c28ca4a34c9f237302933def",
+  "sdk": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "runs": {
+    "ios-genuine-history-source-compile-v1": {
+      "source_base": "b7734b6a73063297c28ca4a34c9f237302933def",
+      "source_inputs": 880,
+      "input_manifest_sha256": "7e3f2efe041411b97c089eaa2b2ce151d50ac81b932454c698605affa753e49c",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 22.76,
+      "log_sha256": "551932c3b77b8239d1aa247550308c9b395e2167540f0e8a7a91e6dc1acaff63",
+      "physical_phone_changed": false,
+      "scope": "Actual native observation and fresh original through account-owned model only when fixture supplied; compile prefix is zero runtime tests. No UI activation, consent, continuation or imported history claim"
+    },
+    "ios-genuine-history-source-v1": {
+      "source_base": "b7734b6a73063297c28ca4a34c9f237302933def",
+      "source_inputs": 880,
+      "input_manifest_sha256": "7e3f2efe041411b97c089eaa2b2ce151d50ac81b932454c698605affa753e49c",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 9.99,
+      "log_sha256": "9f4272a96273e2d7a81bc74f75421cbc613bc400e53cc745adff1c4e0ce8c192",
+      "physical_phone_changed": false,
+      "scope": "Actual native observation and fresh original through account-owned model only when fixture supplied; compile prefix is zero runtime tests. No UI activation, consent, continuation or imported history claim",
+      "fixture_sha256": "35cd1f5f91866d8bea3fb36e240998c1af2557a46b673ab90ac037aabd8dc1d6",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-genuine-history-source-affected-v1": {
+      "source_base": "b7734b6a73063297c28ca4a34c9f237302933def",
+      "source_inputs": 880,
+      "input_manifest_sha256": "7e3f2efe041411b97c089eaa2b2ce151d50ac81b932454c698605affa753e49c",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 10.53,
+      "log_sha256": "9a2b9cca962db045602131f094e51a9c366539a476983b855013a1b3951f14a2",
+      "physical_phone_changed": false,
+      "scope": "Affected source model/pane/native query/recipient custody/constructor/account ownership controls; genuine source request executed separately, no continuation/consent/import or full PR claim",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 44,
+        "passedTests": 44,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "test_sha256": "5e5be879272dd0a582cee5028d6b411f08228abbd248571a21af08663b853ad0",
+  "preserved_candidates": {
+    "local": "1103774b27c3ecd3e31307dcc538762081fcdd87",
+    "m5": "62aad075f5aaa36f58c64cba6d5d16d449e249c7"
+  },
+  "native_simulator_worker": {
+    "exit_code": 0,
+    "seconds": 6.57,
+    "sdk_source": "98707713a2cc02828c2d66ed858588991896b9b0",
+    "input_manifest_sha256": "ba6a6eb091e58aa3cfe08176160dfab1a2df22368cb77b3e59c014d5ec1b6c8d",
+    "log_sha256": "437b6cf9a012e6c308cd1de8f8d3eaffdc1fd2a960ca310a0946be14290e2fe2",
+    "binary": "/Users/pj/project/build/native-sync-acceptance-history-simulator-98707713",
+    "binary_sha256": "eee6d69a6f21c181c52cee8a4b29a40a505a55bbae576886da786515bb35d734",
+    "command": [
+      "bash",
+      "/Users/pj/project/whitenoise-sync-acceptance-workspace/tools/native-sync-acceptance/build-simulator.sh",
+      "/Users/pj/project/mdk-sync-sdk-98707713/crates/marmot-uniffi/output",
+      "/Users/pj/project/build/native-sync-acceptance-history-simulator-98707713",
+      "/Users/pj/project/whitenoise-sync-ios-build/ModuleCache.noindex"
+    ],
+    "features": [
+      "NATIVE_HISTORY_ACCEPTANCE",
+      "NATIVE_HISTORY_RECIPIENT_QUERY"
+    ],
+    "scope": "Matched raw SDK987 simulator worker compile/ad-hoc signature only, no native acceptance execution; old84113 binary preserved.",
+    "strict_signature_exit": 0
+  },
+  "worker_warning": "Incompatible-sysroot warning retained in raw compile log. Read-only xcrun SDK resolves iPhoneSimulator27; actual MachO LC_BUILD_VERSION platform7/minos18/sdk27, arm64. Runtime simulator fixture executed successfully separately.",
+  "native_fixture": "Root-owned native-ios-source-picker-v1 actual1/1 in51.75s; original peers positively closed before observation-only descriptor handoff. No task secrets or storage copied.",
+  "fixture_sha256": "35cd1f5f91866d8bea3fb36e240998c1af2557a46b673ab90ac037aabd8dc1d6",
+  "acceptance": "Actual isolated Bsim root reopened with read-only encrypted task SecretStore through actual AppState/AccountStore. Public native query yields2 actual observations, explicit listed choice creates fresh original; real snapshot group/source/recipient/content counts checked. Same account/chat factory retains identical model owner; refresh preserves immutable selection. Exact original cancel/release then actual scene suspension closes runtime. No injected query/factory/protocol doubles.",
+  "counts": "Compile gate has zero runtime tests. Genuine1/1 and separate affected44/44/no skips; not proof of45 unique feature behaviors.",
+  "scope_limits": "No Continue/recipient approval/import/public-button activation/installed-app journey; no full app PR or SDK/application promotion. Separate existing imported-history and recipient UI proofs remain scoped to84113. New feature acceptance passed first actual execution; no artificial failing baseline/SDK defect claim.",
+  "sdk_and_phone": "Matched987 on M5 only. Prior84113 worker binary hash guarded, SDK4 overlays excluded from commit. M1 phone-ready84113 unchanged.",
+  "static": "Scoped canonical swift-format/strictSwiftLint and diffcheck passed.",
+  "raw_prefixes": [
+    "ios-genuine-history-source-compile-v1",
+    "ios-genuine-history-source-v1",
+    "ios-genuine-history-source-affected-v1"
+  ]
+}

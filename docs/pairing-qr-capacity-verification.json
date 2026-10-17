@@ -1,0 +1,33 @@
+{
+  "scope": "Lossless transport compression for oversized device-pairing QR packets; SDK987 and explicit approval/SAS/enrollment unchanged",
+  "transport": "Legacy whitenoise-pairing:v1: retained for small packets; whitenoise-pairing:v2:deflate: uses Apple COMPRESSION_ZLIB raw DEFLATE then canonical base64",
+  "bounds": {
+    "qr_utf8_bytes": 2200,
+    "decoded_packet_bytes": 49152,
+    "decode_buffer_bytes": 49153,
+    "truncated_expansion_refused": true
+  },
+  "regression": {
+    "observed_user_base64_characters_only": 2688,
+    "synthetic_packet_bytes": 2016,
+    "Mac_native_Swift_baseline_exit": 1,
+    "Mac_native_Swift_after_exit": 0,
+    "scope": "Same-size synthetic packet, not a persisted user packet or native enrollment proof"
+  },
+  "affected": {
+    "passedTests": 25,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "totalTestCount": 25
+  },
+  "log": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-qr-compressed-affected-v4.log",
+  "log_sha256": "872dde457a28671b2cc769aa11779de3c69a0dba14f4ee68da507b3a131ccde4",
+  "full_integration": "Pending after passing slice commit",
+  "installed_acceptance": "Pending rebuild; real setup QR and physical scanner not yet reverified",
+  "private_key_QR": false,
+  "static_checks": {
+    "changed_files_swiftlint_0_63_2": "pass, 0 violations",
+    "full_repository": "2 existing no_unchecked_sendable violations in unchanged DeviceLinkingAccountLifetimeTests.swift lines 8 and 44; no new violations",
+    "compiler_attempts": "v1-v3: zero-test stale native FFI PCM failures; exact compiler-named modules retired only while target idle"
+  }
+}

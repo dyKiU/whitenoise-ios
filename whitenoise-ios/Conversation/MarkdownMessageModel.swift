@@ -543,7 +543,6 @@ enum MarkdownMessageBuilder {
             switch inline {
             case .text(let content):
                 emitted = append(content, to: &out, context: context, budget: &budget) || emitted
-
             case .softBreak:
                 emitted = appendBreak(" ", to: &out, budget: &budget) || emitted
 

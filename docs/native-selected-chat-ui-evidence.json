@@ -1,0 +1,243 @@
+{
+  "base": "cb7978b6f8b6e2af801fb11ccf7c3bdeb6b07fc2",
+  "sdk_source": "3fab3184d8cc089c7a3d24988443ff2d38ee93a5",
+  "source_stashes": {
+    "initial": "bef2f35d2090619ba99beec4a9288ec97826e625",
+    "translated_v2": "547132a0fdaa28f1841cd74b2d806d46b63e68cc",
+    "final_v3": "9d47f57eeee5ba2e72005d734c42bed45615b87d"
+  },
+  "sdk4_stashes": {
+    "local": "844ee802f88635efe4dfe8e1b8e2fdb6b8e24624",
+    "remote": "978b8352e855f193e27c18857311667b099f6281"
+  },
+  "tdd": "Actual account-owned composition default-deny RED0/1 and original lifetime/presentation RED controls are recorded in native-selected-chat-composition/presentation-evidence.json; new pane-render test verifies zero automatic export/approve.",
+  "phases": [
+    {
+      "source_base": "cb7978b6f8b6e2af801fb11ccf7c3bdeb6b07fc2",
+      "source_inputs": 823,
+      "input_manifest_sha256": "3d2f7301c7aed4baa5b988ba89f5fc977f16aa7aeab7ceb2ff781de51c901173",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 80.28,
+      "log_sha256": "540c81063183eae002668539ff9974e689f1edd8ead27ac72ed597a8bc5407e1",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 19,
+        "passedTests": 19,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-ui-green-v1"
+    },
+    {
+      "source_base": "cb7978b6f8b6e2af801fb11ccf7c3bdeb6b07fc2",
+      "source_inputs": 823,
+      "input_manifest_sha256": "6bcff44a5a552ffb599243f3e1a13ef63c0a71f76fd8cbfd4f9dca7f975764e7",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 18.4,
+      "log_sha256": "0f1c87ec092273a4bcf29838561bfba54a02f07655d463b1c9f8953744067684",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 19,
+        "passedTests": 19,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-ui-green-v2"
+    },
+    {
+      "source_base": "cb7978b6f8b6e2af801fb11ccf7c3bdeb6b07fc2",
+      "source_inputs": 823,
+      "input_manifest_sha256": "6bcff44a5a552ffb599243f3e1a13ef63c0a71f76fd8cbfd4f9dca7f975764e7",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 8.23,
+      "log_sha256": "d0374e4ce2c0accc5e2f812203b0d9cf8c352cc2bf614058e9af1131e00c15d6",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 100,
+        "passedTests": 100,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-ui-affected-v2"
+    },
+    {
+      "source_base": "cb7978b6f8b6e2af801fb11ccf7c3bdeb6b07fc2",
+      "source_inputs": 823,
+      "input_manifest_sha256": "4b3386910fb14d520f2c5769aee1c3c4dc95139bf3c292b1ecf0f485eb76760b",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 16.6,
+      "log_sha256": "49573938991a6953a3695eb74868122cceb459446ae6501b9f078bd8729804e9",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 19,
+        "passedTests": 19,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-ui-green-v3"
+    },
+    {
+      "source_base": "cb7978b6f8b6e2af801fb11ccf7c3bdeb6b07fc2",
+      "source_inputs": 823,
+      "input_manifest_sha256": "4b3386910fb14d520f2c5769aee1c3c4dc95139bf3c292b1ecf0f485eb76760b",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 8.23,
+      "log_sha256": "5d7ddba28f4291e2103099396614fd1e011beb2cca180c6246786359b1afbfdb",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 100,
+        "passedTests": 100,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-ui-affected-v3"
+    }
+  ],
+  "localization": {
+    "command": [
+      "xcrun",
+      "xcstringstool",
+      "sync",
+      "/Users/pj/project/build/ios-selected-chat-pane-localizations/Localizable.xcstrings",
+      "--stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/SelectedChatPaneView.stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/SettingsView.stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/GroupDetailsView.stringsdata",
+      "--skip-marking-strings-stale"
+    ],
+    "compiled_stringsdata_sha256": "fe2711bbb166c1c3b77217d065168a0a24ebb5ca3ec679e6ca7947f90f6b1cf0",
+    "Apple_export_template": "/Users/pj/project/build/ios-verification-localizations/export/de.xcloc/Localized Contents/de.xliff",
+    "template_sha256": "e0ccbdbd16bab16d016d6ea38e4181e5928108872643b8fdece3a0f7c44dd432",
+    "original_catalog_sha256": "6a197add57db92ec7410e4c225546cead2005f7aee91bb8988bccf8e3a2b5dbf",
+    "original_entries": 1953,
+    "added": [
+      "Approve only this chat copy request.",
+      "Authenticated chat selector",
+      "Chat ID",
+      "Chat copy action failed. Retry or cancel.",
+      "Chat copy confirmed",
+      "Chat copy is no longer active.",
+      "Consenting devices",
+      "Continue chat copy",
+      "Copy selected chat",
+      "Export chat consent",
+      "Export chat copy request",
+      "Export chat offer",
+      "Linked device roster",
+      "No linked device target is available.",
+      "Offered devices",
+      "Opaque chat copy request",
+      "Receive chat consent",
+      "Receive chat copy request",
+      "Receive chat offer",
+      "Revision",
+      "Selected chat consent",
+      "Selected chat transfer",
+      "Selected chat transfer is unavailable."
+    ],
+    "imports": [
+      {
+        "language": "de",
+        "exit_code": 0,
+        "xliff_sha256": "2603b2567c38b098f4946a74eda33f8be85c6a806cdb35fb149c325773998b3b",
+        "log_sha256": "4120c597539fc1e571f34f21a06134615ec1fcc2655479391d9cef3c09b9f5b4"
+      },
+      {
+        "language": "es",
+        "exit_code": 0,
+        "xliff_sha256": "8c78364ee27c7ddc9b188a87f29527c1bf6a73757315e1f610ed2d5e25e2725c",
+        "log_sha256": "385bada777805f0eb716cb3909129439d00cfc211ecc8d83abd7f31a4aa1e956"
+      },
+      {
+        "language": "fr",
+        "exit_code": 0,
+        "xliff_sha256": "880be0c0d56e033801fff5be7a3a8e4f3ba3cbc2e9ecec8c55d1f9ff08996fb0",
+        "log_sha256": "da4d282ccab4675dbd7938dc92f47a13e9512bac78597c39c979737af32d0308"
+      },
+      {
+        "language": "it",
+        "exit_code": 0,
+        "xliff_sha256": "3d9545048fc3742e7f4d58c3fa3c9e40e7668cbfad4429a91407cf51abab011d",
+        "log_sha256": "49ac780711513ed82cb187652cdcfee6b6497bebb6dd254884f3b16b8ff2e2a8"
+      },
+      {
+        "language": "pt",
+        "exit_code": 0,
+        "xliff_sha256": "b3d40c6e20a0a45cf2a9177ed62d9ba610b7dbd7dd8f3b9068a23310ddde190c",
+        "log_sha256": "f65458738eca80aa9fc16921eccebc5d480f99061e012b20227c1a3edaf28ece"
+      },
+      {
+        "language": "ru",
+        "exit_code": 0,
+        "xliff_sha256": "ff761e697c9a155112332e57bd1477265f0d0dd2f5883ac9c371951f8f1e0ac9",
+        "log_sha256": "d5efe90629ab7889742e1398477cfbe50a813a98b1c1ca6a05e723a9bb7d7d7e"
+      },
+      {
+        "language": "tr",
+        "exit_code": 0,
+        "xliff_sha256": "695f73c6f1df1fe497f04f166db50a462d8d8f0c71e52baea617c02f37e83aed",
+        "log_sha256": "9da0876d21d9b12e1b1ef274fb3b37d3bc7b83f0d28063c913ff16d3fbc44a35"
+      },
+      {
+        "language": "zh-Hans",
+        "exit_code": 0,
+        "xliff_sha256": "8d89947e9c8113a4a445ef7c7c4be7a0bd33eceb2c8ba5729ca98e3a1f86743a",
+        "log_sha256": "2ec4745b62700fd280a44a96681ebb7210465c164f6152198b7380fec6df3f77"
+      },
+      {
+        "language": "zh-Hant",
+        "exit_code": 0,
+        "xliff_sha256": "1d6ca4861f6ddc8b977fa739eb5229742f466d553924337b014afa711b66883f",
+        "log_sha256": "65033b1f2312e23adf72ddfbbb688611a6f637c0486bd61985fa704b8cf9e82e"
+      }
+    ],
+    "all_existing_entries_and_order_unchanged": true,
+    "preservation": "Only whole Apple sync/import-generated new entry retained; original raw top-level entry blocks preserved, no nested plural edits",
+    "catalog_sha256": "99db8cc8b4992414f18fa07c05331848d452b7c9d315b44c5104f2bd07ca76b6"
+  },
+  "visuals": {
+    "copy.png": "a4b43be047a985acd27c94b019b9daee4a92bc9b983db66fb246c5f911fc04ef",
+    "consent.png": "a2e2c8e6aebf9abfc88cf5bd7c6001a33cd59c1a7d48f5bb4d1dd9d5b9de339b"
+  },
+  "visual_harness": [
+    "v1 custom environment not forwarded to testhost, PNGs not retained",
+    "v2 PNGs black because temporary UIWindow had no hosted UIWindowScene; not a product defect",
+    "v3 actual scene-bound test window; previous key window restored; usable screenshots inspected"
+  ],
+  "checks": [
+    "Strict canonical new-view/test format and inserted parent-view regions",
+    "SwiftLint0.63.2 strict fourfiles:zero violations",
+    "git diff --check"
+  ],
+  "limits": [
+    "Original native account/handle controls with generated SDK doubles; not native cryptographic transfer acceptance.",
+    "No inferred chat name: full authenticated selector and exact original chat ID displayed.",
+    "No SDK/capability/install/publish/fullPR changes; tests hosted Staging simulator only.",
+    "Inactive held children currently hide replacement entry. Explicit presentation-reset follow-up required; failed cleanup must remain fenced."
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "base": "c16a2e3c120f5485dc3776d9700dea72d6144615",
+  "sdk": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "runs": {
+    "ios-history-source-pane-v1": {
+      "source_base": "c16a2e3c120f5485dc3776d9700dea72d6144615",
+      "source_inputs": 878,
+      "input_manifest_sha256": "dce5beafe4a33a332fe5de544516ddab4efbfc52b94b8f6d647869411f54f218",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 9.05,
+      "log_sha256": "40f9d6167d4cb4a76068ed6811ef9555fce4a259d436745f990dc99a645ba596",
+      "physical_phone_changed": false,
+      "scope": "Hosted source picker read/no-auto-transfer controls plus original model lifetimes; no actual user tap or native positive grant/import"
+    },
+    "ios-history-source-pane-v2": {
+      "source_base": "c16a2e3c120f5485dc3776d9700dea72d6144615",
+      "source_inputs": 878,
+      "input_manifest_sha256": "a45b1185221ec55077f6eb4632feffffbd62960340b947c9685a9ef0584a82ac",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 81.72,
+      "log_sha256": "6a5e45cccb698c09a36404440e3da5209376a1adc2a04ea45fd7c2ad9481a079",
+      "physical_phone_changed": false,
+      "scope": "Hosted source picker read/no-auto-transfer controls plus original model lifetimes; no actual user tap or native positive grant/import",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 15,
+        "passedTests": 15,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-history-source-pane-affected-v1": {
+      "source_base": "c16a2e3c120f5485dc3776d9700dea72d6144615",
+      "source_inputs": 878,
+      "input_manifest_sha256": "18be4a8eb3d5f368e592e5aa45f9b07d02876afdf24e75b10e95cc986f8e232f",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 82.45,
+      "log_sha256": "5589a74db547559602832531272116359de2594eb13f983630bd3cd597051c66",
+      "physical_phone_changed": false,
+      "scope": "Hosted picker and affected original-account/runtime custody controls; native positive source request and full PR remain pending",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 44,
+        "passedTests": 44,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-history-source-pane-affected-v2": {
+      "source_base": "c16a2e3c120f5485dc3776d9700dea72d6144615",
+      "source_inputs": 878,
+      "input_manifest_sha256": "f29a8ebe1b107e5e01f319fb5b5342401211f54b8174d3677e348f156ee6df7a",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 29.05,
+      "log_sha256": "b3665eb5529b7220378250703b3ca5617a48b8909754fc4353e0cbd4fa5a1268",
+      "physical_phone_changed": false,
+      "scope": "Hosted picker and affected original-account/runtime custody controls; native positive source request and full PR remain pending",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 44,
+        "passedTests": 44,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "tested_paths": {
+    "Shared/Localizable.xcstrings": "8bed41c8ac5081320c9aedf2776ffdbdfa366373516fc236481e9ca1fe65afb8",
+    "whitenoise-ios/Conversation/ConversationView.swift": "38ac7b71404dfd4f876a45fdd0e5a42f590e2b3e415d8c2790ee41e6ab234ce9",
+    "whitenoise-ios/Conversation/HistorySourcePickerModel.swift": "5f139304b1bb990234a73c0e0c2ebdb1432a8c96381b5ea53d2b8d4203043f11",
+    "whitenoise-ios/Conversation/HistorySourcePickerView.swift": "29ce2defeafe3ded565f0ee6620b7c14546c02249649873ec43b499ea3455a1b",
+    "whitenoise-iosTests/HistorySourcePickerModelTests.swift": "9ceb1c70c6f78f7506fa564b6bc999142301aa4376f187d92c4c38f706708d10",
+    "whitenoise-iosTests/HistorySourcePickerPaneTests.swift": "a04bae1ff7c805df2190ea067b2e9d03193c89c6de560ad6fae6bdded49aec5a"
+  },
+  "preserved_candidates": {
+    "compile_only_local": "c935d859fcc6bdc80161ea167c63ab59cd7850af",
+    "compile_only_m5": "d9c9f3bcc6868fbd9f8af540c20e6e6580378e2e",
+    "initial_pass_local": "62e09d574e54473f80374b15e1418a42207e5bb7",
+    "initial_pass_m5": "b2085e414e1600b54de499f31655706a0720337c",
+    "localized_local": "0b5cfb1a89926c6f51eda0edafc30a4d9295a9f4",
+    "localized_m5": "0520fd659fdddea96a23c5882ae9a5dc9a723015",
+    "final_canonical_local": "c2c81dbb6a8a95a7ef39fda55690adcd69287f48",
+    "final_canonical_m5": "f69fea62a487ba53049da8865c600c920d6f4982"
+  },
+  "catalog": {
+    "command": [
+      "xcrun",
+      "xcstringstool",
+      "sync",
+      "/Users/pj/project/build/ios-history-source-pane-localizations/Localizable.xcstrings",
+      "--stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/HistorySourcePickerView.stringsdata",
+      "--skip-marking-strings-stale"
+    ],
+    "compiled_stringsdata_sha256": "9aa282109fa564197294a146997178d63828f784c04d724773749bd3ff2a8386",
+    "Apple_export_template": "/Users/pj/project/build/ios-verification-localizations/export/de.xcloc/Localized Contents/de.xliff",
+    "template_sha256": "e0ccbdbd16bab16d016d6ea38e4181e5928108872643b8fdece3a0f7c44dd432",
+    "original_catalog_sha256": "dc20ccc6b7a9ee43f8abbee6bf7a260fb63d50b5358d4ee8490f3eb4e99f93cf",
+    "original_entries": 1993,
+    "added": [
+      "Send chat history",
+      "Choose a linked device to receive a snapshot of this chat.",
+      "No eligible receiving devices.",
+      "Request history transfer"
+    ],
+    "imports": [
+      {
+        "language": "de",
+        "exit_code": 0,
+        "xliff_sha256": "f2330e97a47238e47be991c51e80fe33bd4250bfe7cd6173d64af9c7e4c34fad",
+        "log_sha256": "69ae3067f3e905195cf31a2433f03249c0833c854b948b4fb00f4248d9da3a04"
+      },
+      {
+        "language": "es",
+        "exit_code": 0,
+        "xliff_sha256": "5582119988571eee48361268ffc4c655204a07a495092fe528f2db03ee7bcef1",
+        "log_sha256": "ebbbb49a9ae65748ea942f5809679c4df4986820eeb443a3004e50f61fe3cbe8"
+      },
+      {
+        "language": "fr",
+        "exit_code": 0,
+        "xliff_sha256": "20ade0069b3c032c747e9420e4cc79d590924bcf4665ecb755fd5fe17b28e22e",
+        "log_sha256": "40492931ad5113fc4e14e51edb93758521ed33f459efb56cef03aed7085759e9"
+      },
+      {
+        "language": "it",
+        "exit_code": 0,
+        "xliff_sha256": "bf9fbfb2c3990d6066af0dbf3efefecc507019c0c43d3529a8f00227750b94e1",
+        "log_sha256": "e1200002b42567f1633154baa6c6b64bf03ee4f6608ff0946b54560da79e060b"
+      },
+      {
+        "language": "pt",
+        "exit_code": 0,
+        "xliff_sha256": "81154797a45cb912c95333a1c35ce32d3d11325e92874050c13c3cfe79f56e38",
+        "log_sha256": "951f412b8a619cec543a5db9f6e31ab5608bf7b50d5c288715063634eef5cee4"
+      },
+      {
+        "language": "ru",
+        "exit_code": 0,
+        "xliff_sha256": "a0891677c74166338d691fa7274f3c22a3e2c69bc7084a545039e1379319497a",
+        "log_sha256": "e867b416cfb28b3c8db3ef9a1162e4cdf1642e3445e7740696e8290255d85813"
+      },
+      {
+        "language": "tr",
+        "exit_code": 0,
+        "xliff_sha256": "a4736216b6d381469b703a34e8b10056980e55221e42df86a876aca0fe86488a",
+        "log_sha256": "35c38558344afe5cd8554a9c43f8ec36100ba005e2e5d69e7fc71886ca24c2d4"
+      },
+      {
+        "language": "zh-Hans",
+        "exit_code": 0,
+        "xliff_sha256": "308a8e0b537257911c695d9074793d7cc2e6d77f62c6dfe42c212977cf07382f",
+        "log_sha256": "f80fe6b54ffa63c00c0ca120153a4e0aa80e6a97663bcc379841a29dabd70aa1"
+      },
+      {
+        "language": "zh-Hant",
+        "exit_code": 0,
+        "xliff_sha256": "67a14a90f5eee05f16e3de765f478825ee5be869ce13bea73fc3cdb8af4d8a38",
+        "log_sha256": "d0d53bb1b96ca1e7c8421257f0e87649e020257f9435f863fcf05d9abe8dac28"
+      }
+    ],
+    "all_existing_entries_and_order_unchanged": true,
+    "preservation": "Only whole Apple sync/import-generated new entry retained; original raw top-level entry blocks preserved, no nested plural edits",
+    "catalog_sha256": "8bed41c8ac5081320c9aedf2776ffdbdfa366373516fc236481e9ca1fe65afb8"
+  },
+  "scope": "Conversation entry supplies exact account/chat factory and identity-specific release. Actual observations displayed as full device keys; explicit choice then fresh original request. Continue captures displayed original revision. SDK errors leave same original Refresh reachable. Close/account/chat replacement retires exact owner. No hex-entry product flow, query grant, implicit recipient approval, capability change or generated SDK commit.",
+  "tests": "Focused15 (13 original-model controls +2 hosted choice/failure controls); final affected44 includes these, not59 unique tests. Actual native missing-account refusal included. Hosted tests prove read/no-automatic-request and failure display, not public button activation/positive original native request or import.",
+  "failure_and_source_changes": "v1 zero-test SwiftUI Section header/footer overload compile failure preserved. v2 explicit header correction and same-original refresh/no-new-factory regression. Large Conversation formatting churn removed before affected; only7-line entry integration retained. Apple import reformatted project.pbxproj: independently parsed plutil JSON equal to signed base; restored canonical project before final affected-v2. No runtime changes between affected runs.",
+  "static_checks": "Canonical swift-format and strict SwiftLint on bounded new/changed model/test/view files; diff check passed. Existing large Conversation formatting preserved outside7-line insertion.",
+  "visuals": {
+    "43A84F7C-AAB1-4A2B-8A4C-A4AEAF5D41F7.png": "14de284f4b662f7c98338f6dfb0bdce8c812206bc3071aa0d75774fb509503db",
+    "AC9ADC71-23E0-47C0-9274-8BA2EF9EEF4C.png": "a0642e987a5f8208d80e281f73615fb8313f84ac0a30cf5cd8706c26e6c20050"
+  },
+  "visual_review": "Both actual hosted images inspected: full receiving key readable; request disabled before selection; failed read shows refusal and reachable Refresh. Localizations use same four Mac keys and nine translations through Apple stringsdata sync/XLIFF imports;1993 preexisting raw entry blocks and order unchanged.",
+  "pending": "Native matched987 positive choice/request/public action and full experimental/published integration matrix; installed journey separate. M1 ready/phone84113 unchanged."
+}

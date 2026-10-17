@@ -1,0 +1,107 @@
+{
+  "red": {
+    "source_base": "792d3d27e87422aa0e7914d9f5da7ce1b58ab3b7",
+    "source_inputs": 790,
+    "input_manifest_sha256": "b2783c7a94343afd40301d7d67df8c0fd861deef6042e360fbebd97a03a3102e",
+    "profile": "local-e6/experimentalflag1/Staging",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 65,
+    "seconds": 118.22,
+    "log_sha256": "dfa8523f8852e4db9e9cccf74f3bdce7b9bb73cf4b38c2e6ba35deeb6b018af2",
+    "physical_phone_changed": false,
+    "scope": "New opaque transport host API missing-feature RED with generated protocol controls; no fresh SDK pairing or delivery acceptance",
+    "tests": {
+      "result": "Failed",
+      "totalTestCount": 2,
+      "passedTests": 0,
+      "failedTests": 2,
+      "skippedTests": 0
+    },
+    "test_failures": [
+      {
+        "failureText": "Expectation failed: model.snapshot?.revision == 7\nmodel.snapshot?.revision \u2192 nil",
+        "targetName": "whitenoise-iosTests",
+        "testIdentifier": 2,
+        "testIdentifierString": "DeviceVerificationViewModelTests/accountReplacementRetiresDisplayAndRejectsDelayedPackets()",
+        "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceVerificationViewModelTests/accountReplacementRetiresDisplayAndRejectsDelayedPackets()",
+        "testName": "accountReplacementRetiresDisplayAndRejectsDelayedPackets()"
+      },
+      {
+        "failureText": "Expectation failed: model.snapshot?.revision == 7\nmodel.snapshot?.revision \u2192 nil",
+        "targetName": "whitenoise-iosTests",
+        "testIdentifier": 1,
+        "testIdentifierString": "DeviceVerificationViewModelTests/actualRuntimeSuspensionRetiresRenderedRevision()",
+        "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceVerificationViewModelTests/actualRuntimeSuspensionRetiresRenderedRevision()",
+        "testName": "actualRuntimeSuspensionRetiresRenderedRevision()"
+      }
+    ]
+  },
+  "red_source_stash": "e3f46751d0f593bab39a460f63973a310b75aefc",
+  "green": {
+    "source_base": "792d3d27e87422aa0e7914d9f5da7ce1b58ab3b7",
+    "source_inputs": 790,
+    "input_manifest_sha256": "ad80647693c8a900a9ac028bc1ae800b6d35eb803b9ab9d34b9bc66e62e1093f",
+    "profile": "local-e6/experimentalflag1/Staging",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 0,
+    "seconds": 85.52,
+    "log_sha256": "ec49605168e815477ac781339008645059804cb1720c5e78e855dc840377c571",
+    "physical_phone_changed": false,
+    "scope": "Account-owned verification model and affected original lifetime/transport/runtime controls; no fresh SDK pairing or enrollment acceptance",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 30,
+      "passedTests": 30,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "test_failures": []
+  },
+  "owned_sha256": {
+    "whitenoise-ios/Core/DeviceVerificationSession.swift": "0a1853c35c26845a586a9124898f8f63fdc28106578ecbd2e58e51608f743b7b",
+    "whitenoise-ios/Core/AccountStore.swift": "7b89612b653e568112870131b244559e88ff7ee808ca0b832ef2ae3c662a4668",
+    "whitenoise-ios/Session/DeviceLinkingAccountScope.swift": "9e7436dfeb4ed5301435aec3ccc74d0e6606ce16a06eaae86e69f381b6a67963",
+    "whitenoise-ios/Session/DeviceLinkingFactory.swift": "749ef78cd6b3ab76ea2704eb581500839d7dbf09679304229c106ea7f0208508",
+    "whitenoise-ios/Settings/DeviceVerificationViewModel.swift": "1ab8b091c4f10c89de3fa6e00a2eb7b27cdbc2830a856e564c8ff5503871cb2d",
+    "whitenoise-iosTests/DeviceVerificationViewModelTests.swift": "917d79df9ac04708e4a84e68123dc5baf8353c4eb7ba1bde2e83cb3104de0cc2"
+  },
+  "compile_only_failures": [
+    {
+      "source_base": "792d3d27e87422aa0e7914d9f5da7ce1b58ab3b7",
+      "source_inputs": 790,
+      "input_manifest_sha256": "b2783c7a94343afd40301d7d67df8c0fd861deef6042e360fbebd97a03a3102e",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 5.54,
+      "log_sha256": "4cb06206426e2db53963224d370d276c5ef0599be6b357a4dc6bb0e36ae59e2a",
+      "physical_phone_changed": false,
+      "scope": "New opaque transport host API missing-feature RED with generated protocol controls; no fresh SDK pairing or delivery acceptance"
+    },
+    {
+      "source_base": "792d3d27e87422aa0e7914d9f5da7ce1b58ab3b7",
+      "source_inputs": 790,
+      "input_manifest_sha256": "b2783c7a94343afd40301d7d67df8c0fd861deef6042e360fbebd97a03a3102e",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 9.07,
+      "log_sha256": "a4e32df5340e43ab6ca6f2b7e6584c63b04e34b6233db8735c682ad9245014a9",
+      "physical_phone_changed": false,
+      "scope": "New opaque transport host API missing-feature RED with generated protocol controls; no fresh SDK pairing or delivery acceptance"
+    },
+    {
+      "source_base": "792d3d27e87422aa0e7914d9f5da7ce1b58ab3b7",
+      "source_inputs": 790,
+      "input_manifest_sha256": "b2783c7a94343afd40301d7d67df8c0fd861deef6042e360fbebd97a03a3102e",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 6.17,
+      "log_sha256": "cc561b4ebe3e405726cbbb468f8892c1f8145ec1c4ebef8b339809fd33987858",
+      "physical_phone_changed": false,
+      "scope": "New opaque transport host API missing-feature RED with generated protocol controls; no fresh SDK pairing or delivery acceptance"
+    }
+  ],
+  "validation": "Swiftformat6.2.3 using Mac4spaces120 configuration and scoped strictSwiftLint0.63.2 pass. Actual30 tests in5 suites; generated protocol controls and isolated real AccountStore/RuntimeLifecycle, not SDK pairing. Full UI/final full PR remain subsequent gates. Four generated SDK overrides excluded; Xcode tests use/install their dedicated simulator host, physical phone unchanged."
+}

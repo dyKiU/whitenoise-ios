@@ -1,0 +1,146 @@
+{
+  "tested_commit": "23b60a10ae7c2096a76b2b00543ae819af8448a5",
+  "scope": "Required unfiltered Staging PR suites on SDK987 experimentalflag1 and canonical published0.12 flag0. Original native source model/publicbuttons1+1 and affected44 are separately qualified; full optin skips do not qualify those runtime journeys. No recipient transfer/import or physical installation in this checkpoint.",
+  "cohorts": {
+    "ios-history-source-23b60a1-full-v1": {
+      "source_base": "23b60a10ae7c2096a76b2b00543ae819af8448a5",
+      "source_inputs": 883,
+      "input_manifest_sha256": "59ae994cdd7fe191d0c74914bb0494296f5b4766c0c58a43b219283442fe8609",
+      "profile": "local-history987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 188.47,
+      "log_sha256": "fd4c8c5973ab7bb759b90dd5e63984b87c2ba06b8d38c3bc8bf5050f7461d3ae",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered experimental unit PR suite; genuine source publicbuttons and original review/cancel acceptance has separate focused proof; no installed navigation/physical deployment",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2883,
+        "passedTests": 2876,
+        "failedTests": 0,
+        "skippedTests": 7
+      },
+      "test_failures": []
+    },
+    "ios-history-source-23b60a1-full-published-v1": {
+      "source_base": "23b60a10ae7c2096a76b2b00543ae819af8448a5",
+      "source_inputs": 883,
+      "input_manifest_sha256": "1011b119b2e57b2578cac3c29aea2543e6062c7e8f3d05fc1cbc199b1ed4f898",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 6.6,
+      "log_sha256": "163dbb4dc897d4aa9c7a474615d7498d38efe20af941d05fb215301ef28a9a6d",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed23b60a1 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-history-source-23b60a1-full-published-v2": {
+      "source_base": "23b60a10ae7c2096a76b2b00543ae819af8448a5",
+      "source_inputs": 883,
+      "input_manifest_sha256": "1011b119b2e57b2578cac3c29aea2543e6062c7e8f3d05fc1cbc199b1ed4f898",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 7.86,
+      "log_sha256": "5743a667959d70f626cba759087099808e7702a38df2701b5cdbe95e246ae900",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed23b60a1 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-history-source-23b60a1-full-published-v3": {
+      "source_base": "23b60a10ae7c2096a76b2b00543ae819af8448a5",
+      "source_inputs": 883,
+      "input_manifest_sha256": "1011b119b2e57b2578cac3c29aea2543e6062c7e8f3d05fc1cbc199b1ed4f898",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 4.46,
+      "log_sha256": "e5bd4278a7c64dc979400771a7fde7b695db88834d5ce2f4969387d26281d7db",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed23b60a1 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-history-source-23b60a1-full-published-v4": {
+      "source_base": "23b60a10ae7c2096a76b2b00543ae819af8448a5",
+      "source_inputs": 883,
+      "input_manifest_sha256": "1011b119b2e57b2578cac3c29aea2543e6062c7e8f3d05fc1cbc199b1ed4f898",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 11.82,
+      "log_sha256": "9b5037b2ef2bfb234530205bf8017749f6f3631125da5e3fd533d493696ae2ab",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed23b60a1 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-history-source-23b60a1-full-published-v5": {
+      "source_base": "23b60a10ae7c2096a76b2b00543ae819af8448a5",
+      "source_inputs": 883,
+      "input_manifest_sha256": "1011b119b2e57b2578cac3c29aea2543e6062c7e8f3d05fc1cbc199b1ed4f898",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 271.63,
+      "log_sha256": "cf408d0af66a5e34ea4ad76ef68948d04828b5fff5e49b42dbc00d3427b5ab34",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signed23b60a1 with canonical publishedSDK; no experimental native crypto acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2720,
+        "passedTests": 2717,
+        "failedTests": 0,
+        "skippedTests": 3
+      },
+      "test_failures": []
+    }
+  },
+  "skipped_test_cases": {
+    "ios-history-source-23b60a1-full-v1": [
+      "ExternalHostedUIControlTests/testExternalDriverAttachesWithoutReplacingHostedApp()",
+      "GenuineHistoryApprovalPaneTests/testHostedExplicitOriginalApprovalCommitsRealRelayImport()",
+      "GenuineHistorySourcePickerTests/testActualNativeChoicesCreateRefreshAndCancelOriginalThroughAccountOwner()",
+      "GenuineHistorySourcePickerTests/testHostedNativeChoiceRequestAndCancelThroughPublicDriver()",
+      "GenuineImportedHistoryPaneTests/testRealCommittedImportThroughAccountOwnedReaderAndHostedPane()",
+      "AccountAttentionCreationTests/generatedAccountReadinessWithAndWithoutAttention(useAttention:)",
+      "SignUpDraftStoreTests/submittedDraftAndDirectoryUseCompleteFileProtection()"
+    ],
+    "ios-history-source-23b60a1-full-published-v5": [
+      "ExternalHostedUIControlTests/testExternalDriverAttachesWithoutReplacingHostedApp()",
+      "SignUpDraftStoreTests/submittedDraftAndDirectoryUseCompleteFileProtection()",
+      "AccountAttentionCreationTests/generatedAccountReadinessWithAndWithoutAttention(useAttention:)"
+    ]
+  },
+  "sdk_restore": {
+    "stash": "ed62d8ee9c84990f283b3d00cf4459302d75ece1",
+    "exact12_verified": "ios-genuine-history-source-buttons-sdk.json",
+    "manifest_sha256": "ff7f9a8c3f623c72a17fe9ba4446fc86ac062b890be2fa3a6be087eeffe57cb7",
+    "source_sha": "98707713a2cc02828c2d66ed858588991896b9b0"
+  },
+  "narrow_cache_repairs": {
+    "ios-history-source-23b60a1-published-pcm-repair-v4.json": {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "sha256": "0d143d7a0424c6bcb83bf507c576f2b59a54aeab6ffe4ccfe1e622cbbf8b7484",
+      "bytes": 556664,
+      "reason": "Published v4 test-target explicit stale named FFI PCM only; zero-tests failure preserved.",
+      "retained_at": "/Users/pj/project/build/retired-ios-23b-published-v4-FFI.pcm"
+    },
+    "ios-history-source-23b60a1-published-pcm-repair-v2.json": {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "sha256": "8585eb7e7c690d00e1504310849f222c966dba96c62a531de3cf38d162d6c7a7",
+      "bytes": 556664,
+      "reason": "Published v2 extension-target exact stale FFI PCM. v3 duplicate compile-only retained: overbroad allXcode guard blocked repair due independentMacbuild, shell stilllaunchedretry.",
+      "idle_guard": "No xcodebuild with owned iOS DerivedData; Maccache unrelated.",
+      "retained_at": "/Users/pj/project/build/retired-ios-23b-published-v2-FFI.pcm"
+    },
+    "ios-history-source-23b60a1-published-pcm-repair.json": {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "sha256": "b4537a5cf2f53b0891dd3377174b7ca536a97e9891e837a7a020526c092deabd",
+      "bytes": 556712,
+      "reason": "Published v1 terminalzero-tests explicit header modified since named FFI PCM built; idle exactfile retirement only",
+      "scope": "No source/SDKcache broad clean",
+      "retained_at": "/Users/pj/project/build/retired-ios-23b-published-v1-FFI.pcm"
+    }
+  },
+  "failure_retention": "Publishedv1 packagePCM, v2 extensionPCM and v4 testPCM were zero-test compiler failures with named header-stale diagnostics. v3 unnecessarily repeated extensionPCM failure after overbroad allXcode guard refused independentMacbuild but shell stilllaunched. All raws retained, no product/source changes. Only3namedPCM files moved while owned iOS cache idle; no broad clean.",
+  "source_invariance": "883 frozeninputs each cohort; published attempts1\u20135 share exactcanonicalmanifest1011b119b2e57b2578cac3c29aea2543e6062c7e8f3d05fc1cbc199b1ed4f898. Final documentation is only postgate delta.",
+  "evidence": "Parent build/results exact prefix inputs/results/SDK/rawlogs/testtrees; M5 samepaths plus actual passing XCResults.",
+  "physical_phone": "M1SDK84113 signed-ready/source/cache unchanged throughout matrix.",
+  "profile": "PersonalTeam staging identities unchanged; no capabilities enabled."
+}

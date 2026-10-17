@@ -1,0 +1,34 @@
+{
+  "source_base": "970db200d44a810cfab5eee7830fa567fb7aeb21",
+  "branch": "codex/native-device-linking-wrapper",
+  "source_inputs": 774,
+  "input_manifest_sha256": "2d5e279145785bb45a5f76940cdaada22e0b12a5d6dea3fe67293e1d171e3e98",
+  "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+  "exit_code": 0,
+  "seconds": 102.71,
+  "log_sha256": "529e5c2e74f290dde7b5636a757223b2e057ac5ae4dbe1a5c8e27cc5762e87a3",
+  "command": [
+    "bash",
+    "scripts/test.sh",
+    "-only-testing:whitenoise-iosTests/NativeDeviceLinkingRuntimeTests"
+  ],
+  "scope": "App wrappers: capabilities and four missing-account operations; no fresh pairing or admission qualification",
+  "tests": {
+    "result": "Passed",
+    "totalTestCount": 5,
+    "passedTests": 5,
+    "failedTests": 0,
+    "skippedTests": 0
+  },
+  "owned_source_sha256": {
+    "whitenoise-ios/Core/MarmotClient.swift": "d3b06ed4fde4b6702ab893aac1b5b72c61a7b85ddd15a10eafe0b744d691674d",
+    "whitenoise-iosTests/NativeDeviceLinkingRuntimeTests.swift": "8da4d537d8440df6c468b7539523b4a57948ddff260bbd7f5e03ad1a2f45ad67"
+  },
+  "formatting": {
+    "formatter": "xcrun swift-format 6.2.3",
+    "scope": "Added forwarding range only, indentation4/lineLength120; existing testfile formatting retained",
+    "diff_check": "passed"
+  },
+  "generated_local_overrides_committed": false,
+  "remote_evidence_prefix": "/Users/pj/project/build/results/ios-native-linking-wrapper-focused-v1"
+}

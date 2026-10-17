@@ -1,0 +1,127 @@
+{
+  "base": "ed5449c9679c55e361120f8bbd250097dee57155",
+  "sdk": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+  "sdk_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+  "red_source_stash": "6ae57b8c0475cf966bbf8910b84e7f3eb7bc6472",
+  "red_source_proof": "Both exact owned RED files hash-verified from named stash (untracked test in third parent) against pre-test795-input manifest.",
+  "owned_source_sha256": {
+    "whitenoise-ios/Session/DeviceLinkingAccountScope.swift": "8d80900bf1b3399ca3738fc1c7b25628035ded69ee086551189b40523ec8bc9c",
+    "whitenoise-iosTests/DeviceLinkingEnrollmentActionTests.swift": "86105b3f6480e51cc21f9169c4edca824760569f28d7d056e5fef2957374ac57"
+  },
+  "runs": {
+    "red": {
+      "source_base": "ed5449c9679c55e361120f8bbd250097dee57155",
+      "source_inputs": 795,
+      "input_manifest_sha256": "92040436ff2111b12ab990cdfd76eb2ce27a61f6febaede6fe6a39b6a36679cf",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 79.79,
+      "log_sha256": "8c61532d0691de4a2519792b231eeb901f8a60479bca5968e32dfb3240812c96",
+      "physical_phone_changed": false,
+      "scope": "Enrollment scope forwards; generated original-handle controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 5,
+        "passedTests": 0,
+        "failedTests": 5,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: session.isWaiting\nsession \u2192 whitenoise_iosTests.(unknown context at $11b0ae280).EnrollmentSession\nisWaiting \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 4,
+          "testIdentifierString": "DeviceLinkingEnrollmentActionTests/delayedPacketCannotEscapeAccountReplacementAndReturn()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceLinkingEnrollmentActionTests/delayedPacketCannotEscapeAccountReplacementAndReturn()",
+          "testName": "delayedPacketCannotEscapeAccountReplacementAndReturn()"
+        },
+        {
+          "failureText": "Caught error: .DeviceLinkingNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 3,
+          "testIdentifierString": "DeviceLinkingEnrollmentActionTests/explicitActionsForwardOnlyToOriginalHandle()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceLinkingEnrollmentActionTests/explicitActionsForwardOnlyToOriginalHandle()",
+          "testName": "explicitActionsForwardOnlyToOriginalHandle()"
+        },
+        {
+          "failureText": "Expectation failed: expected error of type CancellationError, but \".DeviceLinkingNotReady\" of type MarmotKitError was thrown instead: CancellationError.self",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "DeviceLinkingEnrollmentActionTests/explicitCancellationRejectsEveryEnrollmentOperation()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceLinkingEnrollmentActionTests/explicitCancellationRejectsEveryEnrollmentOperation()",
+          "testName": "explicitCancellationRejectsEveryEnrollmentOperation()"
+        },
+        {
+          "failureText": "Expectation failed: expected error \".DeviceLinkingStaleRevision\" of type MarmotKitError, but \".DeviceLinkingNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.DeviceLinkingStaleRevision",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 2,
+          "testIdentifierString": "DeviceLinkingEnrollmentActionTests/originalSdkRevisionErrorRemainsAnError()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceLinkingEnrollmentActionTests/originalSdkRevisionErrorRemainsAnError()",
+          "testName": "originalSdkRevisionErrorRemainsAnError()"
+        },
+        {
+          "failureText": "Expectation failed: session.isWaiting\nsession \u2192 whitenoise_iosTests.(unknown context at $11b0ae280).EnrollmentSession\nisWaiting \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 5,
+          "testIdentifierString": "DeviceLinkingEnrollmentActionTests/suspensionRejectsDelayedEnrollmentResult()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceLinkingEnrollmentActionTests/suspensionRejectsDelayedEnrollmentResult()",
+          "testName": "suspensionRejectsDelayedEnrollmentResult()"
+        }
+      ]
+    },
+    "green": {
+      "source_base": "ed5449c9679c55e361120f8bbd250097dee57155",
+      "source_inputs": 795,
+      "input_manifest_sha256": "3b0d882cca4ab326a566a2fecc103e489a800da9bc4d9d9e3fd75dd20ec4eb40",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 17.65,
+      "log_sha256": "dfe162cf9bd5e53210e25a8574411905a06ec24ae0fe292b3bcb9a520f0807c6",
+      "physical_phone_changed": false,
+      "scope": "Enrollment scope forwards; generated original-handle controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 5,
+        "passedTests": 5,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "affected": {
+      "source_base": "ed5449c9679c55e361120f8bbd250097dee57155",
+      "source_inputs": 795,
+      "input_manifest_sha256": "3b0d882cca4ab326a566a2fecc103e489a800da9bc4d9d9e3fd75dd20ec4eb40",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 7.35,
+      "log_sha256": "812c3603ee169a67c6b051f65819f3e120dd7aea30a930a2455bb22d3daaec50",
+      "physical_phone_changed": false,
+      "scope": "Enrollment scope forwards; generated original-handle controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 30,
+        "passedTests": 30,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "checks": {
+    "swiftlint": "0.63.2 strict scoped pass",
+    "swift_format": "6.2.3 strict scoped pass; Mac four-space/120 configuration",
+    "git_diff_check": "pass"
+  },
+  "scope": "Four explicit revision-bound original-handle enrollment forwards only. Generated handle controls use actual AccountStore A-B-A and RuntimeLifecycle suspension; no genuine SDK enrollment acceptance.",
+  "limits": [
+    "Verification protocol/model/UI and advertised capability unchanged.",
+    "Approval handle custody and enrollment model/UI remain absent.",
+    "No Core/Cargo/SDK build, physical install or production app action.",
+    "Xcode uses a hosted Staging simulator test app; this is not evidence that previously installed development binary remains byte-identical.",
+    "Full published and experimental suites were not repeated for this thin scoped slice."
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "base": "b5a0b39a544ef4274ae31a32c75656326fb45a35",
+  "scope": "Genuine SDK987 listed recipient, public XCUI row/Request/Cancel actions, actual AppState original review and positive runtime cleanup. Continue, recipient approval, transfer/import, full PR and physical phone acceptance are excluded.",
+  "source_sha256": {
+    "whitenoise-ios/Conversation/HistorySourcePickerView.swift": "2173a3144bd2bd4c7436c811beff018a35e8aebe3db8da459cb80c0cabb34c11",
+    "whitenoise-iosTests/GenuineHistorySourcePickerTests.swift": "65d971a8fe32adac88d6cb2aa97e91e64e97f9094c26e8426851883ed7f3856e",
+    "whitenoise-iosUITests/HostedHistorySourcePickerUITests.swift": "73dcae55074dd384f7672f45187fad9ccc60355978f3297dce05b80e10e2e625"
+  },
+  "preserved_sources": {
+    "v1_local": "bc9241691dfb6fc09b434a591cd00d340bc8b04a",
+    "v1_m5": "2aa1cb0e1fdc6c6e266ec38142e618211caf8363",
+    "v2_local": "980e858faf5c9e8b09320edc7e3d240f58f11f0a",
+    "v2_m5": "027e7318142e3ff3c3e7aeafd0389f5bcdc0c722"
+  },
+  "qualification": {
+    "ios-genuine-history-source-buttons-build-v1": {
+      "exit_code": 0,
+      "seconds": 23.0,
+      "source_inputs": 882,
+      "log_sha256": "8d20989584c0be34d317341fa834fa72f5826843b29de1383c6a9d5b582978aa",
+      "scope": "Actual history approval fixture plus public UI driver build only; no runtime success implied"
+    },
+    "ios-genuine-history-source-buttons-build-v2": {
+      "exit_code": 0,
+      "seconds": 21.23,
+      "source_inputs": 882,
+      "log_sha256": "635125af87216afe69ca57c096a1f4a4099e2f30aa4c15e437945251e2d73828",
+      "scope": "Actual history approval fixture plus public UI driver build only; no runtime success implied"
+    },
+    "ios-genuine-history-source-buttons-public-v1": {
+      "unit_exit_code": 0,
+      "driver_exit_code": 65,
+      "seconds": 19.29,
+      "source_inputs": 882,
+      "logs": {
+        "unit": "bac0348732c9009b5a63e6b752b589bf89eb570269a6895291cc15912fa5a1d4",
+        "driver": "fbfac6282036ee71179281bd4825b1ac4999afba78872d21e90d9d1c369505b0"
+      },
+      "completed": {
+        "original_cancelled": true,
+        "public_actions": true,
+        "runtime_closed": true
+      },
+      "unit": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "unit_failures": [],
+      "driver": {
+        "result": "Failed",
+        "totalTestCount": 1,
+        "passedTests": 0,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "driver_failures": [
+        {
+          "failureText": "XCTAssertTrue failed",
+          "targetName": "whitenoise-iosUITests",
+          "testIdentifier": 1,
+          "testIdentifierString": "HostedHistorySourcePickerUITests/testExternalNativeChoiceRequestAndCancel()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosUITests/HostedHistorySourcePickerUITests/testExternalNativeChoiceRequestAndCancel",
+          "testName": "testExternalNativeChoiceRequestAndCancel()"
+        }
+      ]
+    },
+    "ios-genuine-history-source-buttons-public-v2": {
+      "unit_exit_code": 0,
+      "driver_exit_code": 0,
+      "seconds": 13.31,
+      "source_inputs": 882,
+      "logs": {
+        "unit": "4d2a13cae6c8c0679df91accddfd9a6c1754e58d3c634efaf4c1e34176ea12ac",
+        "driver": "78343cf3ec484373997610dcef5d425156f41c657f03fa44b3a9be670a93c630"
+      },
+      "completed": {
+        "original_cancelled": true,
+        "public_actions": true,
+        "runtime_closed": true
+      },
+      "unit": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "unit_failures": [],
+      "driver": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "driver_failures": []
+    },
+    "ios-genuine-history-source-buttons-affected-v1": {
+      "source_base": "b5a0b39a544ef4274ae31a32c75656326fb45a35",
+      "source_inputs": 882,
+      "input_manifest_sha256": "f4b6b38bc403e779433917b420a938c4e3f55404e8f1e17c26b2f470948e2ffa",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 9.59,
+      "log_sha256": "cc54da8357294cce95fddd16ffeda53160038912341c5d69ec4fd6db7ecfbc55",
+      "physical_phone_changed": false,
+      "scope": "Affected source model/pane/native query/recipient custody/constructor/account ownership controls; genuine source request executed separately, no continuation/consent/import or full PR claim",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 44,
+        "passedTests": 44,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "v1_failure": "Driver checked lazy off-screen Cancel existence before scrolling; it subsequently scrolled/tapped and native unit passed1. Minimal driver-only bounded scroll-before-check correction; no SDK/product authority fix.",
+  "sdk_manifest": "ios-genuine-history-source-buttons-sdk.json",
+  "sdk_manifest_sha256": "ff7f9a8c3f623c72a17fe9ba4446fc86ac062b890be2fa3a6be087eeffe57cb7",
+  "runtime_fixture": "Existing private positively closed synthetic Bsim root; actual native query and SDK fresh factory, no injected protocol/query/factory or descriptor-based permission.",
+  "visual": {
+    "path": "build/results/ios-genuine-history-source-buttons-review.png",
+    "sha256": "1a2fb7a072e754068c763adc1b31693ac64b28b543575410dc9c4a7efb9c93d3",
+    "review": "Actual source/receiving fingerprints, chat ID/count/cutoff and source-attestation wording visible. Cancel below fold is reachable through public scroll. Continue never tapped."
+  },
+  "checks": {
+    "swift_format": "scoped strict pass",
+    "swiftlint": "0.63.2 scoped strict pass",
+    "git_diff_check": "pass"
+  },
+  "proof_paths": "Parent build/results regular manifests/results/raw logs; M5 same prefix plus actual unit/driver/affected XCResults.",
+  "catalog": "No new strings or catalog changes.",
+  "phone_ready": "M1 SDK84113/source/signing cache unchanged."
+}

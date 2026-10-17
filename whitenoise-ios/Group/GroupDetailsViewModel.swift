@@ -1004,7 +1004,10 @@ final class GroupDetailsViewModel {
             return L10n.string("That member is already an admin.")
         case .NotAdmin:
             return L10n.string("That member is not an admin.")
-        case .MissingKeyPackage(let account):
+        case .MissingKeyPackage:
+            guard let account = MissingKeyPackageInvitationPresentation.accountIdHex(for: marmotError) else {
+                return UserFacingError.message(for: marmotError)
+            }
             return MissingKeyPackageInvitationPresentation.message(
                 accountIdHex: account,
                 knownName: appState.knownDisplayName(forAccountIdHex: account)

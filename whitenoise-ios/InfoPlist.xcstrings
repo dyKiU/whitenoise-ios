@@ -85,61 +85,61 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise verwendet die Kamera, um Profil-QR-Codes zu scannen und Fotos und Videos für verschlüsselte Chats aufzunehmen."
+            "value" : "White Noise verwendet die Kamera, um QR-Codes für Profile und Geräteverknüpfungen zu scannen und Fotos und Videos für verschlüsselte Chats aufzunehmen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats."
+            "value" : "White Noise uses the camera to scan profile and device pairing QR codes and take photos and videos for encrypted chats."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise usa la cámara para escanear códigos QR de perfiles y tomar fotos y videos para chats cifrados."
+            "value" : "White Noise usa la cámara para escanear códigos QR de perfiles y vinculación de dispositivos y tomar fotos y videos para chats cifrados."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise utilise la caméra pour scanner les codes QR des profils et prendre des photos et des vidéos pour les discussions chiffrées."
+            "value" : "White Noise utilise la caméra pour scanner les codes QR des profils et d’association des appareils et prendre des photos et des vidéos pour les discussions chiffrées."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise usa la fotocamera per scansionare i codici QR dei profili e scattare foto e registrare video per le chat crittografate."
+            "value" : "White Noise usa la fotocamera per scansionare i codici QR dei profili e di abbinamento dei dispositivi e scattare foto e registrare video per le chat crittografate."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O White Noise usa a câmera para ler códigos QR de perfis e tirar fotos e gravar vídeos para conversas criptografadas."
+            "value" : "O White Noise usa a câmera para ler códigos QR de perfis e de emparelhamento de dispositivos e tirar fotos e gravar vídeos para conversas criptografadas."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise использует камеру для сканирования QR-кодов профилей, съёмки фото и видео для зашифрованных чатов."
+            "value" : "White Noise использует камеру для сканирования QR-кодов профилей и сопряжения устройств, съёмки фото и видео для зашифрованных чатов."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise, profil QR kodlarını taramak ve şifreli sohbetler için fotoğraf ve video çekmek amacıyla kamerayı kullanır."
+            "value" : "White Noise, profil ve cihaz eşleştirme QR kodlarını taramak ve şifreli sohbetler için fotoğraf ve video çekmek amacıyla kamerayı kullanır."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise 使用相机扫描个人资料二维码，并为加密聊天拍摄照片和视频。"
+            "value" : "White Noise 使用相机扫描个人资料和设备配对二维码，并为加密聊天拍摄照片和视频。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White Noise 使用相機掃描個人資料 QR 碼，並為加密聊天拍攝照片和影片。"
+            "value" : "White Noise 使用相機掃描個人資料和裝置配對 QR 碼，並為加密聊天拍攝相片和影片。"
           }
         }
       }

@@ -1,0 +1,140 @@
+{
+  "qualified_source": "1cfbbaea21a49ec5b77f05c8abd08a9b771f7352",
+  "reader_commit": "23e6558c56734f9a2f75dc4ed760b31648f3b7dc",
+  "pane_commit": "1966090d3e81c137e98c7cf9e032164da382b007",
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "scope": "Full unfiltered Staging PR suites on matched experimental84113 and canonical published0.12, using existing dedicated simulator/cache. No physical installation or new interactive application history-transfer acceptance.",
+  "raw_local_directory": "../build/results",
+  "raw_remote_directory": "/Users/pj/project/build/results",
+  "cohorts": [
+    {
+      "prefix": "ios-history-reader-pane-1cfbbae-full-v1",
+      "source": "1cfbbaea21a49ec5b77f05c8abd08a9b771f7352",
+      "inputs": 841,
+      "manifest_sha256": "507417f29b4e2a1421ad6b4fb5f397e33aa1d64301f210ecb8fa0984325de70b",
+      "log_sha256": "744c2bd3dafdd4b708f774668553b130d2f97cff929153dfc155cde185d47185",
+      "result_sha256": "6449bedbb40891ab3e4904c959b53fe578c1514116bc4eb31e592665392fd6f1",
+      "profile": "local-history84113/experimentalflag1/Staging",
+      "exit_code": 0,
+      "seconds": 165.45,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2836,
+        "passedTests": 2834,
+        "failedTests": 0,
+        "skippedTests": 2
+      },
+      "compile_only": false
+    },
+    {
+      "prefix": "ios-history-reader-pane-1cfbbae-full-published-v1",
+      "source": "1cfbbaea21a49ec5b77f05c8abd08a9b771f7352",
+      "inputs": 841,
+      "manifest_sha256": "b5ea8e1f92c75b2274080a93292cf90db526b98b7f7b36d534d89e78df2cab19",
+      "log_sha256": "0fcd90058f930aa854fb0101f01f17d44a16758db059a578c861d81c23c5df22",
+      "result_sha256": "6cbee28427066a476e3d80699ff90742442fe017386d2b7516ed356c2a1415af",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 6.72,
+      "tests": null,
+      "compile_only": true
+    },
+    {
+      "prefix": "ios-history-reader-pane-1cfbbae-full-published-v2",
+      "source": "1cfbbaea21a49ec5b77f05c8abd08a9b771f7352",
+      "inputs": 841,
+      "manifest_sha256": "b5ea8e1f92c75b2274080a93292cf90db526b98b7f7b36d534d89e78df2cab19",
+      "log_sha256": "ee3d1db6631ad19e5dfecd1f3b9a17121c8870d3c52c4985be9ea2b6eba2f6e8",
+      "result_sha256": "ad5479d5a1cfa9f4ad1447711f93c099ba8bb3d8bdccc1d3bde9f04fb79b0816",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 11.15,
+      "tests": null,
+      "compile_only": true
+    },
+    {
+      "prefix": "ios-history-reader-pane-1cfbbae-full-published-v3",
+      "source": "1cfbbaea21a49ec5b77f05c8abd08a9b771f7352",
+      "inputs": 841,
+      "manifest_sha256": "b5ea8e1f92c75b2274080a93292cf90db526b98b7f7b36d534d89e78df2cab19",
+      "log_sha256": "3ff16f98e43b628a78a3cefe78f51cbcaa6ac09f05fb57b406a9498ba5ce6e1b",
+      "result_sha256": "d81a560742dcdbe81c3e4fdcf880761d6745f04b06dcaba4d08100e1b8168875",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 11.4,
+      "tests": null,
+      "compile_only": true
+    },
+    {
+      "prefix": "ios-history-reader-pane-1cfbbae-full-published-v4",
+      "source": "1cfbbaea21a49ec5b77f05c8abd08a9b771f7352",
+      "inputs": 841,
+      "manifest_sha256": "b5ea8e1f92c75b2274080a93292cf90db526b98b7f7b36d534d89e78df2cab19",
+      "log_sha256": "e21c30fcab7d684dc7100cfce023d91000bfa545ba499b20e4caca3e45864fa8",
+      "result_sha256": "647d6fa81e4e2fed50eca1d3bffc5da68aed3ffa085ba3d4e96e44c23d18dec9",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "exit_code": 0,
+      "seconds": 279.73,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2716,
+        "passedTests": 2714,
+        "failedTests": 0,
+        "skippedTests": 2
+      },
+      "compile_only": false
+    }
+  ],
+  "compile_only_repairs": [
+    {
+      "source": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "bytes": 555704,
+      "sha256": "23e294928b9a359c07a6858080532d2df04b4fd3998911f108b1d23f8e0d4ddb",
+      "reason": "Exact header modification diagnostic after SDK profile switch; all own Xcode processes terminal and no open file",
+      "scope": "Only named diagnosed FFI PCM moved; frozen source unchanged"
+    },
+    {
+      "source": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "bytes": 555656,
+      "sha256": "5b71458a65d18be7618ea0abbe253eedd8fd0c70dcc9873807060cda684f8e6c",
+      "reason": "Exact NotificationServiceExtension header size mismatch274835->241740; owncacheidle/lsofclear",
+      "scope": "Only newly diagnosed NSE FFI PCM moved; source unchanged"
+    },
+    {
+      "source": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "bytes": 555656,
+      "sha256": "ef4674e38cd4b55b641a6a2fa3058fbefff548e5da7de137a771ed3adc347859",
+      "reason": "Third exact FFI header modification diagnostic, cacheidle/lsofclear",
+      "scope": "Only named diagnosed FFI PCM moved; source unchanged"
+    }
+  ],
+  "SDK4_restoration_and_hosted_test_provenance": {
+    "SDK4_restored_from_named_stash": "42e976e6f4b7ffbcdfbe42089b3dd4269d488790",
+    "sdk4_hashes": {
+      "Packages/MarmotKit/MARMOT_VERSION": "bc26500dd12a74d981c8c4340e33c02c097846fa8bb9b964661e377e4bc4216d",
+      "Packages/MarmotKit/Package.swift": "4c379ba9d572adb649c9692466ebbc80204af9ca0bf5acd63256ff6e0fa29b50",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKit.swift": "ee50aae01fff2d451f3957181eb6643ceda9503e84899a89538684259348e36a",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift": "c2a560f7841709d13d560c6bb6a85bd8489df2ddb96683706dc7996826542843"
+    },
+    "LOCAL_BUILD_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+    "hosted_test_installation": {
+      "profile": "canonical published0.12/flag0",
+      "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+      "installed_executable_sha256": "0aebfc5dac21c31ed5a6093f8399f46861986c89560929a8603f8d6bb3ce60dc",
+      "build_executable_sha256": "0aebfc5dac21c31ed5a6093f8399f46861986c89560929a8603f8d6bb3ce60dc",
+      "manual_installation": false,
+      "account_data_inspected": false
+    },
+    "physical_installation": false
+  },
+  "original_failed_full": "ios-history-reader-pane-1966090-full-v1;2833passed/1hostedteardowncrash/2skipped, retained with crash report fbdc68bb5cf6ee10117db5c944fb0aa335cc0ece4c973b495d06da74be57bc66",
+  "fixture_correction_proof": "docs/hosted-gallery-account-teardown-verification.json",
+  "postgate_delta": "This qualification document only",
+  "limits": [
+    "Full PR coverage is not live account/UI history grant acceptance",
+    "Reader tests use injected page data plus actual native missing-account denial",
+    "Ordered accepted/rejected media are presentation outcomes; no acquisition or automatic downloads",
+    "Current dedicated simulator test host is published0.12 after implicit hosted-test installation; restored SDK source alone does not rebuild that installed bundle",
+    "Personal Team signed-ready refresh pending; physical installation remains deferred"
+  ]
+}

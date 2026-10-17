@@ -1,0 +1,177 @@
+{
+  "base": "32cdbd7c70721df54b7c91c6de44731c2ac5fbe2",
+  "sdk": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "source_candidates": {
+    "initial": "532eff8f8f8cde40740bca9a4a9b10670b081ca3",
+    "final_localized": "53e91d835c91073d2fc92058815d407fc0936044"
+  },
+  "source_sha256": {
+    "Shared/Localizable.xcstrings": "dc20ccc6b7a9ee43f8abbee6bf7a260fb63d50b5358d4ee8490f3eb4e99f93cf",
+    "whitenoise-ios/Settings/HistoryConsentReviewView.swift": "dc311c40bc653660edc17d029f981236d0ef65298a8b22c9503f5e55676290f2",
+    "whitenoise-ios/Settings/SettingsView.swift": "18b1508ebeae40d4686142419b3f85a9f40fdf0eb64e2bba645a4ea835ceb219",
+    "whitenoise-iosTests/HistoryConsentReviewPaneTests.swift": "aac0dc5cbe499ffc18cfd73736a0186e9073f6e408a299300839228c2f6edb7e"
+  },
+  "runs": {
+    "green-v1": {
+      "source_inputs": 853,
+      "input_manifest_sha256": "a30cc8b9ad29190ebe0285a64e420ab264d219ba76cf8098a1704e8ac9d3c073",
+      "log_sha256": "163c6daafc794c3e06076f660fea060119ac95e6dbdb308e795d5ec14ee54de3",
+      "exit_code": 0,
+      "seconds": 78.99,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 9,
+        "passedTests": 9,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "prefix": "ios-history-recipient-pane-green-v1"
+    },
+    "green-v2": {
+      "source_inputs": 853,
+      "input_manifest_sha256": "ab682af75d36b698ce6845cd707bb7a09f6780cbdd31147d6a858d91f7258eb9",
+      "log_sha256": "39fa638cf4b178aaa81a01e0250c66042ab269a6c3b0453b0582aa920e28007b",
+      "exit_code": 0,
+      "seconds": 10.9,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 9,
+        "passedTests": 9,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "prefix": "ios-history-recipient-pane-green-v2"
+    },
+    "affected-v2": {
+      "source_inputs": 853,
+      "input_manifest_sha256": "ab682af75d36b698ce6845cd707bb7a09f6780cbdd31147d6a858d91f7258eb9",
+      "log_sha256": "171391f1ef27b3bc1b4a4ad9a1ac3efab93b2991753cbd19503bc254fd0c90d8",
+      "exit_code": 0,
+      "seconds": 9.02,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 101,
+        "passedTests": 101,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "prefix": "ios-history-recipient-pane-affected-v2"
+    }
+  },
+  "localization": {
+    "command": [
+      "xcrun",
+      "xcstringstool",
+      "sync",
+      "/Users/pj/project/build/ios-history-recipient-localizations/Localizable.xcstrings",
+      "--stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/HistoryConsentReviewView.stringsdata",
+      "--stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/SettingsView.stringsdata",
+      "--skip-marking-strings-stale"
+    ],
+    "compiled_stringsdata_sha256": "193d0caf0506f8d5093df50931c02016bdd18d7f5f849c04b1f3585ec4a50c80",
+    "settings_stringsdata_sha256": "9990a1c9c08192d6f506d9ea49193554cc76c30063c16be282d1e4403d01c091",
+    "Apple_export_template": "/Users/pj/project/build/ios-verification-localizations/export/de.xcloc/Localized Contents/de.xliff",
+    "template_sha256": "e0ccbdbd16bab16d016d6ea38e4181e5928108872643b8fdece3a0f7c44dd432",
+    "original_catalog_sha256": "2251562a5856c887b9f5c8f81af3acbaf32f9ba1647b9c18e019b08fc34bb9c1",
+    "original_entries": 1985,
+    "added": [
+      "Review incoming history",
+      "No pending history requests.",
+      "Receiving device key",
+      "Snapshot through",
+      "Records",
+      "Imported records",
+      "Size",
+      "History request unavailable. Retry or cancel."
+    ],
+    "imports": [
+      {
+        "language": "de",
+        "exit_code": 0,
+        "xliff_sha256": "abff222d624774ef360b4a61bfb0d0da250117dfa9371aa9734608a12751f588",
+        "log_sha256": "aebe76230498e9e58c7ad31275ec7e3f3215a7bb0cb772cb1de79238f7f0569d"
+      },
+      {
+        "language": "es",
+        "exit_code": 0,
+        "xliff_sha256": "8f4c706c02dcd4f67ab30f1aa90426b6d673987003852254b0cf6a57b421edd0",
+        "log_sha256": "28529535f71e0096c8f11062873de6449f307a12cf215b889a0de450868cbd73"
+      },
+      {
+        "language": "fr",
+        "exit_code": 0,
+        "xliff_sha256": "b54fb8f5f6b347e86285b8f9ea9861b7debdb88e84ac5a4e13679195a3094c74",
+        "log_sha256": "6cba1ea0c28b0d3718bd120a6ae7122564bb15a7ee195b5daf1215f56c160d13"
+      },
+      {
+        "language": "it",
+        "exit_code": 0,
+        "xliff_sha256": "3604c3215f87b457f80b6835cce9e4d7ea512794f56c7792423be1e8b71748dc",
+        "log_sha256": "0d19b76db1ab08c8337ac7d53b56bfadeec5a759a809e0bd731f096723509c6b"
+      },
+      {
+        "language": "pt",
+        "exit_code": 0,
+        "xliff_sha256": "52d26dda8aabc0b9c0f34cdd5001fd9aa90df48ff776de6e65fb638a4083c9d5",
+        "log_sha256": "0417ebc6e07160ad81fc24abd0eb6daf30b702d52fdc177c151445072b4c5ebb"
+      },
+      {
+        "language": "ru",
+        "exit_code": 0,
+        "xliff_sha256": "75ad9cb3e68eb2dd821dbcb5119771225af05b65d4f5e763b420e82bf11b2a26",
+        "log_sha256": "3831356edbca45d4e1f04a878d269d018acb5c59845431923f12d8e28d3277a4"
+      },
+      {
+        "language": "tr",
+        "exit_code": 0,
+        "xliff_sha256": "6c17afa5a56ee123274de2516478ad8048f0721fe4d3346071b65f490a0a1cfb",
+        "log_sha256": "8eeef1bc0766057990a31167085911a21a7906f72692f09b96154274ae5f2c7c"
+      },
+      {
+        "language": "zh-Hans",
+        "exit_code": 0,
+        "xliff_sha256": "f12b01de13a55a87fc482adaf56ec1e0eddeb86d76fb58ea59b106d8c6d2f34a",
+        "log_sha256": "33de4fec5f04c5c31cc6dbd308931cf6d4ee1850e4c98a103f82bb63ae8f736c"
+      },
+      {
+        "language": "zh-Hant",
+        "exit_code": 0,
+        "xliff_sha256": "e54a4934cdf921f04c78480a481bfce2e11778f76dad87a18462b272facda192",
+        "log_sha256": "69e4823c06e0ea7464bb025aaa852bc2643051ff8070890f02f8e7337b1e6a01"
+      }
+    ],
+    "all_existing_entries_and_order_unchanged": true,
+    "preservation": "Only whole Apple sync/import-generated new entry retained; original raw top-level entry blocks preserved, no nested plural edits",
+    "catalog_sha256": "dc20ccc6b7a9ee43f8abbee6bf7a260fb63d50b5358d4ee8490f3eb4e99f93cf"
+  },
+  "localization_script_sha256": "64d7c8e32363e42e3974d6b01858a8c2954a98ede831bc5c0930f5f3c4607743",
+  "extraction_failure": {
+    "path": "ios-history-recipient-catalog-extraction-v1-failed.log",
+    "sha256": "f6bcaf8fca4d4c5a41efbdbc488de7f4c61d4a37d18f174cd63e4d19459de195",
+    "scope": "Assertion before catalog edits: pane-only stringsdata omitted Settings label; corrected to Apple sync both compiled inputs."
+  },
+  "screenshot": {
+    "path": "ios-history-recipient-review-initial.png",
+    "sha256": "4a3ebe65209ff4d4cb967f372ade9274310089d261da6acdad6afbac079dbbc8",
+    "synthetic_original_review_only": true,
+    "inspection": "Complete device fingerprints, cutoff/count/size and separate source-attested footer visible; Form scroll holds explicit actions below."
+  },
+  "checks": {
+    "strict_swiftlint_0_63_2": 0,
+    "canonical_scoped_swift_format": 0,
+    "git_diff_check": 0
+  },
+  "raw_local_directory": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results",
+  "raw_m5_directory": "/Users/pj/project/build/results",
+  "limits": [
+    "Model default-deny semanticRED0/3 and original lifecycleRED0/5 preserved in preceding signed proofs; this pane composes their held originals without new authority.",
+    "Exact displayed revision forwarded only on explicit Approve; row UUID selects an already-held original, never reconstructs one. Read-only pane opening and refresh never approve.",
+    "Synthetic hosted pane screenshot/actions and isolated lifecycle tests qualify native presentation, not actual imported-history UI acceptance.",
+    "Scope custody remains AccountStore-owned through pane departure; SDK84113 and Personal Team identity unchanged; no manual install or physical phone action.",
+    "All1985 old catalog values/order retained;8 new keys translated in9 languages using actual Apple stringsdata sync and XLIFF imports.",
+    "Full unfiltered experimental and canonical published suites remain next; no integration/publication claim.",
+    "Only this compact proof is added after final source freeze."
+  ]
+}

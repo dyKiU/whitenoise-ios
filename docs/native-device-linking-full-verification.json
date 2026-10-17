@@ -1,0 +1,136 @@
+{
+  "source_commit": "3402bb997829c866238055be1db302889a40b53d",
+  "full_gates": [
+    {
+      "source_commit": "3402bb997829c866238055be1db302889a40b53d",
+      "source_inputs": 780,
+      "verified_sources": {
+        "preserved_worktree": 778,
+        "preserved_M5_generated_metadata": 2
+      },
+      "mismatches": [],
+      "input_manifest_sha256": "2dde0b739e80bd66b8f91ee5c46f18a98dcc55af86d3af7b7e99a9e6412bab1b",
+      "log_sha256": "8bda582c8946afddaeeb6b262f64d12da0138f03d62d01fdfedb87ce7d383b0a",
+      "result": {
+        "source_base": "3402bb997829c866238055be1db302889a40b53d",
+        "source_inputs": 780,
+        "input_manifest_sha256": "2dde0b739e80bd66b8f91ee5c46f18a98dcc55af86d3af7b7e99a9e6412bab1b",
+        "profile": "local-e6/experimentalflag1/Staging",
+        "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+        "exit_code": 0,
+        "seconds": 195.89,
+        "log_sha256": "8bda582c8946afddaeeb6b262f64d12da0138f03d62d01fdfedb87ce7d383b0a",
+        "physical_phone_changed": false,
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 2724,
+          "passedTests": 2722,
+          "failedTests": 0,
+          "skippedTests": 2
+        },
+        "test_failures": []
+      },
+      "scope": "Full experimental Staging regression suite only; no fresh pairing, ordinary chat delivery, physical install or upstream interoperability claim"
+    },
+    {
+      "source_commit": "3402bb997829c866238055be1db302889a40b53d",
+      "source_inputs": 780,
+      "verified_sources": {
+        "preserved_worktree": 775,
+        "signed_source": 5
+      },
+      "mismatches": [],
+      "input_manifest_sha256": "1f561f0f6199fdffa2c5ad369a38c9a42aa0fc2e04b878ffb116633ff19ee582",
+      "log_sha256": "274df6371e700f5ee82d278b385ead766b5af5e8a21b890fa3ed24deea657cb2",
+      "result": {
+        "source_base": "3402bb997829c866238055be1db302889a40b53d",
+        "source_inputs": 780,
+        "input_manifest_sha256": "1f561f0f6199fdffa2c5ad369a38c9a42aa0fc2e04b878ffb116633ff19ee582",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 0,
+        "seconds": 270.05,
+        "log_sha256": "274df6371e700f5ee82d278b385ead766b5af5e8a21b890fa3ed24deea657cb2",
+        "physical_phone_changed": false,
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 2704,
+          "passedTests": 2702,
+          "failedTests": 0,
+          "skippedTests": 2
+        },
+        "test_failures": []
+      },
+      "scope": "Full published0.12 default Staging regression suite only; no fresh pairing, ordinary chat delivery, physical install or upstream interoperability claim"
+    }
+  ],
+  "compile_only_attempts": [
+    {
+      "result": {
+        "source_base": "3402bb997829c866238055be1db302889a40b53d",
+        "source_inputs": 780,
+        "input_manifest_sha256": "1f561f0f6199fdffa2c5ad369a38c9a42aa0fc2e04b878ffb116633ff19ee582",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 65,
+        "seconds": 6.81,
+        "log_sha256": "63008b5af015595a52797da59039366882f01c67e116c0529d5e861f5e5b8c33",
+        "physical_phone_changed": false
+      },
+      "scope": "Compile-only diagnosed stale FFI module; zero tests; source identical to final published full gate",
+      "retirement": {
+        "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+        "bytes": 529976,
+        "sha256": "585dd58a343d9c2ab8b482f512718be2285235481def85dad1250c646a681ea2",
+        "cause": "Exact diagnosed e6-to-published FFI precompiled-module header mismatch; zero tests; target idle"
+      }
+    },
+    {
+      "result": {
+        "source_base": "3402bb997829c866238055be1db302889a40b53d",
+        "source_inputs": 780,
+        "input_manifest_sha256": "1f561f0f6199fdffa2c5ad369a38c9a42aa0fc2e04b878ffb116633ff19ee582",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 65,
+        "seconds": 12.65,
+        "log_sha256": "4430e2f8f75ed214a4c5dd7cab80ea1a4ff1432acacc15ce666f705df6399f39",
+        "physical_phone_changed": false
+      },
+      "scope": "Compile-only diagnosed stale FFI module; zero tests; source identical to final published full gate",
+      "retirement": {
+        "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+        "bytes": 529928,
+        "sha256": "185b55f7a7866b8464afa18b7165c964e806148a62856f0ba99eed71c2cfbdcc",
+        "cause": "Second exact diagnosed e6-to-published FFI module header mismatch; zero tests; target idle"
+      }
+    },
+    {
+      "result": {
+        "source_base": "3402bb997829c866238055be1db302889a40b53d",
+        "source_inputs": 780,
+        "input_manifest_sha256": "1f561f0f6199fdffa2c5ad369a38c9a42aa0fc2e04b878ffb116633ff19ee582",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 65,
+        "seconds": 13.52,
+        "log_sha256": "352fc2af2e7bf333f415ca722c77de6e874fff2f5fff602445e08ce57586efc6",
+        "physical_phone_changed": false
+      },
+      "scope": "Compile-only diagnosed stale FFI module; zero tests; source identical to final published full gate",
+      "retirement": {
+        "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+        "bytes": 529928,
+        "sha256": "4c2cb0bbaea99c5cef483773e986224b7723c02c0f5b07fc20bd3b8416bf4428",
+        "cause": "Third exact diagnosed e6-to-published FFI module header mismatch; zero tests; target idle"
+      }
+    }
+  ],
+  "binding_restoration": {
+    "restored_from": "5df8b7d071e8a46ac6fce12240045cb3ff05971c",
+    "four_overrides_restored_byte_exact": true,
+    "all_previous_experimental_inputs_unchanged": 780,
+    "physical_phone_changed": false
+  },
+  "limits": [
+    "Full app regressions, not fresh pairing or chat delivery acceptance",
+    "Hosted tests install their current test-host products; final hosted product is published baseline until the next experimental rebuild",
+    "Physical iPhone installation remains deferred; M1 signed ready build remains011969a/e6"
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "base": "00837b43dde1b92d1cd35785629f2592168f015a",
+  "sdk_source": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "transport_format": "whitenoise-pairing:v1: + canonical base64; total UTF8 <=2200",
+  "source_paths": {
+    "Shared/Localizable.xcstrings": "1e81119d21cdc49ca0b57a9803e0c4e300c6415a427ba7ab3325ba8202e4827a",
+    "whitenoise-ios/InfoPlist.xcstrings": "21d92378a8f0f49a4477399d9dd0a0bd02c38fb03981422b09a54cc5c27589be",
+    "whitenoise-ios/Settings/DeviceVerificationView.swift": "2fa81827c94c6bf747e712fa16834c6bdb551fff059db13665fdac4134f91068",
+    "whitenoise-ios/Core/DevicePairingQRCode.swift": "0626f4cfe1d1285092a1d09d59720c058061fcc3b5e45b9020ca4fc0e5d23ce7",
+    "whitenoise-ios/Settings/DevicePairingQRViews.swift": "4d00eeb565e7904f7893f941621c3ed910aeeac52b18391c6be50608ebb5dbff",
+    "whitenoise-iosTests/DevicePairingQRCodeTests.swift": "9da5b3e1fe9068419cd55e8add578fcc1bd10c4511baf3f9109dacc180d72073"
+  },
+  "affected_result": {
+    "exit_code": 0,
+    "seconds": 26.480030791833997,
+    "command": [
+      "bash",
+      "scripts/test.sh",
+      "-only-testing:whitenoise-iosTests/DevicePairingQRCodeTests",
+      "-only-testing:whitenoise-iosTests/QRCodeTests",
+      "-only-testing:whitenoise-iosTests/OnboardingQRScannerTests",
+      "-only-testing:whitenoise-iosTests/QRScannerFailureTests",
+      "-only-testing:whitenoise-iosTests/DeviceVerificationViewModelTests",
+      "-only-testing:whitenoise-iosTests/DeviceLinkingOwnedActionTests",
+      "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests",
+      "-only-testing:whitenoise-iosTests/DeviceEnrollmentViewModelTests"
+    ],
+    "log": "/Users/pj/project/build/results/ios-pairing-qr-affected-v2.log",
+    "log_sha256": "5ebb6d11409069bc4b772ba111e2c1a2ffff4a7305dc7c6212306536fbf9ef7f",
+    "inputs": 893,
+    "sdk_source": "98707713a2cc02828c2d66ed858588991896b9b0"
+  },
+  "actual_xcresult_summary": {
+    "passed": 57,
+    "failed": 0,
+    "skipped": 0,
+    "total": 57
+  },
+  "raw_artifacts": "parent build/results/ios-pairing-qr-affected-v2*",
+  "scope": [
+    "Real CoreImage maximum-supported image encode/decode, packet byte equality, foreign/noncanonical/oversize rejection and existing camera coordinator explicit retry/one scan.",
+    "Affected verification, original ownership, account lifetime and enrollment view-model controls.",
+    "Existing scan receives into packet field only, same explicit native Receive/Approve and SAS/enrollment controls.",
+    "Scanner dismissed on scene/account retirement, prior input cleared before scan; QR hidden outside active scene.",
+    "Existing QR camera/component reuse; camera-purpose strings updated in all ten existing locales."
+  ],
+  "limits": [
+    "New feature acceptance; no fabricated failing baseline.",
+    "Actual physical camera scan and installed Mac/iPhone pairing remain unverified.",
+    "This transports pairing packets, not account private keys; both devices still require account sign-in.",
+    "Packets larger than one QR show Copy fallback; never truncated, no multipart claimed.",
+    "Signed qualification-only follow-up preserves all final tested product/test/SDK inputs; physical signing/build and installed QR pairing remain separate."
+  ],
+  "localization_correction": {
+    "source": {
+      "Shared/Localizable.xcstrings": "c15fbec1c2600c4b064b4eede2abdbbf56f1d177dd6beb95d721fbb2633f9988",
+      "whitenoise-ios.xcodeproj/project.pbxproj": "28dc8ad1ae1dd80b233c33f9619fa399f1a20ed6339b33b92ce2fd1cc07e4e25",
+      "whitenoise-iosTests/whitenoise_iosTests.swift": "e5ce32070b08d815781f26dcde46e4478fa560317d7debd4357c0e6d2d57880f"
+    },
+    "changes": "Four QR labels translated in all ten locales; four project camera descriptions and canonical permission expectation aligned with camera catalog. No QR/native behavior changed.",
+    "actual_gates": {
+      "ios-pairing-qr-localization-affected-v1": {
+        "exit_code": 0,
+        "seconds": 50.11264262511395,
+        "command": [
+          "bash",
+          "scripts/test.sh",
+          "-only-testing:whitenoise-iosTests/DevicePairingQRCodeTests",
+          "-only-testing:whitenoise-iosTests/QRCodeTests",
+          "-only-testing:whitenoise-iosTests/OnboardingQRScannerTests",
+          "-only-testing:whitenoise-iosTests/QRScannerFailureTests",
+          "-only-testing:whitenoise-iosTests/DeviceVerificationViewModelTests",
+          "-only-testing:whitenoise-iosTests/DeviceLinkingOwnedActionTests",
+          "-only-testing:whitenoise-iosTests/DeviceLinkingAccountLifetimeTests",
+          "-only-testing:whitenoise-iosTests/DeviceEnrollmentViewModelTests"
+        ],
+        "log": "/Users/pj/project/build/results/ios-pairing-qr-localization-affected-v1.log",
+        "log_sha256": "fc5e63858250b0414cbb1969818d1d121356b6785875fbf0e7f7784576f0543d",
+        "input_manifest_sha256": "3e4e689d02745bc4dd97196e3a9636a4bb709356857d025296e89a7c5ddfc0f7",
+        "actual_summary": {
+          "passedTests": 57,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 57
+        }
+      },
+      "ios-pairing-qr-catalog-v1": {
+        "exit_code": 0,
+        "seconds": 8.205586584052071,
+        "command": [
+          "bash",
+          "scripts/test.sh",
+          "-only-testing:whitenoise-iosTests/LocalizationCatalogTests"
+        ],
+        "log": "/Users/pj/project/build/results/ios-pairing-qr-catalog-v1.log",
+        "log_sha256": "ea766744932e841779f23826bbaf25cf29ea8e5e571b62459cf6bfe690192d17",
+        "input_manifest_sha256": "3e4e689d02745bc4dd97196e3a9636a4bb709356857d025296e89a7c5ddfc0f7",
+        "actual_summary": {
+          "passedTests": 14,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "totalTestCount": 14
+        }
+      }
+    },
+    "prior_full_experimental": {
+      "source": "2849fa78a117174885eb1d1aac651f6cefeecb64",
+      "exit_code": 65,
+      "passed": 2877,
+      "failed": 4,
+      "skipped": 9,
+      "log_sha256": "6a7fda219206df437aeac341ac56293444ce9caa6bdf1de1aa38d0a66d011d71",
+      "failure_scope": "Four localization/permission controls; original terminal failure retained."
+    }
+  },
+  "full_compatibility": {
+    "experimental": {
+      "tested_source": "ff82c81f6483f8cebeb9b4d17992f6604acb99bb",
+      "exit_code": 0,
+      "seconds": 217.65989616606385,
+      "command": [
+        "bash",
+        "scripts/test.sh"
+      ],
+      "log": "/Users/pj/project/build/results/ios-pairing-qr-full-experimental-v2.log",
+      "log_sha256": "fe4717828e95e90e5b59bec241dbbcedf4a32480fa2728e7bea74211a9425012",
+      "inputs": 894,
+      "sdk_source": "98707713a2cc02828c2d66ed858588991896b9b0",
+      "actual_summary": {
+        "passedTests": 2881,
+        "failedTests": 0,
+        "skippedTests": 9,
+        "totalTestCount": 2890
+      },
+      "input_manifest_sha256": "4e15fe69afb50e32d15db66211040b2bd38ebd28ab12c6129ac080169f5aff29"
+    },
+    "published": {
+      "tested_source": "ff82c81f6483f8cebeb9b4d17992f6604acb99bb",
+      "exit_code": 0,
+      "seconds": 260.6768651669845,
+      "command": [
+        "bash",
+        "scripts/test.sh"
+      ],
+      "log": "/Users/pj/project/build/results/ios-pairing-qr-full-published-v4.log",
+      "log_sha256": "ac5a84d980d8b4a1b82a0f6f5b2ba2915868aeb2ac64bf0f720404ef7f91b00c",
+      "inputs": 894,
+      "sdk_source": "published-MarmotKit-0.12.0",
+      "actual_summary": {
+        "passedTests": 2717,
+        "failedTests": 0,
+        "skippedTests": 3,
+        "totalTestCount": 2720
+      },
+      "input_manifest_sha256": "abac9c8cb85afca2f6e3a5ca16db80504bdaa6f5bc6d6f9a0278659f723dd5bd"
+    }
+  },
+  "published_compile_attempts": [
+    {
+      "exit_code": 65,
+      "actual_tests": 0,
+      "log_sha256": "c951d371ab4c532c3117bf81591bb0b20514d2fe6b189216025b0a0cf9131c33",
+      "diagnosed_module_retirement": {
+        "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+        "bytes": 556712,
+        "sha256": "b4537a5cf2f53b0891dd3377174b7ca536a97e9891e837a7a020526c092deabd",
+        "reason": "Exact compiler-reported obsolete FFI PCM; own iOS cache idle."
+      }
+    },
+    {
+      "exit_code": 65,
+      "actual_tests": 0,
+      "log_sha256": "6d2af84c92aa66f97f6d7e2532c1fab8e5301a1207e3799a6b6aa957791d604c",
+      "diagnosed_module_retirement": {
+        "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+        "bytes": 556664,
+        "sha256": "8585eb7e7c690d00e1504310849f222c966dba96c62a531de3cf38d162d6c7a7",
+        "reason": "Exact second compiler-reported obsolete FFI PCM; own iOS cache idle."
+      }
+    },
+    {
+      "exit_code": 65,
+      "actual_tests": 0,
+      "log_sha256": "3fff40c98f1488cb59064854eb44eb63a77127a1b1e4cb2cc3c2bc3407bebcad",
+      "diagnosed_module_retirement": {
+        "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+        "bytes": 556664,
+        "sha256": "0d143d7a0424c6bcb83bf507c576f2b59a54aeab6ffe4ccfe1e622cbbf8b7484",
+        "reason": "Exact third compiler-reported obsolete FFI PCM; own iOS cache idle."
+      }
+    }
+  ],
+  "final_product_hashes": {
+    "Shared/Localizable.xcstrings": "c15fbec1c2600c4b064b4eede2abdbbf56f1d177dd6beb95d721fbb2633f9988",
+    "whitenoise-ios/InfoPlist.xcstrings": "21d92378a8f0f49a4477399d9dd0a0bd02c38fb03981422b09a54cc5c27589be",
+    "whitenoise-ios/Settings/DeviceVerificationView.swift": "2fa81827c94c6bf747e712fa16834c6bdb551fff059db13665fdac4134f91068",
+    "whitenoise-ios/Core/DevicePairingQRCode.swift": "0626f4cfe1d1285092a1d09d59720c058061fcc3b5e45b9020ca4fc0e5d23ce7",
+    "whitenoise-ios/Settings/DevicePairingQRViews.swift": "4d00eeb565e7904f7893f941621c3ed910aeeac52b18391c6be50608ebb5dbff",
+    "whitenoise-iosTests/DevicePairingQRCodeTests.swift": "9da5b3e1fe9068419cd55e8add578fcc1bd10c4511baf3f9109dacc180d72073",
+    "whitenoise-ios.xcodeproj/project.pbxproj": "28dc8ad1ae1dd80b233c33f9619fa399f1a20ed6339b33b92ce2fd1cc07e4e25",
+    "whitenoise-iosTests/whitenoise_iosTests.swift": "e5ce32070b08d815781f26dcde46e4478fa560317d7debd4357c0e6d2d57880f"
+  }
+}

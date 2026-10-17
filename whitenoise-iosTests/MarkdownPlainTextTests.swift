@@ -7,6 +7,22 @@ import Testing
 /// text — syntax dropped, content kept — without changing anything for
 /// records that carry no parsed tokens.
 struct MarkdownPlainTextTests {
+    @Test func negativeUnixTimestampsUseLocalizedStaticTextForEveryStyle() {
+        let styles: [MarkdownTimestampStyleFfi] = [
+            .shortTime, .longTime, .shortDate, .longDate, .shortDateTime,
+            .longDateTime, .compactDateTime, .compactDateTimeSeconds, .relative,
+        ]
+        for style in styles {
+            let document = doc([
+                .paragraph(inlines: [.timestamp(unixSeconds: -1, style: style)])
+            ])
+            let expected = MarkdownTimestampFormatter.staticText(unixSeconds: -1, style: style)
+                .replacingOccurrences(of: "\u{202F}", with: " ")
+                .replacingOccurrences(of: "\u{00A0}", with: " ")
+            #expect(expected != MarkdownTimestampFormatter.literalToken(unixSeconds: -1, style: style))
+            #expect(MarkdownPlainText.flatten(document) == expected)
+        }
+    }
 
     private func doc(_ blocks: [MarkdownBlockFfi]) -> MarkdownDocumentFfi {
         MarkdownDocumentFfi(blocks: blocks, truncated: false)

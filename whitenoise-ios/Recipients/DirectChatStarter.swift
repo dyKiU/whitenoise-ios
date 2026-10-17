@@ -17,8 +17,13 @@ nonisolated enum StartChatFailurePresentation {
             return .other(message: UserFacingError.message(for: error))
         }
         switch marmotError {
-        case .MissingKeyPackage, .InvalidKeyPackageEvent, .InvalidIdentity:
-            return .missingSetup
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            case .MissingKeyPackage(_, .notFound), .InvalidKeyPackageEvent, .InvalidIdentity:
+                return .missingSetup
+        #else
+            case .MissingKeyPackage, .InvalidKeyPackageEvent, .InvalidIdentity:
+                return .missingSetup
+        #endif
         default:
             return .other(message: UserFacingError.message(for: marmotError))
         }

@@ -487,6 +487,11 @@ final class AppState {
 
     func handleRuntimeEvent(_ event: MarmotEventFfi, generation: Int) {
         guard runtimeEventsGeneration == generation else { return }
+        if case .welcomeDeliveryPending(let accountID, _, _, _, _) = event,
+           activeAccount?.accountIdHex == accountID,
+           let notice = InvitationDeliveryNotice.toast(for: event) {
+            present(notice)
+        }
         pollVotesInvalidation.observe(event)
         if case .projectionUpdated(let update) = event,
            activeAccount?.accountIdHex == update.accountIdHex,
@@ -861,6 +866,16 @@ final class AppState {
             present(.error(L10n.string("Couldn't sign out")))
             return false
         }
+        isSigningOut = true
+        defer { finishAccountExit() }
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            do {
+                try await accountStore.cancelDeviceLinking()
+            } catch {
+                present(UserFacingError.toast(title: L10n.string("Couldn't sign out"), error: error))
+                return false
+            }
+        #endif
         let signingOutAccountIdHex = accounts
             .first(where: { $0.label == signingOut })?
             .accountIdHex
@@ -875,9 +890,7 @@ final class AppState {
         // signed-out account (#320, residual of #7/#111). The `defer` clears
         // the flag on every exit path, including the early wipe failure return
         // below.
-        isSigningOut = true
         notifications.cancelForegroundBatches(accountRef: signingOut)
-        defer { finishAccountExit() }
         guard let exitingClient = client else {
             present(.error(L10n.string("Couldn't sign out")))
             return false
@@ -1052,6 +1065,16 @@ final class AppState {
             present(.error(L10n.string("Couldn't wipe profile")))
             return false
         }
+        isSigningOut = true
+        defer { finishAccountExit() }
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            do {
+                try await accountStore.cancelDeviceLinking()
+            } catch {
+                present(UserFacingError.toast(title: L10n.string("Couldn't wipe profile"), error: error))
+                return false
+            }
+        #endif
         let wipingAccountIdHex = accounts
             .first(where: { $0.label == wipingRef })?
             .accountIdHex
@@ -1059,9 +1082,7 @@ final class AppState {
         // Same #320 guard the normal sign-out uses: block any APNS-token-driven
         // push reschedule for the whole teardown; cleared before routing so a
         // reschedule for the *new* active account is not suppressed.
-        isSigningOut = true
         notifications.cancelForegroundBatches(accountRef: wipingRef)
-        defer { finishAccountExit() }
         guard let exitingClient = client else {
             present(.error(L10n.string("Couldn't wipe profile")))
             return false

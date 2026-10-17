@@ -2,6 +2,8 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+repo_root="$PWD"
+source "$repo_root/scripts/local-device-sync-settings.sh"
 
 DESTINATION="${WN_TEST_DESTINATION:-$(scripts/pick-simulator.sh)}"
 RESULT_BUNDLE="${WN_TEST_RESULT_BUNDLE:-build/TestResults.xcresult}"
@@ -14,6 +16,7 @@ xcodebuild_args=(
   -destination "$DESTINATION"
   -skipPackagePluginValidation
   -skipMacroValidation
+  ${device_sync_settings[@]+"${device_sync_settings[@]}"}
 )
 
 # Opt-in cache locations. Unset locally so developers keep sharing Xcode's
@@ -24,6 +27,9 @@ if [ -n "${WN_TEST_DERIVED_DATA:-}" ]; then
 fi
 if [ -n "${WN_TEST_SOURCE_PACKAGES:-}" ]; then
   xcodebuild_args+=(-clonedSourcePackagesDirPath "$WN_TEST_SOURCE_PACKAGES")
+fi
+if [ -n "${WN_TEST_JOBS:-}" ]; then
+  xcodebuild_args+=(-jobs "$WN_TEST_JOBS")
 fi
 
 build_settings=(
@@ -105,4 +111,4 @@ fi
 
 phase "test-without-building" run test-without-building \
   "${xcodebuild_args[@]}" \
-  -resultBundlePath "$RESULT_BUNDLE"
+  -resultBundlePath "$RESULT_BUNDLE" "$@"

@@ -130,12 +130,23 @@ Install a formal release using its version:
 ./scripts/sync-bindings.sh 0.9.21
 ```
 
-The app now pins the formal MarmotKit 0.11.0 release. For local reproduction only,
-`scripts/sync-local-bindings.sh <clean-mdk-checkout> <full-master-sha>` builds
-matching artifacts with both exporters; restore the published pin before committing.
+The app pins the formal MarmotKit 0.12.0 release. For local reproduction only,
+`scripts/sync-local-bindings.sh <clean-mdk-checkout> <full-source-sha>` builds
+matching artifacts with both exporters. Set `EXPERIMENTAL_DEVICE_SYNC=1` explicitly
+for the private development profile. The installer validates source and features
+before replacing artifacts and records the actual source branch; compiled Swift
+provenance must match the packaged feature list. Restore the published pin before
+committing generated local artifacts.
 Keep the XCFramework ignored. `CancellablePresentedChatList.swift` is a handwritten
 adapter using the released UniFFI native future cancellation API; preserve it on
 binding refresh and run its native cancellation test. Do not patch generated binding files directly or commit an expanded XCFramework. Change Rust/UniFFI, publish an immutable release, install it with the script, then validate the iOS app. The generated Swift source, binary URL, and checksum must always move together.
+
+Private development tests opt in with `WN_EXPERIMENTAL_DEVICE_SYNC=1` after
+installing matching local bindings. The test runner validates source, features
+and both native archive hashes before defining the Swift flag in both phases.
+Keep local generated overrides and `LOCAL_BUILD.json` out of commits. Native
+capability/factory smoke tests do not qualify fresh pairing or chat delivery.
+See `docs/native-device-linking-development.md` for the current acceptance scope.
 
 Avatar metadata from presented rows, conversation headers and identity sidecars
 is authoritative. Request only visible `avatarAsset.target` values and read the
@@ -395,3 +406,11 @@ Commit related work as one clear checkpoint when asked. Leave unrelated cleanup 
 - Use `v<MARKETING_VERSION>` for the first build of a version, or `v<MARKETING_VERSION>-build.<CURRENT_PROJECT_VERSION>` for a subsequent shipment with the same marketing version. Never move or overwrite a published tag.
 - Record the app version, build number, MarmotKit version, and validation results in the tag annotation. Distinguish automated checks from pending signed-device/manual checks; a tag alone does not establish App Store/TestFlight publication.
 - Keep `CLAUDE.md` as a symlink to this canonical file.
+
+One-scan development pairing uses the compact native bootstrap and automatic
+SDK-owned encrypted relay exchange. Activate only after exact account/runtime
+factory adoption; a late result must be cancelled before it can export a scanner
+response. Keep visual SAS comparison, bilateral enrollment/chat-sharing approval
+and each existing device's explicit review. Transport receipts never replace
+approval. The normal UI offers no per-packet export/import/receive/ACK/finalize
+controls; the existing low-level SDK APIs remain available for controlled tests.
