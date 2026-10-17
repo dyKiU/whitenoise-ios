@@ -41,6 +41,21 @@ nonisolated final class MarmotClient: Sendable {
     /// identities. Per-account relay lists live in Marmot after setup.
     static let seedRelays = AppContainerConfig.seedRelays
 
+    /// Pairing needs general-purpose relays; the inbox relays reject its event kind.
+    /// Explicit custom runtimes retain their supplied route, including isolated tests.
+    static let pairingRelays = ["wss://nos.lol", "wss://relay.primal.net"]
+
+    static func pairingOptions(_ options: MarmotOptions, runtimeRelays: [String]) -> MarmotOptions {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            guard runtimeRelays == seedRelays else { return options }
+            var configured = options
+            configured.pairingRelayUrls = pairingRelays
+            return configured
+        #else
+            return options
+        #endif
+    }
+
     let marmot: Marmot
     let rootPath: String
     let relayUrls: [String]
@@ -99,7 +114,12 @@ nonisolated final class MarmotClient: Sendable {
         func approveDeviceLinkingSession(accountRef: String, request: Data, target: Data?) async throws
             -> DeviceLinkingSession
         {
-            try await marmot.approveDeviceLinkingSession(accountRef: accountRef, request: request, target: target)
+            if let code = String(data: request, encoding: .utf8), code.hasPrefix("WNPAIR1:") {
+                return try await marmot.approveAutomaticDeviceLinkingSession(
+                    accountRef: accountRef, code: code, target: target)
+            }
+            return try await marmot.approveDeviceLinkingSession(
+                accountRef: accountRef, request: request, target: target)
         }
     #endif
 
@@ -146,9 +166,12 @@ nonisolated final class MarmotClient: Sendable {
         self.marmot = try Marmot.newWithConfiguration(
             rootPath: rootPath,
             relayUrls: relayUrls,
-            options: MarmotOptions(
-                relayPolicy: relayPolicy, cursorPersistence: cursorPersistence, clientName: "whitenoise",
-                secretStore: secretStore, attachmentAcquisitionMode: .hostManaged)
+            options: Self.pairingOptions(
+                MarmotOptions(
+                    relayPolicy: relayPolicy, cursorPersistence: cursorPersistence, clientName: "whitenoise",
+                    secretStore: secretStore, attachmentAcquisitionMode: .hostManaged
+                ), runtimeRelays: relayUrls
+            )
         )
         // A rejected audit destination must not block startup; recordings stay local.
         do {
@@ -701,11 +724,22 @@ nonisolated final class MarmotClient: Sendable {
     func existingDirectConversation(
         accountRef: String,
         peerAccountId: String
-    ) async throws -> ExistingDirectConversationFfi? {
-        try await marmot.existingDirectConversation(
-            accountRef: accountRef,
-            peerAccountId: peerAccountId
-        )
+    ) async throws -> DirectConversationDestination? {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            guard
+                let conversation = try await marmot.existingAccountDirectConversation(
+                    accountRef: accountRef, peerAccountId: peerAccountId
+                )
+            else { return nil }
+            switch conversation {
+            case .localMls(let conversation): return .localMls(conversation)
+            case .pairedSource(let conversation): return .pairedSource(conversation)
+            }
+        #else
+            return try await marmot.existingDirectConversation(
+                accountRef: accountRef, peerAccountId: peerAccountId
+            ).map(DirectConversationDestination.localMls)
+        #endif
     }
 
     // MARK: - Group mutations & reads

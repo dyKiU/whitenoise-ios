@@ -85,38 +85,6 @@ struct SettingsView: View {
                 }
             #endif
 
-            #if WN_EXPERIMENTAL_DEVICE_SYNC
-                if appState.client != nil, appState.activeAccountRef != nil {
-                    Section {
-                        NavigationLink {
-                            SelectedChatEntryView(
-                                model: appState.accountStore.selectedChatTransferModel, groupIdHex: nil,
-                                acquire: { try appState.makeSelectedChatTransferViewModel() }
-                            )
-                            .id(appState.accountStore.deviceLinkingOwnershipIdentity)
-                        } label: {
-                            Label("Selected chat consent", systemImage: "checkmark.message")
-                        }
-                        .accessibilityIdentifier("settings.selectedChatConsent")
-                    }
-                }
-            #endif
-
-            #if WN_EXPERIMENTAL_DEVICE_SYNC
-                if appState.client != nil, appState.activeAccountRef != nil {
-                    Section {
-                        NavigationLink {
-                            HistoryConsentReviewEntryView(
-                                model: appState.accountStore.historyConsentReviewModel,
-                                acquire: { try appState.makeHistoryConsentReviewModel() }
-                            ).id(appState.accountStore.deviceLinkingOwnershipIdentity)
-                        } label: {
-                            Label("Review incoming history", systemImage: "clock.badge.checkmark")
-                        }.accessibilityIdentifier("settings.historyConsent")
-                    }
-                }
-            #endif
-
             destinationSection([.support, .donate, .developerTools])
 
             Section {

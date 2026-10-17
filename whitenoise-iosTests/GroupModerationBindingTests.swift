@@ -27,6 +27,8 @@ struct GroupModerationBindingTests {
                 groupIdHex: group.groupIdHex, text: "Reported text", clientToken: UUID().uuidString)
             let messageID = sent.messageIdHex
             #expect(!messageID.isEmpty)
+            try await MarmotLocalSendFixtureReadiness.waitForCompletion(client: client,
+                accountRef: account.label, groupIdHex: group.groupIdHex, token: sent.clientToken)
             _ = try await client.reportMessage(accountRef: account.label, groupID: group.groupIdHex,
                 messageID: messageID, reason: .spam, explanation: "Please review")
             let reports = try await client.contentReports(accountRef: account.label, groupID: group.groupIdHex, after: nil)
@@ -36,6 +38,7 @@ struct GroupModerationBindingTests {
             let before = try #require(try await client.reportedMessage(accountRef: account.label,
                 groupID: group.groupIdHex, messageID: messageID))
             #expect(before.hasReports)
+            #expect(before.sender == account.accountIdHex)
             #expect(before.plaintext == "Reported text")
             let dismissal = try await client.dismissReport(accountRef: account.label, groupID: group.groupIdHex, reportID: report.reportIdHex)
             let dismissed = try await client.contentReports(accountRef: account.label, groupID: group.groupIdHex, after: nil)

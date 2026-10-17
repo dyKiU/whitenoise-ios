@@ -76,6 +76,41 @@ import Testing
             }
         }
 
+        @Test func cancellationDismissesOnlyAfterCleanupAndSurvivesOwnerRetirement() async throws {
+            let cancellation = DeviceVerificationCancellation()
+            var cleanup: CheckedContinuation<Void, Never>?
+            var current = true
+            var dismissed = false
+            let model = DeviceVerificationViewModel(
+                isCurrent: { current },
+                cancel: {
+                    current = false
+                    await withCheckedContinuation { cleanup = $0 }
+                })
+            let task = Task {
+                await cancellation.cancel(operation: { try await model.cancel() }, onCancelled: { dismissed = true })
+            }
+            await waitFor { cleanup != nil }
+            #expect(cancellation.isWorking && !model.isActive && !dismissed)
+            var duplicateStarted = false
+            await cancellation.cancel(operation: { duplicateStarted = true }, onCancelled: { dismissed = true })
+            #expect(!duplicateStarted && !dismissed)
+            cleanup?.resume()
+            await task.value
+            #expect(dismissed && !cancellation.isWorking && cancellation.failure == nil)
+        }
+
+        @Test func failedCancellationStaysVisibleAndCanRetryCleanup() async {
+            let cancellation = DeviceVerificationCancellation()
+            var dismissed = false
+            await cancellation.cancel(
+                operation: { throw MarmotKitError.DeviceLinkingRuntimeUnavailable },
+                onCancelled: { dismissed = true })
+            #expect(!dismissed && !cancellation.isWorking && cancellation.failure == .runtimeUnavailable)
+            await cancellation.cancel(operation: {}, onCancelled: { dismissed = true })
+            #expect(dismissed && cancellation.failure == nil)
+        }
+
         @Test func accountReplacementRetiresDisplayAndRejectsDelayedPackets() async throws {
             let store = AccountStore(defaults: IsolatedAccountDefaults.make())
             store.activeAccountRef = "original"
@@ -179,6 +214,99 @@ import Testing
             try await model.acknowledgePacket("original-ack")
             #expect(session.acknowledged == ["original-ack"])
             try await model.cancel()
+        }
+
+        @Test func scanStartsExchangeWithoutConfirmingComparisonOrSharing() async throws {
+            let store = AccountStore(defaults: IsolatedAccountDefaults.make())
+            store.activeAccountRef = "scan-test"
+            let session = VerificationSession(noPointer: .init())
+            let original = try await store.holdDeviceLinkingSession(session, accountRef: "scan-test")
+            var enrollmentCalls = 0
+            let model = DeviceVerificationViewModel(
+                begin: { original }, cancel: {}, approve: { _, _ in original },
+                targets: { [] }, verificationSupported: true, enrollmentSupported: true,
+                enrollment: {
+                    enrollmentCalls += 1
+                    throw MarmotKitError.DeviceLinkingNotReady
+                })
+            try await model.scanAndSync(request: Data("WNPAIR1:synthetic-bootstrap".utf8))
+            #expect(model.owner === original)
+            #expect(enrollmentCalls == 0)
+            #expect(session.confirmed.isEmpty)
+            try await store.cancelDeviceLinking()
+        }
+
+        @Test func cancellingScanDuringTargetReadPreventsFactory() async throws {
+            var read: CheckedContinuation<[DeviceLinkingTargetFfi], Never>?
+            var factoryCalls = 0
+            let model = DeviceVerificationViewModel(
+                begin: { throw MarmotKitError.DeviceLinkingNotReady }, cancel: {},
+                approve: { _, _ in
+                    factoryCalls += 1
+                    throw MarmotKitError.DeviceLinkingNotReady
+                }, targets: { await withCheckedContinuation { read = $0 } }, verificationSupported: true)
+            let task = Task { try await model.scanAndSync(request: Data("WNPAIR1:synthetic-bootstrap".utf8)) }
+            for _ in 0..<200 {
+                if read != nil { break }
+                await Task.yield()
+            }
+            let continuation = try #require(read)
+            task.cancel()
+            continuation.resume(returning: [])
+            await #expect(throws: (any Error).self) { try await task.value }
+            #expect(factoryCalls == 0 && model.owner == nil)
+        }
+
+        @Test(arguments: [0, 1, 2]) func scanUsesFreshUnambiguousTargetWithoutGrantingTrust(count: Int) async throws {
+            var inputs: [(Data, Data?)] = []
+            var reads = 0
+            var confirmations = 0
+            let model = DeviceVerificationViewModel(
+                begin: { throw MarmotKitError.DeviceLinkingNotReady }, cancel: {},
+                approve: { request, target in
+                    inputs.append((request, target))
+                    throw MarmotKitError.DeviceLinkingNotReady
+                },
+                targets: {
+                    reads += 1
+                    return (0..<count).map { .init(selector: Data([UInt8($0)]), deviceCount: 2) }
+                }, verificationSupported: true,
+                enrollment: {
+                    confirmations += 1
+                    throw MarmotKitError.DeviceLinkingNotReady
+                })
+            let request = Data("WNPAIR1:synthetic-bootstrap".utf8)
+            await #expect(throws: (any Error).self) { try await model.scanAndSync(request: request) }
+            #expect(reads == 1)
+            #expect(inputs.count == (count > 1 ? 0 : 1))
+            if count <= 1 {
+                #expect(inputs[0].0 == request)
+                #expect(inputs[0].1 == (count == 0 ? nil : Data([0])))
+            }
+            #expect(confirmations == 0 && model.owner == nil)
+        }
+
+        @Test func invalidScanAndFailedTargetReadCannotStartBootstrap() async throws {
+            var reads = 0
+            var factories = 0
+            let model = DeviceVerificationViewModel(
+                begin: { throw MarmotKitError.DeviceLinkingNotReady }, cancel: {},
+                approve: { _, _ in
+                    factories += 1
+                    throw MarmotKitError.DeviceLinkingNotReady
+                },
+                targets: {
+                    reads += 1
+                    throw MarmotKitError.DeviceLinkingRuntimeUnavailable
+                }, verificationSupported: true)
+            for request in [Data(), Data("not-a-pairing-code".utf8), Data(repeating: 65, count: 1025)] {
+                await #expect(throws: (any Error).self) { try await model.scanAndSync(request: request) }
+            }
+            #expect(reads == 0 && factories == 0)
+            await #expect(throws: MarmotKitError.DeviceLinkingRuntimeUnavailable) {
+                try await model.scanAndSync(request: Data("WNPAIR1:synthetic-bootstrap".utf8))
+            }
+            #expect(reads == 1 && factories == 0)
         }
 
         @Test func firstDeviceSetupRequiresSuccessfulEmptyReadAndPreservesNilFactoryInput() async throws {

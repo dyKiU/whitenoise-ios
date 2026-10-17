@@ -27,7 +27,7 @@ if hashlib.sha256(swift.read_bytes()).hexdigest() != manifest.get('installed_swi
 if not (package/'Artifacts/MarmotKit.xcframework/Info.plist').is_file():
     raise SystemExit('Matched local XCFramework is absent')
 native={name:record for name,record in manifest.get('artifacts',{}).items()
-        if name.startswith('MarmotKit.xcframework/')}
+        if name.startswith('MarmotKit.xcframework/') and name.endswith('.a')}
 if len(native) != 2:
     raise SystemExit('Matched local manifest must identify both iOS native archives')
 for name,record in native.items():

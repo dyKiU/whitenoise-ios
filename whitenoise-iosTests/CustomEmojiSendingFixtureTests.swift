@@ -35,6 +35,12 @@ struct CustomEmojiSendingFixtureTests {
                 await window.cancel()
                 return snapshot
             }
+            // The fixture's cold worker must process a genuine ordinary send before
+            // the epoch-pinned legacy media operation; admission alone is not readiness.
+            let readiness = try await client.sendTextWithClientToken(accountRef: account.label,
+                groupIdHex: group.groupIdHex, text: "Emoji fixture readiness", clientToken: UUID().uuidString)
+            try await MarmotLocalSendFixtureReadiness.waitForCompletion(client: client,
+                accountRef: account.label, groupIdHex: group.groupIdHex, token: readiness.clientToken)
             var snapshot = try await readSnapshot()
             let epoch = try await client.marmot.groupMlsState(accountRef: account.label, groupIdHex: group.groupIdHex).epoch
             let groupSubscription = try await client.subscribeGroupState(accountRef: account.label, groupIdHex: group.groupIdHex)
@@ -114,6 +120,8 @@ struct CustomEmojiSendingFixtureTests {
             var readBack = try await readSnapshot()
             let sent = try #require(readBack.messages.first {
                 $0.timeline.direction == "sent" && $0.timeline.kind == MessageSemantics.kindChat
+                    && $0.timeline.plaintext == "yay :party: :celebrate: :party-time:"
+                    && $0.timeline.tags.contains(MessageTagFfi(values: ["emoji", "party", uploadedURL]))
             }).timeline
             #expect(sent.plaintext == "yay :party: :celebrate: :party-time:")
             #expect(sent.tags.contains(MessageTagFfi(values: ["emoji", "party", uploadedURL])))

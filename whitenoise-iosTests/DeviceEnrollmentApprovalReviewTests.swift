@@ -18,6 +18,23 @@ import Testing
         private var reject = false
         private var failedCleanup = false
         private var cancellations = 0
+        private let cancellationCompletion = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        private enum CompletionFailure: Error { case timedOut }
+        func waitForCancellationCompletion() async throws {
+            let completion = cancellationCompletion.stream
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    for await _ in completion { return }
+                    throw CompletionFailure.timedOut
+                }
+                group.addTask {
+                    try await Task.sleep(for: .seconds(30))
+                    throw CompletionFailure.timedOut
+                }
+                defer { group.cancelAll() }
+                try await group.next()
+            }
+        }
         private var pending: CheckedContinuation<Void, Never>?
         var isWaiting: Bool { lock.withLock { pending != nil } }
         var cancelCount: Int { lock.withLock { cancellations } }
@@ -66,6 +83,8 @@ import Testing
         override func cancel() async throws {
             lock.withLock { cancellations += 1 }
             if lock.withLock({ failedCleanup }) { throw MarmotKitError.DeviceLinkingRuntimeUnavailable }
+            cancellationCompletion.continuation.yield(())
+            cancellationCompletion.continuation.finish()
         }
     }
 
@@ -159,6 +178,8 @@ import Testing
                 #expect(model.review == nil)
                 #expect(!model.isActive)
                 #expect(original.approvedRevisions.isEmpty)
+                // Read completion fences display; actual asynchronous owner cleanup has its own completion.
+                try await original.waitForCancellationCompletion()
                 #expect(original.cancelCount == 1)
             }
         }
@@ -292,6 +313,8 @@ import Testing
                 await #expect(throws: MarmotKitError.DeviceLinkingClosed) { try await late.enrollmentApproval() }
                 #expect(calls == 1)
                 #expect(!held.isActive)
+                // Read completion fences display; actual asynchronous owner cleanup has its own completion.
+                try await original.waitForCancellationCompletion()
                 #expect(original.cancelCount == 1)
                 #expect(original.approvedRevisions.isEmpty)
             }
