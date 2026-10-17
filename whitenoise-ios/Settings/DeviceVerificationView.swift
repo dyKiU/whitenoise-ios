@@ -138,7 +138,6 @@
                                     enrollment = original
                                     try await original.performTransportAction(
                                         .shareChats, displayedRevision: snapshot.revision)
-                                    Self.diagnostics.notice("Pairing sharing approval accepted")
                                 }
                             }.disabled(
                                 isWorking || !model.isActive || enrollment?.sharingApprovalSubmitted == true)
@@ -186,9 +185,6 @@
             .onDisappear { actionTask?.cancel() }
             .onChange(of: model.isActive) { _, active in if !active { clearPackets() } }
             .onChange(of: model.snapshot?.phase) { _, phase in
-                if let phase {
-                    Self.diagnostics.notice("Pairing phase=\(String(describing: phase), privacy: .public)")
-                }
                 if phase == .cancelled || phase == .expired || phase == .failed { setup = "" }
             }
         }
