@@ -1300,12 +1300,6 @@ private struct ReactionMetadataRowLayout: Layout {
     }
 }
 
-private struct PendingMessageExternalLink: Identifiable, Equatable {
-    let url: URL
-
-    var id: String { url.absoluteString }
-}
-
 nonisolated enum MessageExternalLinkConfirmation {
     private static let maxDisplayedHostCharacters = 96
     private static let maxDisplayedURLCharacters = 180

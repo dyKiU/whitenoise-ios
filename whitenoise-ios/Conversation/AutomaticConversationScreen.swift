@@ -10,6 +10,16 @@ import SwiftUI
         var body: some View {
             AutomaticConversationContent(
                 model: model, blockedAuthors: blockedUsers.blockedAccountIds,
+                localAccountIdHex: appState.activeAccount?.accountIdHex,
+                blockedPeerNpub: blockedPeerNpub,
+                canUnblock: blockedUsers.canMutate, isUnblocking: blockedUsers.isSaving,
+                onUnblock: {
+                    guard let model, let peer = model.pairedHeader?.directPeerAccountIdHex else { return }
+                    Task {
+                        guard model.isCurrentOwner, model.accountRef == appState.activeAccountRef else { return }
+                        await blockedUsers.setBlocked(false, userId: peer, using: appState)
+                    }
+                },
                 title: model?.pairedHeader.map { row in
                     AutomaticChatListPresentation.title(
                         row,
@@ -31,15 +41,31 @@ import SwiftUI
             }
 
         }
+
+        private var blockedPeerNpub: String? {
+            guard let peer = model?.pairedHeader?.directPeerAccountIdHex,
+                blockedUsers.isConfirmedBlocked(peer, accountRef: appState.activeAccountRef)
+            else { return nil }
+            return IdentityPresentation.canonicalNpub(accountIdHex: peer)
+        }
     }
 
     private struct AutomaticConversationContent: View {
         let model: AccountConversationViewModel?
         let blockedAuthors: Set<String>
+        var localAccountIdHex: String? = nil
+        var blockedPeerNpub: String? = nil
+        var canUnblock = false
+        var isUnblocking = false
+        var onUnblock: () -> Void = {}
         let title: String
+        @Environment(\.dismiss) private var dismiss
         @State private var text = ""
         @State private var sending = false
         @State private var sendFailed = false
+        @State private var scrollPosition = ScrollPosition(edge: .bottom)
+        @State private var followsNewest = true
+        @State private var userScrolling = false
 
         private func statusLabel(_ status: LocalSendStatusFfi?) -> LocalizedStringKey {
             switch status {
@@ -51,52 +77,105 @@ import SwiftUI
         }
 
         var body: some View {
-            List {
-                if model?.isLoading == true { ProgressView() }
-                if model?.error != nil { Text("Chat unavailable") }
-                if model?.snapshot?.nextBefore != nil {
-                    Button("Load older messages") { Task { await model?.loadOlder() } }
-                }
-                ForEach(model?.pairedMessages ?? [], id: \.messageIdHex) { message in
-                    if !blockedAuthors.contains(message.authorHex.lowercased()) {
-                        AutomaticPairedMessageRow(message: message)
+            ScrollView {
+                LazyVStack(spacing: 6) {
+                    if model?.isLoading == true { ProgressView() }
+                    if model?.error != nil { Text("Chat unavailable") }
+                    if model?.snapshot?.nextBefore != nil {
+                        Button("Load older messages") { Task { await model?.loadOlder() } }
+                    }
+                    ForEach(
+                        PairedTimelineEntry.make(messages: model?.pairedMessages ?? [], blockedAuthors: blockedAuthors)
+                    ) { entry in
+                        if let day = entry.dayStart {
+                            TimelineInlineDateHeader(heading: .init(id: entry.id, day: day))
+                        }
+                        AutomaticPairedMessageRow(
+                            message: entry.message,
+                            markdownBlocks: model?.markdownByMessageId[entry.id],
+                            localAccountIdHex: localAccountIdHex,
+                            showsSenderName: model?.pairedHeader?.directPeerAccountIdHex == nil)
+                    }
+                    ForEach((model.map { Array($0.pendingTexts.values) } ?? []).sorted { $0.createdAt < $1.createdAt })
+                    {
+                        pending in
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text(verbatim: pending.text)
+                                .padding(.horizontal, ChatBubbleMetrics.horizontalInset)
+                                .padding(.vertical, ChatBubbleMetrics.verticalInset)
+                                .foregroundStyle(MessageBubblePalette.foreground(isFromMe: true))
+                                .background(MessageBubblePalette.background(isFromMe: true))
+                                .clipShape(.rect(cornerRadius: ChatBubbleMetrics.cornerRadius, style: .continuous))
+                            Text(statusLabel(pending.status)).font(.caption).foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: ChatBubbleMetrics.regularMaximumWidth, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.leading, ChatBubbleMetrics.compactOppositeInset)
+                        .padding(.horizontal, 12)
                     }
                 }
-                ForEach((model.map { Array($0.pendingTexts.values) } ?? []).sorted { $0.id < $1.id }) { pending in
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text(verbatim: pending.text)
-                        Text(statusLabel(pending.status)).font(.caption).foregroundStyle(.secondary)
+                .padding(.vertical, 8)
+            }
+            .defaultScrollAnchor(.bottom, for: .initialOffset)
+            .scrollPosition($scrollPosition)
+            .onScrollPhaseChange { _, phase in
+                userScrolling = phase == .interacting || phase == .decelerating
+            }
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.contentSize.height - geometry.visibleRect.maxY < 80
+            } action: { _, atBottom in
+                if userScrolling { followsNewest = atBottom }
+            }
+            .onChange(of: model?.snapshot?.sequence) { _, _ in
+                if followsNewest { scrollPosition.scrollTo(edge: .bottom) }
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                ConversationHeaderBar(isSelectingMessages: false, onBack: { dismiss() }, onClose: {}) {
+                    HStack(spacing: 10) {
+                        AvatarBubble(
+                            seed: model?.pairedHeader?.directPeerAccountIdHex ?? model?.groupIdHex ?? "",
+                            title: title, pictureURL: nil
+                        )
+                        .frame(width: 40, height: 40)
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(verbatim: title).font(.headline).lineLimit(1)
+                            Text("Shared from a linked device").font(.caption).foregroundStyle(.secondary)
+                        }
                     }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
             }
-            .listStyle(.plain)
-            .scrollDismissesKeyboard(.interactively)
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
-                VStack(alignment: .leading, spacing: 8) {
-                    if sendFailed { Text("Send failed").foregroundStyle(.red).font(.caption) }
-                    HStack(alignment: .bottom) {
-                        WNInput(placeholder: L10n.string("Message"), text: $text, kind: .multiline(1...5))
-                        Button(action: send) {
-                            Image(systemName: "arrow.up.circle.fill")
-                                .font(.title)
-                                .frame(minWidth: 44, minHeight: 44)
-                        }
-                        .accessibilityLabel("Send")
-                        .disabled(
-                            sending || model?.pairedHeader == nil
-                                || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                if let blockedPeerNpub {
+                    BlockedConversationNotice(
+                        npub: blockedPeerNpub, canUnblock: canUnblock,
+                        isUnblocking: isUnblocking, onUnblock: onUnblock)
+                } else {
+                    VStack(alignment: .leading, spacing: 8) {
+                        if sendFailed { Text("Send failed").foregroundStyle(.red).font(.caption) }
+                        ComposerBar(
+                            draft: $text, isSending: sending, hasAttachments: false, audioDraft: nil,
+                            preparedAttachments: [], replyPreview: nil, mediaEnabled: false,
+                            disabledMessage: model?.pairedHeader == nil ? L10n.string("Chat unavailable") : nil,
+                            voiceRecordingActive: false, voiceRecordingLocked: false,
+                            voiceRecordingSamples: [], voiceRecordingDurationSeconds: 0,
+                            focusRequest: 0, dismissRequest: 0, mentionCandidates: [],
+                            voiceMessagesEnabled: false, cameraAvailable: false, gifsAvailable: false,
+                            onTakePhoto: {}, onPhotoLibrary: {}, onAttachFile: {}, onShareLocation: {},
+                            onShareContact: {}, onSearchGIFs: {}, onPasteImage: { _ in },
+                            onRemoveAudioDraft: { _ in }, onRemovePreparedAttachment: { _ in },
+                            onPreviewPreparedMedia: { _ in }, onCancelReply: {}, onCancelVoiceRecording: {},
+                            onStopVoiceRecording: {}, onVoicePressBegan: {}, onVoiceDragChanged: { _ in },
+                            onVoicePressEnded: {}, onMentionSelect: { _ in }, onSend: send
+                        )
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
             }
         }
 
         private func send() {
-            guard let model, !sending else { return }
+            guard let model, !sending, blockedPeerNpub == nil else { return }
             let captured = text
             sending = true
             sendFailed = false
@@ -106,6 +185,8 @@ import SwiftUI
                     _ = try await model.sendText(captured)
                     guard model.isCurrentOwner else { return }
                     if text == captured { text = "" }
+                    followsNewest = true
+                    scrollPosition.scrollTo(edge: .bottom)
                     await model.refreshPendingStatus()
                 } catch {
                     guard model.isCurrentOwner else { return }
@@ -117,38 +198,135 @@ import SwiftUI
 
     struct AutomaticPairedMessageRow: View {
         let message: PairedChatMessageFfi?
+        var markdownBlocks: [MarkdownDisplayBlock]? = nil
+        var localAccountIdHex: String? = nil
+        var showsSenderName = true
+        @Environment(AppState.self) private var appState
+        @Environment(\.horizontalSizeClass) private var sizeClass
+        @Environment(\.openURL) private var openURL
+        @State private var pendingExternalLink: PendingMessageExternalLink?
 
         var body: some View {
             if let message {
+                let presentation = PairedMessagePresentation(
+                    message: message, localAccountIdHex: localAccountIdHex)
                 TimelineView(.periodic(from: .now, by: 1)) { clock in
-                    if message.expiresAt.map({ Double($0) > clock.date.timeIntervalSince1970 }) ?? true {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(IdentityPresentation.text(accountIdHex: message.authorHex))
-                                .font(.caption.weight(.semibold))
-                            if message.deleted {
-                                Text("Message deleted").foregroundStyle(.secondary)
-                            } else if message.canonicalChat {
-                                Text(verbatim: ContentSanitizer.textRun(message.content))
-                                    .textSelection(.enabled)
-                            } else {
-                                Text("Unsupported message").foregroundStyle(.secondary)
+                    if presentation.isVisible(at: clock.date) {
+                        HStack(alignment: .bottom, spacing: 6) {
+                            if presentation.isOutgoing {
+                                Spacer(
+                                    minLength: sizeClass == .regular
+                                        ? ChatBubbleMetrics.regularOppositeInset
+                                        : ChatBubbleMetrics.compactOppositeInset)
                             }
-                            if !message.deleted, !message.mediaAttachments.isEmpty {
-                                Text("Attachment unavailable").font(.caption).foregroundStyle(.secondary)
+                            VStack(alignment: presentation.isOutgoing ? .trailing : .leading, spacing: 2) {
+                                if !presentation.isOutgoing, showsSenderName {
+                                    Text(appState.displayName(forAccountIdHex: message.authorHex))
+                                        .font(.caption2.weight(.semibold))
+                                        .foregroundStyle(WNIdentityPalette.color(for: message.authorHex))
+                                        .padding(.leading, 12)
+                                }
+                                MessageBubbleChromeLayout(isFromMe: presentation.isOutgoing) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        if presentation.isDeleted {
+                                            Text("Message deleted").italic()
+                                        } else if message.canonicalChat {
+                                            if let markdownBlocks {
+                                                MarkdownMessageView(blocks: markdownBlocks)
+                                                    .tint(
+                                                        MessageBubblePalette.foreground(
+                                                            isFromMe: presentation.isOutgoing)
+                                                    )
+                                                    .environment(\.openURL, OpenURLAction(handler: handleMessageLink))
+                                                    .environment(
+                                                        \.copyMessageLink,
+                                                        MessageLinkCopyAction { [appState] target in
+                                                            MessageLinkCopyAction.copy(target, presenting: appState)
+                                                        })
+                                            } else {
+                                                Text(verbatim: ContentSanitizer.textRun(presentation.text))
+                                                    .textSelection(.enabled)
+                                            }
+                                        } else {
+                                            Text("Unsupported message")
+                                        }
+                                        if presentation.showsUnavailableAttachment {
+                                            Text("Attachment unavailable").font(.caption)
+                                        }
+                                    }
+                                    .padding(.horizontal, ChatBubbleMetrics.horizontalInset)
+                                    .padding(.vertical, ChatBubbleMetrics.verticalInset)
+                                    .foregroundStyle(
+                                        MessageBubblePalette.foreground(isFromMe: presentation.isOutgoing)
+                                    )
+                                    .background(MessageBubblePalette.background(isFromMe: presentation.isOutgoing))
+                                    .clipShape(
+                                        .rect(cornerRadius: ChatBubbleMetrics.cornerRadius, style: .continuous))
+                                    HStack {
+                                        if presentation.isOutgoing { Spacer(minLength: 8) }
+                                        MessageMetadataFooter(
+                                            time: MessageBubble.timeLabel(recordedAt: presentation.timestamp),
+                                            isEdited: false, status: .received, isFromMe: presentation.isOutgoing,
+                                            showsDeliveryStatus: false)
+                                        if !presentation.isOutgoing { Spacer(minLength: 8) }
+                                    }
+                                    .padding(.horizontal, ChatBubbleMetrics.horizontalInset)
+                                }
                             }
-                            Text("Shared from a linked device").font(.caption2).foregroundStyle(.secondary)
+                            .frame(
+                                maxWidth: sizeClass == .regular ? ChatBubbleMetrics.regularMaximumWidth : nil,
+                                alignment: presentation.isOutgoing ? .trailing : .leading)
+                            if !presentation.isOutgoing {
+                                Spacer(
+                                    minLength: sizeClass == .regular
+                                        ? ChatBubbleMetrics.regularOppositeInset
+                                        : ChatBubbleMetrics.compactOppositeInset)
+                            }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, 12)
+                        .sheet(item: $pendingExternalLink) { link in
+                            MessageLinkActionSheet(
+                                url: link.url,
+                                onOpen: {
+                                    pendingExternalLink = nil
+                                    openURL(link.url)
+                                },
+                                onCopy: {
+                                    pendingExternalLink = nil
+                                    if let target = MessageLinkTarget(url: link.url) {
+                                        MessageLinkCopyAction.copy(target, presenting: appState)
+                                    }
+                                },
+                                onCancel: { pendingExternalLink = nil }
+                            )
+                            .appAppearance()
+                        }
                     }
                 }
+            }
+        }
+
+        private func handleMessageLink(_ url: URL) -> OpenURLAction.Result {
+            switch MessageLinkPolicy.action(for: url) {
+            case .openProfile(let npub):
+                appState.presentProfile(npub: npub)
+                return .handled
+            case .openChat(let groupIdHex):
+                appState.presentChat(groupIdHex: groupIdHex)
+                return .handled
+            case .confirmExternal(let external):
+                pendingExternalLink = PendingMessageExternalLink(url: external)
+                return .handled
+            case .blocked:
+                return .discarded
             }
         }
     }
 
     #Preview("Shared conversation") {
         NavigationStack {
-            AutomaticConversationContent(model: nil, blockedAuthors: [], title: L10n.string("Unnamed group"))
+            AutomaticConversationContent(
+                model: nil, blockedAuthors: [], title: L10n.string("Unnamed group"))
         }
     }
 

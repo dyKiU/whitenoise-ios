@@ -35,6 +35,7 @@ struct ChatsListView: View {
     #if WN_EXPERIMENTAL_DEVICE_SYNC
         @State private var automaticChats: AccountChatListViewModel?
     #endif
+    @State private var conversationSource = ConversationSourcePreference.shared
     @State private var showNewChat = false
     @State private var showSettings = false
     @State private var path: [ChatNavigationTarget] = []
@@ -344,6 +345,12 @@ struct ChatsListView: View {
                     model.start()
                 }
             #endif
+            .onChange(of: conversationSource.showsSharedChats) { _, _ in
+                selectedChatIds.removeAll()
+                chatListEditMode = .inactive
+                scope = .active
+                listViewport.requestTop()
+            }
             .task(id: subscriptionScope) {
                 // The inbox needs the block list so a direct chat with a
                 // blocked peer can say so instead of previewing their message.
@@ -553,6 +560,9 @@ struct ChatsListView: View {
         viewModel: ChatsListViewModel,
         rows: [ChatsListViewModel.Item]
     ) -> some View {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            let rows = conversationSource.showsSharedChats ? [] : rows
+        #endif
         if viewModel.isLoading && rows.isEmpty && !hasAutomaticRows {
             ProgressView()
         } else if let error = viewModel.loadError, !hasAutomaticRows {
@@ -654,9 +664,9 @@ struct ChatsListView: View {
 
     #if WN_EXPERIMENTAL_DEVICE_SYNC
         private var automaticRows: [PairedChatSummaryFfi] {
-            guard scope == .active, !selectionMode else { return [] }
+            guard conversationSource.showsSharedChats, scope == .active, !selectionMode else { return [] }
             return AutomaticChatListPresentation.rows(
-                automaticChats?.pairedRows ?? [], excluding: Set(viewModel?.items.map(\.id) ?? []),
+                automaticChats?.pairedRows ?? [], excluding: [],
                 query: search.query, title: pairedChatTitle)
         }
 
