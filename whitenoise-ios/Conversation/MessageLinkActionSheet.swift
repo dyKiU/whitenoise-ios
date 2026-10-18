@@ -1,5 +1,12 @@
 import SwiftUI
 
+struct PendingMessageExternalLink: Identifiable, Equatable {
+    let url: URL
+
+    var id: String { url.absoluteString }
+}
+
+
 struct MessageLinkActionSheet: View {
     let url: URL
     let onOpen: () -> Void

@@ -5,7 +5,8 @@ import SwiftUI
     enum AutomaticChatListPresentation {
         static func title(_ row: PairedChatSummaryFfi, peerDisplayName: String? = nil) -> String {
             PairedChatDisplayTitle.resolve(
-                name: row.name, directPeerAccountIdHex: row.directPeerAccountIdHex, peerDisplayName: peerDisplayName)
+                name: row.name, directPeerAccountIdHex: row.directPeerAccountIdHex,
+                peerDisplayName: peerDisplayName)
         }
 
         static func rows(
@@ -32,19 +33,21 @@ import SwiftUI
                 Button {
                     select(row.groupIdHex)
                 } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "bubble.left.and.bubble.right")
-                            .font(.title2)
-                            .frame(width: 44, height: 44)
-                        VStack(alignment: .leading, spacing: 4) {
+                    ChatListRowLayout {
+                        AvatarBubble(
+                            seed: row.directPeerAccountIdHex ?? row.groupIdHex,
+                            title: title(row), pictureURL: nil)
+                    } content: {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(verbatim: title(row))
                                 .font(.headline)
-                                .lineLimit(2)
+                                .lineLimit(1)
                             Text("Shared from a linked device")
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
+                                .lineLimit(2)
                         }
-                        Spacer(minLength: 0)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     .contentShape(Rectangle())

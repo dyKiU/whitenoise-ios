@@ -12,7 +12,7 @@ struct ChatRow: View {
     let item: ChatsListViewModel.Item
 
     var body: some View {
-        HStack(alignment: dynamicTypeSize.isAccessibilitySize ? .top : .center, spacing: 12) {
+        ChatListRowLayout {
             GroupAvatarBubble(
                 groupIdHex: item.id,
                 imageHashHex: encryptedImageHashHex,
@@ -28,6 +28,7 @@ struct ChatRow: View {
                 if item.isPinned { PinnedChatAvatarBadge() }
             }
 
+        } content: {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 5) {
                     Text(title)
@@ -95,7 +96,6 @@ struct ChatRow: View {
                 }
             }
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
         .accessibilityValue(item.isPinned ? L10n.string("Pinned") : "")
     }
