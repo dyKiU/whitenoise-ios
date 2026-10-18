@@ -186,6 +186,35 @@ import Testing
             return (model, original, state)
         }
 
+        @Test func nativeMarkdownProjectionClearsOnDeletionAndAccountRetirement() async throws {
+            let (model, original, state) = try await ready()
+            defer { model.invalidate() }
+            var replacement = snapshot(sequence: 2, eventId: state.eventId)
+            guard case .pairedSource(var message) = replacement.rows[0] else {
+                Issue.record("Expected source-attested synthetic row")
+                return
+            }
+            message.contentTokens = .init(
+                blocks: [.paragraph(inlines: [.text(content: "Synthetic rendered text")])],
+                truncated: false, blankLinesBefore: Data())
+            replacement.rows = [.pairedSource(row: message)]
+            original.emit(replacement)
+            #expect(await waitFor { model.markdownByMessageId[state.eventId] != nil })
+            replacement.sequence = 3
+            message.deleted = true
+            replacement.rows = [.pairedSource(row: message)]
+            original.emit(replacement)
+            #expect(await waitFor { model.snapshot?.sequence == 3 })
+            #expect(model.markdownByMessageId.isEmpty)
+            replacement.sequence = 4
+            message.deleted = false
+            replacement.rows = [.pairedSource(row: message)]
+            original.emit(replacement)
+            #expect(await waitFor { model.markdownByMessageId[state.eventId] != nil })
+            model.invalidate()
+            #expect(model.markdownByMessageId.isEmpty)
+        }
+
         @Test func observedCanonicalRowBeforeAdmissionReturnsDoesNotLeaveDuplicatePendingBubble() async throws {
             let original = PendingConversation(snapshot(sequence: 1))
             let state = PendingSendState()
