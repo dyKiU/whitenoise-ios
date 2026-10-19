@@ -3,7 +3,7 @@ import MarmotKit
 
 nonisolated enum MissingKeyPackageInvitationPresentation {
     static func accountIdHex(for error: Error) -> String? {
-        #if WN_EXPERIMENTAL_DEVICE_SYNC
+        #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
             guard case .MissingKeyPackage(let account, .notFound) = error as? MarmotKitError else { return nil }
         #else
             guard case .MissingKeyPackage(let account) = error as? MarmotKitError else { return nil }

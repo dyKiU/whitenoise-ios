@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 repo_root="$PWD"
 source "$repo_root/scripts/local-device-sync-settings.sh"
+validate_sdk_build_arguments "$@"
 
 DESTINATION="${WN_TEST_DESTINATION:-$(scripts/pick-simulator.sh)}"
 RESULT_BUNDLE="${WN_TEST_RESULT_BUNDLE:-build/TestResults.xcresult}"

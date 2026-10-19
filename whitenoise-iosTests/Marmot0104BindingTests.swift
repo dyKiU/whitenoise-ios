@@ -139,7 +139,7 @@ struct Marmot0104BindingTests {
     }
 
     @Test func terminalAttachmentStatesDoNotWaitOrRetryAutomatically() {
-        #if WN_EXPERIMENTAL_DEVICE_SYNC
+        #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
         #expect(!AttachmentAcquisitionPresentation.canAwait(.storageBlocked))
         #expect(AttachmentTransferPresentation.label(.storageBlocked) == L10n.string("Waiting to retry"))
         #endif
@@ -164,7 +164,7 @@ struct Marmot0104BindingTests {
         #expect(counts.reads == 1)
     }
 
-    #if WN_EXPERIMENTAL_DEVICE_SYNC
+    #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
     @Test func storageBlockedStopsAnAlreadyRunningAttachmentWait() async {
         let probe = AttachmentWaitProbe(states: [.queued, .storageBlocked, .ready])
         do {

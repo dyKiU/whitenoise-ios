@@ -18,3 +18,6 @@ Packages/MarmotKit/LOCAL_BUILD.json
 
 # Python tooling
 __pycache__/
+
+# Verified ephemeral SDK original-source receipt; never commit.
+/Packages/MarmotKit/LOCAL_BUILD_INPUTS/

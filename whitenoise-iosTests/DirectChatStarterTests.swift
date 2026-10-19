@@ -129,7 +129,7 @@ struct DirectChatStarterTests {
         }
     }
 
-    #if WN_EXPERIMENTAL_DEVICE_SYNC
+    #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
         @Test func obsoletePublicationOffersAnErrorInsteadOfSharingTheApp() {
             let error = MarmotKitError.MissingKeyPackage(account: alice, reason: .obsoleteOnly)
             let failure = StartChatFailurePresentation.failure(for: error)

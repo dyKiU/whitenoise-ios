@@ -189,7 +189,7 @@ nonisolated enum AttachmentAcquisitionPresentation {
 
     static func canAwait(_ state: AttachmentTransferStateFfi) -> Bool {
         switch state {
-        #if WN_EXPERIMENTAL_DEVICE_SYNC
+        #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
         case .storageBlocked: false
         #endif
         case .queued, .downloading, .verifyingCiphertext, .decrypting, .verifyingPlaintext,

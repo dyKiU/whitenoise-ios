@@ -146,6 +146,10 @@ installing matching local bindings. The test runner validates source, features
 and both native archive hashes before defining the Swift flag in both phases.
 Keep local generated overrides and `LOCAL_BUILD.json` out of commits. Native
 capability/factory smoke tests do not qualify fresh pairing or chat delivery.
+Verified current SDK overlays also define `WN_CURRENT_SDK_API` for public API
+shape changes. A `WN_SDK_PROFILE=default` overlay requires explicit SDK source/run
+provenance and keeps private sync disabled. Use the stable settings helper; do
+not enable either capability flag directly for published bindings.
 See `docs/native-device-linking-development.md` for the current acceptance scope.
 
 Avatar metadata from presented rows, conversation headers and identity sidecars

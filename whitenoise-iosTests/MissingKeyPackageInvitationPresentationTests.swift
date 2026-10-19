@@ -31,7 +31,7 @@ struct MissingKeyPackageInvitationPresentationTests {
         }
     }
 
-    #if WN_EXPERIMENTAL_DEVICE_SYNC
+    #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
         @Test func obsoletePublicationDoesNotIdentifySomeoneAsAbsentFromWhiteNoise() {
             let error = MarmotKitError.MissingKeyPackage(account: account, reason: .obsoleteOnly)
             #expect(MissingKeyPackageInvitationPresentation.accountIdHex(for: error) == nil)
