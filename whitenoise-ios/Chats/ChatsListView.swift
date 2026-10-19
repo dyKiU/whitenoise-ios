@@ -614,6 +614,10 @@ struct ChatsListView: View {
                     AutomaticChatListSection(
                         model: automaticChats, rows: automaticRows,
                         select: { path.append(ChatNavigationTarget(groupIdHex: $0)) },
+                        activeAccountIdHex: appState.activeAccount?.accountIdHex,
+                        blockedAuthors: blockedUsers.blockedAccountIds,
+                        senderName: { appState.displayName(forAccountIdHex: $0) },
+                        mentionDisplayName: { appState.mentionDisplayName(for: $0) },
                         title: pairedChatTitle
                     )
                     .task(
@@ -811,7 +815,7 @@ struct ChatsListView: View {
             Text(ChatListLeavePresentation.confirmationMessage)
         }
         .listRowSeparator(.hidden)
-        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+        .listRowInsets(ChatListRowMetrics.insets)
         .background(alignment: .trailing) {
             if let target = pendingMute, !target.fromSelection, target.groupIds == [item.id] {
                 mutePicker(target: target, item: item)

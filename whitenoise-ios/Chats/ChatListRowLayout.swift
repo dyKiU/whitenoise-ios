@@ -1,5 +1,9 @@
 import SwiftUI
 
+enum ChatListRowMetrics {
+    static let insets = EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16)
+}
+
 /// Shared geometry for native and linked-device conversation rows.
 struct ChatListRowLayout<Avatar: View, Content: View>: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize

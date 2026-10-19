@@ -20,12 +20,50 @@ import SwiftUI
                         || title($0).localizedStandardContains(query))
             }
         }
+
+        static func latestMessage(_ row: PairedChatSummaryFfi, now: Date = Date()) -> PairedChatMessageFfi? {
+            row.latestMessage.flatMap { message in
+                message.expiresAt.map { Double($0) <= now.timeIntervalSince1970 } == true ? nil : message
+            }
+        }
+
+        static func preview(
+            _ row: PairedChatSummaryFfi, activeAccountIdHex: String?,
+            blockedAuthors: Set<String> = [], senderName: (String) -> String,
+            mentionDisplayName: MarkdownMentionResolver? = nil, now: Date = Date()
+        ) -> ChatRowPreviewPresentation {
+            if let peer = row.directPeerAccountIdHex, blockedAuthors.contains(peer.lowercased()) {
+                return .init(prefix: nil, body: L10n.string("You blocked this user"))
+            }
+            guard let message = latestMessage(row, now: now) else {
+                return .init(prefix: nil, body: L10n.string("No messages yet"))
+            }
+            guard !blockedAuthors.contains(message.authorHex.lowercased()) else {
+                return .init(prefix: nil, body: L10n.string("New message"))
+            }
+            let body = ContentSanitizer.compactSingleLine(
+                MessagePreview.body(message, mentionDisplayName: mentionDisplayName), maxLength: 140) ?? ""
+            guard message.canonicalChat || message.deleted else {
+                return .init(prefix: nil, body: body)
+            }
+            let media = ChatListAttachmentPresentation.metadata(for: message.mediaAttachments)
+            let symbol = message.deleted ? nil : ChatListAttachmentPresentation.systemImageName(
+                kind: media.kind, count: media.count)
+            return .message(
+                body: body, systemImageName: symbol, sender: message.authorHex, senderDisplayName: nil,
+                isDirectMessage: row.directPeerAccountIdHex != nil,
+                activeAccountIdHex: activeAccountIdHex, senderName: senderName)
+        }
     }
 
     struct AutomaticChatListSection: View {
         let model: AccountChatListViewModel?
         let rows: [PairedChatSummaryFfi]
         let select: (String) -> Void
+        var activeAccountIdHex: String?
+        var blockedAuthors: Set<String> = []
+        var senderName: (String) -> String = { _ in L10n.string("Unknown user") }
+        var mentionDisplayName: MarkdownMentionResolver?
         var title: (PairedChatSummaryFfi) -> String = { AutomaticChatListPresentation.title($0) }
 
         var body: some View {
@@ -34,25 +72,29 @@ import SwiftUI
                     select(row.groupIdHex)
                 } label: {
                     ChatListRowLayout {
-                        AvatarBubble(
+                        GroupAvatarBubble(
+                            groupIdHex: row.groupIdHex, imageHashHex: nil,
                             seed: row.directPeerAccountIdHex ?? row.groupIdHex,
-                            title: title(row), pictureURL: nil)
+                            title: title(row), pictureURL: nil, loadPriority: .chatList)
                     } content: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(verbatim: title(row))
-                                .font(.headline)
-                                .lineLimit(1)
-                            Text("Shared from a linked device")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        ChatRowDetails(
+                            title: title(row),
+                            preview: AutomaticChatListPresentation.preview(
+                                row, activeAccountIdHex: activeAccountIdHex,
+                                blockedAuthors: blockedAuthors, senderName: senderName,
+                                mentionDisplayName: mentionDisplayName),
+                            timestamp: AutomaticChatListPresentation.latestMessage(row).map {
+                                RelativeTime.chatList(Date(timeIntervalSince1970: TimeInterval($0.createdAt)))
+                            }
+                        ) {}
                     }
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     .contentShape(Rectangle())
+                    .accessibilityElement(children: .combine)
                 }
                 .buttonStyle(.plain)
+                .listRowSeparator(.hidden)
+                .listRowInsets(ChatListRowMetrics.insets)
             }
             if model?.hasPreviousPairedPage == true {
                 Button("Load previous chats") { Task { await model?.loadPreviousPaired() } }
