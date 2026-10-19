@@ -207,6 +207,8 @@ class LocalSdkProfileTests(unittest.TestCase):
             target = app / relative
             target.parent.mkdir(parents=True)
             shutil.copytree(self.package, target)
+            self.copied_overlay_has_receipt = 'qualification_receipt' in json.loads(
+                (target / 'LOCAL_BUILD.json').read_text())
         env = dict(os.environ)
         for name in ['WN_SDK_PROFILE', 'WN_CURRENT_SDK_API', 'WN_EXPERIMENTAL_DEVICE_SYNC',
                      'OTHER_SWIFT_FLAGS', 'SWIFT_ACTIVE_COMPILATION_CONDITIONS', 'SWIFT_FLAGS',
@@ -244,11 +246,13 @@ class LocalSdkProfileTests(unittest.TestCase):
         self.assertIn('Explicit immutable SDK F required', result.stderr)
 
     def test_legacy_private_shell_does_not_require_new_receipt(self):
-        self.make_fixture(profile='experimental')
+        self.make_fixture(profile='experimental', platform=os.environ['PROFILE_CONTROL_APP_PLATFORM'])
         del self.local['qualification_receipt']
         self.write('LOCAL_BUILD.json', encoded(self.local).encode())
+        self.assertFalse('qualification_receipt' in json.loads((self.package / 'LOCAL_BUILD.json').read_text()))
         result = self.shell({'WN_EXPERIMENTAL_DEVICE_SYNC': '1', 'WN_SDK_SOURCE_SHA': '',
                              'WN_SDK_RUN_ID': '', 'SOURCE_SHA': '', 'SDK_RUN_ID': ''})
+        self.assertFalse(self.copied_overlay_has_receipt)
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, '1|experimental|OTHER_SWIFT_FLAGS=$(inherited) -D WN_CURRENT_SDK_API -D WN_EXPERIMENTAL_DEVICE_SYNC\n')
 
