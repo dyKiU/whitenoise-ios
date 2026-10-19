@@ -266,7 +266,8 @@ import SwiftUI
                                         if presentation.isOutgoing { Spacer(minLength: 8) }
                                         MessageMetadataFooter(
                                             time: MessageBubble.timeLabel(recordedAt: presentation.timestamp),
-                                            isEdited: false, status: .received, isFromMe: presentation.isOutgoing,
+                                            isEdited: presentation.isEdited, status: .received,
+                                            isFromMe: presentation.isOutgoing,
                                             showsDeliveryStatus: false)
                                         if !presentation.isOutgoing { Spacer(minLength: 8) }
                                     }

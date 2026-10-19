@@ -29,6 +29,20 @@ import Testing
             #expect(presentation.text == "Synthetic text")
         }
 
+        @Test func editedIndicatorFollowsAcceptedMetadataAndIsHiddenForDeletedOrUnsupportedMessages() {
+            var value = message()
+            #expect(!PairedMessagePresentation(message: value, localAccountIdHex: nil).isEdited)
+            value.edit = .init(editCount: 1, latestEditMessageIdHex: String(repeating: "f", count: 64), editedAt: 150)
+            let edited = PairedMessagePresentation(message: value, localAccountIdHex: nil)
+            #expect(edited.isEdited)
+            #expect(edited.timestamp == 123)
+            value.deleted = true
+            #expect(!PairedMessagePresentation(message: value, localAccountIdHex: nil).isEdited)
+            value.deleted = false
+            value.canonicalChat = false
+            #expect(!PairedMessagePresentation(message: value, localAccountIdHex: nil).isEdited)
+        }
+
         @Test func missingOrDifferentAccountNeverLooksLikeAnOwnMessage() {
             let value = message()
             for account in [nil, "", String(repeating: "f", count: 64)] {
