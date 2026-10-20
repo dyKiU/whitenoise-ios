@@ -12013,20 +12013,26 @@ struct MediaComposerAvailabilityTests {
         #expect(ComposerAvailabilityPresentation.awaitsLiveConversationState(
             usesLiveWindow: true,
             hasWindowSnapshot: false,
+            hasLiveEpoch: false,
             hasWindowSubscription: false,
-            isLocallyReset: false
+            isLocallyReset: false,
+            isActiveParticipant: true
         ))
         #expect(ComposerAvailabilityPresentation.awaitsLiveConversationState(
             usesLiveWindow: true,
             hasWindowSnapshot: false,
+            hasLiveEpoch: false,
             hasWindowSubscription: true,
-            isLocallyReset: false
+            isLocallyReset: false,
+            isActiveParticipant: true
         ))
         #expect(ComposerAvailabilityPresentation.awaitsLiveConversationState(
             usesLiveWindow: true,
             hasWindowSnapshot: true,
+            hasLiveEpoch: true,
             hasWindowSubscription: false,
-            isLocallyReset: false
+            isLocallyReset: false,
+            isActiveParticipant: true
         ))
     }
 
@@ -12034,14 +12040,18 @@ struct MediaComposerAvailabilityTests {
         #expect(!ComposerAvailabilityPresentation.awaitsLiveConversationState(
             usesLiveWindow: true,
             hasWindowSnapshot: true,
+            hasLiveEpoch: true,
             hasWindowSubscription: true,
-            isLocallyReset: false
+            isLocallyReset: false,
+            isActiveParticipant: true
         ))
         #expect(!ComposerAvailabilityPresentation.awaitsLiveConversationState(
             usesLiveWindow: false,
             hasWindowSnapshot: false,
+            hasLiveEpoch: false,
             hasWindowSubscription: false,
-            isLocallyReset: false
+            isLocallyReset: false,
+            isActiveParticipant: true
         ))
     }
 
@@ -12049,9 +12059,53 @@ struct MediaComposerAvailabilityTests {
         #expect(!ComposerAvailabilityPresentation.awaitsLiveConversationState(
             usesLiveWindow: true,
             hasWindowSnapshot: false,
+            hasLiveEpoch: false,
             hasWindowSubscription: false,
-            isLocallyReset: true
+            isLocallyReset: true,
+            isActiveParticipant: true
         ))
+    }
+
+    @Test func cachedConversationKeepsTheComposerWhileLiveCapabilitiesLoad() {
+        #expect(ComposerAvailabilityPresentation.awaitsLiveConversationState(
+            usesLiveWindow: true,
+            hasWindowSnapshot: true,
+            hasLiveEpoch: false,
+            hasWindowSubscription: true,
+            isLocallyReset: false,
+            isActiveParticipant: true
+        ))
+    }
+
+    @Test func inactiveMembershipDoesNotWaitForLiveCapabilities() {
+        // MDK preserves departed membership in its local-only snapshot even
+        // while the epoch and live send permissions are unavailable.
+        #expect(!ComposerAvailabilityPresentation.awaitsLiveConversationState(
+            usesLiveWindow: true,
+            hasWindowSnapshot: true,
+            hasLiveEpoch: false,
+            hasWindowSubscription: true,
+            isLocallyReset: false,
+            isActiveParticipant: false
+        ))
+    }
+
+    @Test func missingLiveStateStopsHidingTheUnavailableNoticeAfterTheGracePeriod() {
+        // Neither a stalled open nor repeated local-only snapshots may hide
+        // the unavailable notice indefinitely.
+        for hasSnapshot in [false, true] {
+            for hasSubscription in [false, true] {
+                #expect(!ComposerAvailabilityPresentation.awaitsLiveConversationState(
+                    usesLiveWindow: true,
+                    hasWindowSnapshot: hasSnapshot,
+                    hasLiveEpoch: false,
+                    hasWindowSubscription: hasSubscription,
+                    isLocallyReset: false,
+                    isActiveParticipant: true,
+                    hasLoadingGraceExpired: true
+                ))
+            }
+        }
     }
 
     @Test func freshConversationReportsGroupDerivedComposerMessages() throws {
