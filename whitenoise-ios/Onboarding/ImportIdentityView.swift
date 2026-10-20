@@ -27,12 +27,12 @@ struct ImportIdentityView: View {
 
     let isPushed: Bool
     let onPreferredSheetExpansionChange: (Bool) -> Void
-    let onChatsOpened: () -> Void
+    let onChatsOpened: (() -> Void)?
 
     init(
         isPushed: Bool = false,
         onPreferredSheetExpansionChange: @escaping (Bool) -> Void = { _ in },
-        onChatsOpened: @escaping () -> Void = {}
+        onChatsOpened: (() -> Void)? = nil
     ) {
         self.isPushed = isPushed
         self.onPreferredSheetExpansionChange = onPreferredSheetExpansionChange
@@ -133,7 +133,7 @@ struct ImportIdentityView: View {
             if appState.pendingAccountSetup != nil || appState.activeAccount?.accountIdHex != setup.accountID {
                 openingSetup = nil
             } else {
-                onChatsOpened()
+                onChatsOpened?()
             }
         }
     }
@@ -288,11 +288,19 @@ struct ImportIdentityView: View {
         WNOnboardingButton(title: "Sign In", isLoading: model.isImporting) {
             isKeyFocused = false
             Task {
-                await model.runImport(using: appState, dismiss: { dismiss() })
+                await model.runImport(using: appState, dismiss: completeImport)
             }
         }
         .disabled(!canSubmit && !model.isImporting)
         .accessibilityLabel(model.isImporting ? "Signing In" : "Sign In")
+    }
+
+    private func completeImport() {
+        if let onChatsOpened {
+            onChatsOpened()
+        } else {
+            dismiss()
+        }
     }
 
     private func privateKeyField(identity: Binding<String>) -> some View {
@@ -315,7 +323,7 @@ struct ImportIdentityView: View {
                     guard canSubmit else { return }
                     isKeyFocused = false
                     Task {
-                        await model.runImport(using: appState, dismiss: { dismiss() })
+                        await model.runImport(using: appState, dismiss: completeImport)
                     }
                 }
             )
