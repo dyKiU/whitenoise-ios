@@ -609,7 +609,7 @@ final class RuntimeLifecycle {
     #if WN_EXPERIMENTAL_DEVICE_SYNC
         private func cancelDeviceLinkingBeforeRuntimeClose() async {
             do {
-                try await appState?.accountStore.cancelDeviceLinking()
+                try await appState?.accountStore.cancelDeviceLinking(preservingConversationState: true)
             } catch {
                 // The exact retiring scope retains its cleanup error for explicit retry.
                 // Terminal Core shutdown must still release the shared SQLite lock.

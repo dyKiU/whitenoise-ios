@@ -28,11 +28,16 @@
         func makeAutomaticConversationModel(groupIdHex: String) throws -> AccountConversationViewModel {
             let (client, account, current) = try automaticChatContext()
             if let held = accountStore.automaticConversationModels[groupIdHex], held.isCurrentOwner { return held }
+            let continuity = try accountStore.automaticConversationContinuity(groupIdHex: groupIdHex)
             let model = AccountConversationViewModel(
                 accountRef: account, groupIdHex: groupIdHex,
-                runtime: client, observations: client, isCurrent: current)
+                runtime: client, observations: client, continuity: continuity,
+                isPresentationCurrent: { [weak self] in
+                    self?.activeAccountRef == account && self?.isAccountExitInProgress == false
+                        && self?.isErasingAppData == false
+                }, isCurrent: current)
             do { try accountStore.holdAutomaticConversation(model, groupIdHex: groupIdHex) } catch {
-                model.invalidate()
+                model.suspend()
                 throw error
             }
             return model

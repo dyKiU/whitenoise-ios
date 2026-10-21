@@ -8,7 +8,7 @@ import Testing
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     nonisolated private final class PendingSendState: Sendable {
         nonisolated private struct State: Sendable {
-            var value: LocalSendStatusFfi = .queued
+            var value: LocalSendStatusFfi? = .queued
             var calls = 0
             var blocked = false
             var entered = false
@@ -19,9 +19,10 @@ import Testing
         var callCount: Int { state.withLock { $0.calls } }
         var isWaiting: Bool { state.withLock { $0.entered } }
         func reject() { state.withLock { $0.value = .rejected } }
+        func forgetStatus() { state.withLock { $0.value = nil } }
         func holdNextStatus() { state.withLock { $0.blocked = true } }
         func finishStatus() { release.signal() }
-        func status() throws -> LocalSendStatusFfi {
+        func status() throws -> LocalSendStatusFfi? {
             let held = state.withLock { value in
                 value.calls += 1
                 value.entered = value.blocked
@@ -37,6 +38,8 @@ import Testing
             var enabled = false
             var reached = false
             var waiter: CheckedContinuation<Void, Never>?
+            var failuresRemaining = 0
+            var tokens: [String] = []
         }
         private let gate = Mutex(Gate())
         private let state: PendingSendState
@@ -46,6 +49,8 @@ import Testing
             set { gate.withLock { $0.enabled = newValue } }
         }
         var didReachMessageActionGate: Bool { gate.withLock { $0.reached } }
+        var submittedTokens: [String] { gate.withLock { $0.tokens } }
+        func interruptNextAdmission() { gate.withLock { $0.failuresRemaining = 1 } }
         func releaseMessageActionGate() {
             let waiter = gate.withLock { value in
                 value.enabled = false
@@ -58,6 +63,7 @@ import Testing
         func sendTextWithClientToken(accountRef: String, groupIdHex: String, text: String, clientToken: String)
             async throws -> LocalSendAcceptanceFfi
         {
+            gate.withLock { $0.tokens.append(clientToken) }
             await withCheckedContinuation { reply in
                 let immediate = gate.withLock { value in
                     guard value.enabled else { return true }
@@ -67,6 +73,12 @@ import Testing
                 }
                 if immediate { reply.resume() }
             }
+            let interrupted = gate.withLock { value in
+                guard value.failuresRemaining > 0 else { return false }
+                value.failuresRemaining -= 1
+                return true
+            }
+            if interrupted { throw CancellationError() }
             return .init(clientToken: clientToken, messageIdHex: state.eventId)
         }
         func replyWithClientToken(
@@ -257,6 +269,160 @@ import Testing
             #expect(await waitFor { model.snapshot?.sequence == 2 })
             #expect(model.pendingTexts.isEmpty)
             #expect(model.pairedMessages.map(\.messageIdHex) == [state.eventId])
+        }
+
+        @Test func windowEndKeepsAcceptedPendingTokenForReconciliation() async throws {
+            let (model, original, state) = try await ready()
+            defer { model.invalidate() }
+            let accepted = try await model.sendText("Synthetic pending message")
+            original.cancel()
+            #expect(await waitFor { model.error == .unavailable })
+            #expect(model.pendingTexts[accepted.clientToken]?.acceptedMessageIdHex == state.eventId)
+            #expect(model.pendingTexts[accepted.clientToken]?.text == "Synthetic pending message")
+        }
+
+        @Test func backgroundHandoffKeepsTranscriptDraftAndPendingWithoutKeepingNativeOwner() async throws {
+            let suite = "automatic-background-" + UUID().uuidString
+            let defaults = try #require(UserDefaults(suiteName: suite))
+            defer { defaults.removePersistentDomain(forName: suite) }
+            let store = AccountStore(defaults: defaults)
+            store.activeAccountRef = "synthetic-account"
+            let (model, original, state) = try await ready()
+            try store.holdAutomaticConversation(model, groupIdHex: group)
+            let accepted = try await model.sendText("Synthetic pending message")
+            model.continuity.draft = "An unsent draft"
+            original.emit(snapshot(sequence: 2, eventId: "previous-message"))
+            #expect(await waitFor { model.snapshot?.sequence == 2 })
+            try await store.cancelDeviceLinking(preservingConversationState: true)
+            #expect(!model.isCurrentOwner)
+            #expect(store.automaticConversationModels.isEmpty)
+            let retained = try store.automaticConversationContinuity(groupIdHex: group)
+            #expect(retained === model.continuity)
+            #expect(retained.draft == "An unsent draft")
+            #expect(retained.pendingTexts[accepted.clientToken]?.acceptedMessageIdHex == state.eventId)
+            #expect(retained.snapshot?.sequence == 2)
+
+            var fresh = snapshot(sequence: 1, eventId: state.eventId)
+            fresh.generation = "new-runtime-generation"
+            let replacement = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: PendingSender(state: state),
+                observations: PendingFactory(original: PendingConversation(fresh)), continuity: retained)
+            try store.holdAutomaticConversation(replacement, groupIdHex: group)
+            #expect(replacement.snapshot?.sequence == 2)
+            replacement.start()
+            #expect(await waitFor { replacement.snapshot?.generation == fresh.generation })
+            #expect(replacement.pendingTexts.isEmpty)
+            #expect(replacement.continuity.draft == "An unsent draft")
+            replacement.invalidate()
+        }
+
+        @Test func inactiveObservationRetiresWithoutClearingAcceptedSendOrDraft() async throws {
+            var current = true
+            let state = PendingSendState()
+            let sender = PendingSender(state: state)
+            let original = PendingConversation(snapshot(sequence: 1))
+            let model = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: sender,
+                observations: PendingFactory(original: original), isPresentationCurrent: { true },
+                isCurrent: { current })
+            model.start()
+            defer { model.invalidate() }
+            #expect(await waitFor { model.snapshot != nil })
+            let accepted = try await model.sendText("Synthetic pending message")
+            model.continuity.draft = "Unsent draft"
+            current = false
+            original.cancel()
+            #expect(await waitFor { model.retired })
+            current = true
+            #expect(!model.isCurrentOwner)
+            #expect(model.pairedHeader != nil)
+            #expect(model.continuity.draft == "Unsent draft")
+            #expect(model.pendingTexts[accepted.clientToken]?.acceptedMessageIdHex == state.eventId)
+
+            let replacement = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: sender,
+                observations: PendingFactory(original: PendingConversation(snapshot(sequence: 1))),
+                continuity: model.continuity)
+            let statusCallsBeforeResume = state.callCount
+            replacement.start()
+            defer { replacement.suspend() }
+            #expect(await waitFor { state.callCount > statusCallsBeforeResume })
+            #expect(sender.submittedTokens == [accepted.clientToken])
+            #expect(replacement.pendingTexts[accepted.clientToken] != nil)
+        }
+
+        @Test func lateAdmissionAfterBackgroundKeepsOriginalTokenAndCannotResurrectSwitchedAccount() async throws {
+            for switchesAccount in [false, true] {
+                let suite = "automatic-late-background-" + UUID().uuidString
+                let defaults = try #require(UserDefaults(suiteName: suite))
+                defer { defaults.removePersistentDomain(forName: suite) }
+                let store = AccountStore(defaults: defaults)
+                store.activeAccountRef = "synthetic-account"
+                let original = PendingConversation(snapshot(sequence: 1))
+                let state = PendingSendState()
+                let sender = PendingSender(state: state)
+                sender.messageActionGateEnabled = true
+                let model = AccountConversationViewModel(
+                    accountRef: "synthetic-account", groupIdHex: group, runtime: sender,
+                    observations: PendingFactory(original: original))
+                try store.holdAutomaticConversation(model, groupIdHex: group)
+                model.start()
+                #expect(await waitFor { model.snapshot != nil })
+                let send = Task { try await model.sendText("Synthetic pending message") }
+                #expect(await waitFor { sender.didReachMessageActionGate })
+                let token = try #require(model.pendingTexts.keys.first)
+                try await store.cancelDeviceLinking(preservingConversationState: true)
+                if switchesAccount { store.activeAccountRef = "different-account" }
+                sender.releaseMessageActionGate()
+                let result = await send.result
+                if switchesAccount {
+                    if case .success = result { Issue.record("Retired account accepted a late result") }
+                    #expect(model.pendingTexts.isEmpty)
+                    #expect(model.snapshot == nil)
+                } else {
+                    #expect(try result.get().clientToken == token)
+                    #expect(model.pendingTexts[token]?.acceptedMessageIdHex == state.eventId)
+                }
+                model.invalidate()
+            }
+        }
+
+        @Test func interruptedUnacceptedAdmissionResumesWithOriginalTokenAfterFreshWindow() async throws {
+            let suite = "automatic-reconcile-background-" + UUID().uuidString
+            let defaults = try #require(UserDefaults(suiteName: suite))
+            defer { defaults.removePersistentDomain(forName: suite) }
+            let store = AccountStore(defaults: defaults)
+            store.activeAccountRef = "synthetic-account"
+            let state = PendingSendState()
+            state.forgetStatus()
+            let sender = PendingSender(state: state)
+            sender.messageActionGateEnabled = true
+            sender.interruptNextAdmission()
+            let model = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: sender,
+                observations: PendingFactory(original: PendingConversation(snapshot(sequence: 1))))
+            try store.holdAutomaticConversation(model, groupIdHex: group)
+            model.start()
+            #expect(await waitFor { model.snapshot != nil })
+            let send = Task { try await model.sendText("Synthetic interrupted message") }
+            #expect(await waitFor { sender.didReachMessageActionGate })
+            let token = try #require(model.pendingTexts.keys.first)
+            try await store.cancelDeviceLinking(preservingConversationState: true)
+            sender.releaseMessageActionGate()
+            if case .success = await send.result { Issue.record("Expected interrupted native admission") }
+            let retained = try store.automaticConversationContinuity(groupIdHex: group)
+            #expect(retained.pendingTexts[token]?.needsAdmissionReconciliation == true)
+            var fresh = snapshot(sequence: 1)
+            fresh.generation = "fresh-reconciliation-generation"
+            let replacement = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: sender,
+                observations: PendingFactory(original: PendingConversation(fresh)), continuity: retained)
+            try store.holdAutomaticConversation(replacement, groupIdHex: group)
+            replacement.start()
+            defer { replacement.invalidate() }
+            #expect(await waitFor { replacement.pendingTexts[token]?.acceptedMessageIdHex == state.eventId })
+            #expect(sender.submittedTokens == [token, token])
+            #expect(replacement.pendingTexts.count == 1)
         }
 
         @Test func newerOriginalWindowRefreshesRejectedTokenWithoutManualStatusAction() async throws {

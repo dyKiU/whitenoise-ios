@@ -28,7 +28,7 @@ import SwiftUI
                         })
                 } ?? L10n.string("Unnamed group")
             )
-            .id(appState.automaticChatOwner)
+            .id(appState.activeAccountRef)
             .task(id: appState.automaticChatOwner) {
                 await blockedUsers.run(using: appState, target: nil)
             }
@@ -60,7 +60,10 @@ import SwiftUI
         var onUnblock: () -> Void = {}
         let title: String
         @Environment(\.dismiss) private var dismiss
-        @State private var text = ""
+        private var text: String {
+            get { model?.continuity.draft ?? "" }
+            nonmutating set { model?.continuity.draft = newValue }
+        }
         @State private var sending = false
         @State private var sendFailed = false
         @State private var scrollPosition = ScrollPosition(edge: .bottom)
@@ -155,9 +158,11 @@ import SwiftUI
                     VStack(alignment: .leading, spacing: 8) {
                         if sendFailed { Text("Send failed").foregroundStyle(.red).font(.caption) }
                         ComposerBar(
-                            draft: $text, isSending: sending, hasAttachments: false, audioDraft: nil,
+                            draft: Binding(get: { text }, set: { text = $0 }),
+                            isSending: sending, hasAttachments: false, audioDraft: nil,
                             preparedAttachments: [], replyPreview: nil, mediaEnabled: false,
-                            disabledMessage: model?.pairedHeader == nil ? L10n.string("Chat unavailable") : nil,
+                            disabledMessage: model?.isCurrentOwner == true && model?.pairedHeader != nil
+                                ? nil : L10n.string("Chat unavailable"),
                             voiceRecordingActive: false, voiceRecordingLocked: false,
                             voiceRecordingSamples: [], voiceRecordingDurationSeconds: 0,
                             focusRequest: 0, dismissRequest: 0, mentionCandidates: [],

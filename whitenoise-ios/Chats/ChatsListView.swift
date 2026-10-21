@@ -1776,12 +1776,12 @@ private struct ChatDestination: View {
         destination
             #if WN_EXPERIMENTAL_DEVICE_SYNC
                 .task(id: appState.automaticChatOwner) {
-                    if let automaticDestination {
-                        appState.releaseAutomaticConversationModel(automaticDestination, groupIdHex: target.groupIdHex)
-                    }
-                    automaticDestination = nil
+                    guard appState.automaticChatOwner.ready else { return }
                     guard let model = try? appState.makeAutomaticConversationModel(groupIdHex: target.groupIdHex)
                     else { return }
+                    if let previous = automaticDestination, previous !== model {
+                        appState.releaseAutomaticConversationModel(previous, groupIdHex: target.groupIdHex)
+                    }
                     automaticDestination = model
                     model.start()
                 }

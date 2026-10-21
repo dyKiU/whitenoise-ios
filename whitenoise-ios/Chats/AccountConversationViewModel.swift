@@ -10,6 +10,7 @@ import Observation
         let replyToMessageIdHex: String?
         var acceptedMessageIdHex: String?
         var status: LocalSendStatusFfi?
+        var needsAdmissionReconciliation = false
     }
 
     /// Logical observations never replace the ordinary conversation's authenticated proofs.
@@ -18,38 +19,57 @@ import Observation
     final class AccountConversationViewModel {
         let accountRef: String
         let groupIdHex: String
-        private(set) var snapshot: AccountConversationWindowSnapshotFfi?
-        private(set) var pendingTexts: [String: PairedPendingText] = [:]
-        private(set) var markdownByMessageId: [String: [MarkdownDisplayBlock]] = [:]
+        let continuity: PairedConversationContinuity
+        private(set) var snapshot: AccountConversationWindowSnapshotFfi? {
+            get { continuity.snapshot }
+            set { continuity.snapshot = newValue }
+        }
+        private(set) var pendingTexts: [String: PairedPendingText] {
+            get { continuity.pendingTexts }
+            set { continuity.pendingTexts = newValue }
+        }
+        private(set) var markdownByMessageId: [String: [MarkdownDisplayBlock]] {
+            get { continuity.markdownByMessageId }
+            set { continuity.markdownByMessageId = newValue }
+        }
         private(set) var isLoading = false
         private(set) var error: AutomaticChatPresentationError?
         @ObservationIgnored private let observations: any AccountChatObserving
         @ObservationIgnored private let runtime: any PairedConversationSending
         @ObservationIgnored private var task: Task<Void, Never>?
+        @ObservationIgnored private var pendingStatusTask: Task<Void, Never>?
         @ObservationIgnored private var owner: (any AccountConversationObserving)?
-        @ObservationIgnored private var retired = false
+        @ObservationIgnored private var activeSnapshot: AccountConversationWindowSnapshotFfi?
+        @ObservationIgnored private(set) var retired = false
         @ObservationIgnored private let isCurrent: @MainActor () -> Bool
-        var isCurrentOwner: Bool { !retired && isCurrent() }
+        @ObservationIgnored private let isPresentationCurrent: @MainActor () -> Bool
+        var isCurrentOwner: Bool { !retired && !continuity.retired && isCurrent() }
 
         init(
             accountRef: String, groupIdHex: String, runtime: any PairedConversationSending,
             observations: any AccountChatObserving,
+            continuity: PairedConversationContinuity? = nil,
+            isPresentationCurrent: (@MainActor () -> Bool)? = nil,
             isCurrent: @escaping @MainActor () -> Bool = { true }
         ) {
             self.isCurrent = isCurrent
+            self.isPresentationCurrent = isPresentationCurrent ?? isCurrent
             self.accountRef = accountRef
             self.groupIdHex = groupIdHex
             self.runtime = runtime
             self.observations = observations
+            self.continuity = continuity ?? PairedConversationContinuity(accountRef: accountRef, groupIdHex: groupIdHex)
+            precondition(self.continuity.accountRef == accountRef && self.continuity.groupIdHex == groupIdHex)
         }
 
         var pairedHeader: PairedChatSummaryFfi? {
-            guard isCurrentOwner, let snapshot, case .pairedSource(let header) = snapshot.header else { return nil }
+            guard !continuity.retired, isPresentationCurrent(),
+                let snapshot, case .pairedSource(let header) = snapshot.header else { return nil }
             return header
         }
 
         var pairedMessages: [PairedChatMessageFfi] {
-            guard isCurrentOwner else { return [] }
+            guard !continuity.retired, isPresentationCurrent() else { return [] }
             return snapshot?.rows.compactMap { row in
                 if case .pairedSource(let value) = row { return value }
                 return nil
@@ -58,19 +78,24 @@ import Observation
 
         func start() {
             guard isCurrentOwner, task == nil else { return }
-            isLoading = true
+            isLoading = snapshot == nil
             task = Task { [weak self] in await self?.observe() }
         }
 
         func invalidate() {
+            suspend()
+            continuity.invalidate()
+        }
+
+        func suspend() {
             retired = true
             task?.cancel()
             task = nil
+            pendingStatusTask?.cancel()
+            pendingStatusTask = nil
             owner?.cancel()
             owner = nil
-            snapshot = nil
-            markdownByMessageId = [:]
-            pendingTexts = [:]
+            activeSnapshot = nil
             isLoading = false
             error = nil
         }
@@ -98,26 +123,52 @@ import Observation
             let token = UUID().uuidString.lowercased()
             pendingTexts[token] = PairedPendingText(id: token, text: text, replyToMessageIdHex: messageIdHex)
             do {
-                let accepted: LocalSendAcceptanceFfi
-                if let messageIdHex {
-                    accepted = try await runtime.replyWithClientToken(
-                        accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: messageIdHex,
-                        text: text, clientToken: token)
-                } else {
-                    accepted = try await runtime.sendTextWithClientToken(
-                        accountRef: accountRef, groupIdHex: groupIdHex, text: text, clientToken: token)
-                }
-                guard isCurrentOwner, !Task.isCancelled, owner === original else {
+                let accepted = try await submit(try pendingText(token))
+                // A late admission may already be durable. Keep its correlation across a runtime handoff.
+                guard !continuity.retired, isPresentationCurrent() else {
                     throw AutomaticChatPresentationError.retired
                 }
                 guard accepted.clientToken == token else { throw AutomaticChatPresentationError.invalidSnapshot }
                 // Native admission returns the canonical ID; the client token is never an event ID.
                 pendingTexts[token]?.acceptedMessageIdHex = accepted.messageIdHex.isEmpty ? nil : accepted.messageIdHex
+                if continuity.draft == text { continuity.draft = "" }
                 reconcileObservedPendingTexts()
+                startPendingStatusObservation()
                 return accepted
             } catch {
-                pendingTexts[token] = nil
+                if isCurrentOwner, owner === original {
+                    pendingTexts[token] = nil
+                } else if !continuity.retired {
+                    pendingTexts[token]?.needsAdmissionReconciliation = true
+                }
                 throw error
+            }
+        }
+
+        private func pendingText(_ token: String) throws -> PairedPendingText {
+            guard let pending = pendingTexts[token] else { throw AutomaticChatPresentationError.retired }
+            return pending
+        }
+
+        private func submit(_ pending: PairedPendingText) async throws -> LocalSendAcceptanceFfi {
+            if let target = pending.replyToMessageIdHex {
+                return try await runtime.replyWithClientToken(
+                    accountRef: accountRef, groupIdHex: groupIdHex, targetMessageId: target,
+                    text: pending.text, clientToken: pending.id)
+            }
+            return try await runtime.sendTextWithClientToken(
+                accountRef: accountRef, groupIdHex: groupIdHex, text: pending.text, clientToken: pending.id)
+        }
+
+        private func startPendingStatusObservation() {
+            guard isCurrentOwner, pendingStatusTask == nil, !pendingTexts.isEmpty else { return }
+            pendingStatusTask = Task { [weak self] in
+                guard let self else { return }
+                defer { pendingStatusTask = nil }
+                while isCurrentOwner, !Task.isCancelled, !pendingTexts.isEmpty {
+                    do { try await Task.sleep(for: .seconds(2)) } catch { return }
+                    await refreshPendingStatus()
+                }
             }
         }
 
@@ -127,19 +178,59 @@ import Observation
             let group = groupIdHex
             let client = runtime
             for token in Array(pendingTexts.keys) {
+                var reconcilingAdmission = false
                 do {
                     let status = try await client.localSendStatus(
                         accountRef: account, groupIdHex: group, clientToken: token)
                     guard isCurrentOwner, !Task.isCancelled, owner === original else { return }
                     pendingTexts[token]?.status = status
+                    if case .completed(let summary)? = status, summary.messageIds.count == 1 {
+                        pendingTexts[token]?.acceptedMessageIdHex = summary.messageIds[0]
+                    }
+                    if status == nil, pendingTexts[token]?.acceptedMessageIdHex == nil,
+                        pendingTexts[token]?.needsAdmissionReconciliation == true
+                    {
+                        let pending = try pendingText(token)
+                        pendingTexts[token]?.needsAdmissionReconciliation = false
+                        reconcilingAdmission = true
+                        // Retry only an interrupted admission, with its original idempotency token.
+                        let accepted = try await submit(pending)
+                        guard !continuity.retired, isPresentationCurrent(), accepted.clientToken == token else { return }
+                        pendingTexts[token]?.acceptedMessageIdHex = accepted.messageIdHex.isEmpty ? nil : accepted.messageIdHex
+                        if continuity.draft == pending.text { continuity.draft = "" }
+                    }
                 } catch {
-                    guard isCurrentOwner, owner === original else { return }
+                    guard isCurrentOwner, owner === original else {
+                        if !continuity.retired { pendingTexts[token]?.needsAdmissionReconciliation = true }
+                        return
+                    }
+                    if reconcilingAdmission {
+                        if error is CancellationError
+                            || (error as? MarmotKitError)?.isTransientStartupReadinessFailure == true
+                        {
+                            pendingTexts[token]?.needsAdmissionReconciliation = true
+                        } else {
+                            pendingTexts[token]?.status = .rejected
+                        }
+                    }
                     self.error = .unavailable
                 }
             }
+            reconcileObservedPendingTexts()
         }
 
         private func observe() async {
+            defer {
+                task = nil
+                pendingStatusTask?.cancel()
+                pendingStatusTask = nil
+                owner?.cancel()
+                owner = nil
+                activeSnapshot = nil
+                isLoading = false
+                // A finished foreground owner must not be reused after an inactive/active transition.
+                retired = true
+            }
             while isCurrentOwner, !Task.isCancelled {
                 await observeOnce()
                 guard isCurrentOwner, !Task.isCancelled else { return }
@@ -159,6 +250,7 @@ import Observation
                 guard let initial = original.snapshot() else { throw AutomaticChatPresentationError.invalidSnapshot }
                 try install(initial)
                 await refreshPendingStatus()
+                startPendingStatusObservation()
                 while let replacement = try await original.next() {
                     guard isCurrentOwner, !Task.isCancelled, owner === original else {
                         original.cancel()
@@ -174,7 +266,6 @@ import Observation
                 if let original = owner {
                     refuse(original)
                 } else {
-                    snapshot = nil
                     self.error = .unavailable
                     isLoading = false
                 }
@@ -185,7 +276,7 @@ import Observation
             guard !replacement.generation.isEmpty, replacement.rows.count <= 128 else {
                 throw AutomaticChatPresentationError.invalidSnapshot
             }
-            if let current = snapshot {
+            if let current = activeSnapshot {
                 guard replacement.generation == current.generation, replacement.sequence >= current.sequence else {
                     throw AutomaticChatPresentationError.invalidSnapshot
                 }
@@ -203,6 +294,7 @@ import Observation
                 }
             }
             markdownByMessageId = markdown
+            activeSnapshot = replacement
             snapshot = replacement
             reconcileObservedPendingTexts()
             isLoading = false
@@ -224,9 +316,7 @@ import Observation
         private func refuse(_ original: any AccountConversationObserving) {
             original.cancel()
             owner = nil
-            snapshot = nil
-            markdownByMessageId = [:]
-            pendingTexts = [:]
+            activeSnapshot = nil
             isLoading = false
             error = .unavailable
         }
