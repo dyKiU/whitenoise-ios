@@ -32,7 +32,11 @@ import SwiftUI
             .task(id: appState.automaticChatOwner) {
                 await blockedUsers.run(using: appState, target: nil)
             }
-            .task(id: model?.pairedHeader?.directPeerAccountIdHex) {
+            .task(
+                id: AutomaticChatProfileScope(
+                    owner: appState.automaticChatOwner,
+                    peerAccountIds: model?.pairedHeader?.directPeerAccountIdHex.map { [$0] } ?? [])
+            ) {
                 guard !Task.isCancelled, let model, model.isCurrentOwner,
                     model.accountRef == appState.activeAccountRef,
                     let peer = model.pairedHeader?.directPeerAccountIdHex

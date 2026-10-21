@@ -14,31 +14,43 @@ import Observation
     @Observable
     final class AccountChatListViewModel {
         let accountRef: String
-        private(set) var snapshot: AccountChatListWindowSnapshotFfi?
+        let continuity: PairedChatListContinuity
+        private(set) var snapshot: AccountChatListWindowSnapshotFfi? {
+            get { continuity.snapshot }
+            set { continuity.snapshot = newValue }
+        }
         private(set) var isLoading = false
         private(set) var error: AutomaticChatPresentationError?
         @ObservationIgnored private let runtime: any AccountChatObserving
         @ObservationIgnored private var task: Task<Void, Never>?
         @ObservationIgnored private var owner: (any AccountChatListObserving)?
+        @ObservationIgnored private var activeSnapshot: AccountChatListWindowSnapshotFfi?
         @ObservationIgnored private var pageTicket: UUID?
         @ObservationIgnored private var pairedBoundaryVisible = false
         @ObservationIgnored private var scrollPageArmed = false
         private var pageStarts: [String?] = [nil]
-        @ObservationIgnored private var retired = false
+        @ObservationIgnored private(set) var retired = false
         @ObservationIgnored private let isCurrent: @MainActor () -> Bool
-        var isCurrentOwner: Bool { !retired && isCurrent() }
+        @ObservationIgnored private let isPresentationCurrent: @MainActor () -> Bool
+        var isCurrentOwner: Bool { !retired && !continuity.retired && isCurrent() }
 
         init(
-            accountRef: String, runtime: any AccountChatObserving, isCurrent: @escaping @MainActor () -> Bool = { true }
+            accountRef: String, runtime: any AccountChatObserving,
+            continuity: PairedChatListContinuity? = nil,
+            isPresentationCurrent: (@MainActor () -> Bool)? = nil,
+            isCurrent: @escaping @MainActor () -> Bool = { true }
         ) {
             self.isCurrent = isCurrent
+            self.isPresentationCurrent = isPresentationCurrent ?? isCurrent
             self.accountRef = accountRef
             self.runtime = runtime
+            self.continuity = continuity ?? PairedChatListContinuity(accountRef: accountRef)
+            precondition(self.continuity.accountRef == accountRef)
         }
 
         /// Reads the one bounded visible lane, never concatenates the ordinary metadata rows.
         var pairedRows: [PairedChatSummaryFfi] {
-            guard isCurrentOwner else { return [] }
+            guard !continuity.retired, isPresentationCurrent() else { return [] }
             return snapshot?.rows.compactMap { row in
                 if case .pairedSource(let value) = row { return value }
                 return nil
@@ -47,11 +59,16 @@ import Observation
 
         func start() {
             guard isCurrentOwner, task == nil else { return }
-            isLoading = true
+            isLoading = snapshot == nil
             task = Task { [weak self] in await self?.observe() }
         }
 
         func invalidate() {
+            suspend()
+            continuity.invalidate()
+        }
+
+        func suspend() {
             retired = true
             pageTicket = nil
             pairedBoundaryVisible = false
@@ -61,7 +78,7 @@ import Observation
             task = nil
             owner?.cancel()
             owner = nil
-            snapshot = nil
+            activeSnapshot = nil
             error = nil
             isLoading = false
         }
@@ -124,6 +141,14 @@ import Observation
         }
 
         private func observe() async {
+            defer {
+                task = nil
+                owner?.cancel()
+                owner = nil
+                activeSnapshot = nil
+                isLoading = false
+                retired = true
+            }
             while isCurrentOwner, !Task.isCancelled {
                 await observeOnce()
                 guard isCurrentOwner, !Task.isCancelled else { return }
@@ -156,7 +181,6 @@ import Observation
                 if let original = owner {
                     refuse(original)
                 } else {
-                    snapshot = nil
                     self.error = .unavailable
                     isLoading = false
                 }
@@ -167,12 +191,13 @@ import Observation
             guard !replacement.generation.isEmpty, replacement.rows.count <= 128 else {
                 throw AutomaticChatPresentationError.invalidSnapshot
             }
-            if let current = snapshot {
+            if let current = activeSnapshot {
                 guard replacement.generation == current.generation, replacement.sequence >= current.sequence else {
                     throw AutomaticChatPresentationError.invalidSnapshot
                 }
                 if replacement.sequence == current.sequence { return }
             }
+            activeSnapshot = replacement
             snapshot = replacement
             isLoading = false
             error = nil
@@ -183,7 +208,7 @@ import Observation
             scrollPageArmed = false
             original.cancel()
             owner = nil
-            snapshot = nil
+            activeSnapshot = nil
             isLoading = false
             error = .unavailable
         }

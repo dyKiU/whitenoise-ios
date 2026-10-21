@@ -164,6 +164,67 @@ import Testing
             #expect(!model.hasPreviousPairedPage)
         }
 
+        @Test func endedWindowRetainsKnownRowsWhileAReplacementLoads() async {
+            let (model, original) = await ready()
+            defer { model.invalidate() }
+            let loadedRows = model.pairedRows
+            original.cancel()
+            #expect(await waitFor { model.error == .unavailable })
+            #expect(model.pairedRows == loadedRows)
+            #expect(model.snapshot != nil)
+        }
+
+        @Test func backgroundHandoffKeepsListUntilFreshWindowAndAccountSwitchClearsIt() async throws {
+            let suite = "automatic-list-background-" + UUID().uuidString
+            let defaults = try #require(UserDefaults(suiteName: suite))
+            defer { defaults.removePersistentDomain(forName: suite) }
+            let store = AccountStore(defaults: defaults)
+            store.activeAccountRef = "synthetic-account"
+            let (model, _) = await ready()
+            try store.holdAutomaticChatList(model)
+            let knownRows = model.pairedRows
+            try await store.cancelDeviceLinking(preservingConversationState: true)
+            #expect(model.retired)
+            #expect(store.automaticChatListModel == nil)
+            #expect(model.pairedRows == knownRows)
+            let retained = try store.automaticListContinuity()
+            #expect(retained === model.continuity)
+            var fresh = page(sequence: 1, start: 64, cursor: nil)
+            fresh.generation = "fresh-list-generation"
+            let replacement = AccountChatListViewModel(
+                accountRef: "synthetic-account", runtime: PagingFactory(original: PagingList(fresh)),
+                continuity: retained)
+            try store.holdAutomaticChatList(replacement)
+            #expect(replacement.pairedRows == knownRows)
+            replacement.start()
+            #expect(!replacement.isLoading)
+            #expect(await waitFor { replacement.snapshot?.generation == fresh.generation })
+            #expect(replacement.pairedRows.first?.groupIdHex == "0040")
+            store.activeAccountRef = "another-account"
+            store.activeAccountRef = "synthetic-account"
+            #expect(model.pairedRows.isEmpty)
+            #expect(replacement.pairedRows.isEmpty)
+            #expect(retained.retired)
+            #expect(try store.automaticListContinuity() !== retained)
+        }
+
+        @Test func inactiveListObserverCannotBeReusedAfterForegroundReturns() async {
+            var current = true
+            let original = PagingList(page(sequence: 1, start: 0, cursor: nil))
+            let model = AccountChatListViewModel(
+                accountRef: "synthetic-account", runtime: PagingFactory(original: original),
+                isPresentationCurrent: { true }, isCurrent: { current })
+            model.start()
+            defer { model.invalidate() }
+            #expect(await waitFor { original.hasUpdateWaiter })
+            current = false
+            original.cancel()
+            #expect(await waitFor { model.retired })
+            current = true
+            #expect(!model.isCurrentOwner)
+            #expect(model.pairedRows.count == 64)
+        }
+
         @Test func pagePublishedByOriginalStreamBeforeReplyStillRetainsBackCursor() async {
             let (model, original) = await ready()
             defer { model.invalidate() }

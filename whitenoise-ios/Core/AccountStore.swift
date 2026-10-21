@@ -50,6 +50,7 @@ final class AccountStore {
         }
         let historyConsentLifetime = HistoryConsentAccountLifetime()
         private(set) var automaticChatListModel: AccountChatListViewModel?
+        private var automaticChatListContinuity: PairedChatListContinuity?
         private(set) var automaticConversationModels: [String: AccountConversationViewModel] = [:]
         private var automaticConversationContinuities: [String: PairedConversationContinuity] = [:]
 
@@ -70,8 +71,23 @@ final class AccountStore {
             return state
         }
 
-        func holdAutomaticChatList(_ model: AccountChatListViewModel) {
-            automaticChatListModel?.invalidate()
+        func automaticListContinuity() throws -> PairedChatListContinuity {
+            guard let account = activeAccountRef else { throw AutomaticChatPresentationError.retired }
+            if let held = automaticChatListContinuity, !held.retired { return held }
+            let state = PairedChatListContinuity(accountRef: account)
+            automaticChatListContinuity = state
+            return state
+        }
+
+        func holdAutomaticChatList(_ model: AccountChatListViewModel) throws {
+            guard model.accountRef == activeAccountRef else { throw AutomaticChatPresentationError.retired }
+            if let previous = automaticChatListContinuity, previous !== model.continuity {
+                previous.invalidate()
+            }
+            automaticChatListContinuity = model.continuity
+            if let previous = automaticChatListModel, previous !== model {
+                if previous.continuity === model.continuity { previous.suspend() } else { previous.invalidate() }
+            }
             automaticChatListModel = model
         }
         func holdAutomaticConversation(_ model: AccountConversationViewModel, groupIdHex: String) throws {
@@ -308,8 +324,12 @@ final class AccountStore {
         private func retireDeviceLinkingScope(preservingConversationState: Bool = false) {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
-            automaticChatListModel?.invalidate()
+            if preservingConversationState { automaticChatListModel?.suspend() } else { automaticChatListModel?.invalidate() }
             automaticChatListModel = nil
+            if !preservingConversationState {
+                automaticChatListContinuity?.invalidate()
+                automaticChatListContinuity = nil
+            }
             for model in automaticConversationModels.values {
                 if preservingConversationState { model.suspend() } else { model.invalidate() }
             }
