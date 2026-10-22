@@ -884,6 +884,8 @@ struct ConversationView: View {
             // Hiding the bar also takes the back button's screen-edge pop
             // gesture with it; this puts the swipe-back to Chats back.
             .background {
+                ConversationNavigationBarVisibility()
+                    .accessibilityHidden(true)
                 InteractivePopGestureEnabler(
                     onBegin: beginPopTransition,
                     onFinish: finishPopTransition
@@ -1229,6 +1231,9 @@ struct ConversationView: View {
 
     private var conversationRuntimeTasks: some View {
         conversationAttachmentSheets
+            .task(id: viewModel?.composerLoadingTaskID) {
+                await viewModel?.waitForComposerLoadingGracePeriod()
+            }
             .task(
                 id: ConversationRuntimeStartToken(
                     accountRef: appState.activeAccountRef,

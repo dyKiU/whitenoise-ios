@@ -20,15 +20,19 @@ struct ImportIdentityView: View {
     @State private var showScanner = false
     @State private var openingSetup: AccountSetupModel?
     @State private var isRecoveringSetup = false
+    @State private var showsPrivateKeyForm = false
+    @State private var recoveryMessage: String?
+    @State private var selectedRecoveryProfile: AccountSummaryFfi?
+    @State private var recoveredInSession: [AccountSummaryFfi] = []
 
     let isPushed: Bool
     let onPreferredSheetExpansionChange: (Bool) -> Void
-    let onChatsOpened: () -> Void
+    let onChatsOpened: (() -> Void)?
 
     init(
         isPushed: Bool = false,
         onPreferredSheetExpansionChange: @escaping (Bool) -> Void = { _ in },
-        onChatsOpened: @escaping () -> Void = {}
+        onChatsOpened: (() -> Void)? = nil
     ) {
         self.isPushed = isPushed
         self.onPreferredSheetExpansionChange = onPreferredSheetExpansionChange
@@ -48,6 +52,19 @@ struct ImportIdentityView: View {
 
     private var canSubmit: Bool {
         !isBusy && keyState == .valid
+    }
+
+    private var readyProfiles: [AccountSummaryFfi] {
+        OnboardingRecoveryPresentation.readyProfiles(
+            accounts: appState.accounts,
+            recoveredInSession: recoveredInSession,
+            recoveryIDs: Set(appState.onboardingRecoveryAccounts.map(\.accountIdHex)),
+            unfinishedIDs: Set(appState.accountSetupSnapshots.map(\.accountIdHex))
+        )
+    }
+
+    private var hasRecoveryProfiles: Bool {
+        !appState.onboardingRecoveryAccounts.isEmpty || !readyProfiles.isEmpty
     }
 
     /// Accept only a checksum-valid NIP-19 encoding of a 32-byte private key.
@@ -71,10 +88,40 @@ struct ImportIdentityView: View {
                     onOpenChats: { openChats(setup) }
                 )
                 .onAppear { onPreferredSheetExpansionChange(true) }
+            } else if !showsPrivateKeyForm && (isRecoveringSetup || hasRecoveryProfiles) {
+                OnboardingRecoverySection(
+                    isPushed: isPushed,
+                    isWorking: $isRecoveringSetup,
+                    readyProfiles: readyProfiles,
+                    onRecovered: { account in
+                        var recovered = account
+                        recovered.signedOut = true
+                        recovered.running = false
+                        recoveredInSession.removeAll { $0.accountIdHex == account.accountIdHex }
+                        recoveredInSession.append(recovered)
+                    },
+                    onProfilesChanged: { message in
+                        guard !hasRecoveryProfiles else { return }
+                        showPrivateKeyForm(account: nil, message: message)
+                    },
+                    onSignIn: showPrivateKeyForm
+                )
+                .onAppear { onPreferredSheetExpansionChange(true) }
             } else {
                 signInForm
             }
         }
+        .task(id: appState.runtimeGeneration) {
+            guard openingSetup == nil, !appState.isAccountSetupPresented else { return }
+            try? await appState.refreshAccounts(refreshUnreadSummaries: false)
+        }
+    }
+
+    private func showPrivateKeyForm(account: AccountSummaryFfi?, message: String?) {
+        selectedRecoveryProfile = account
+        recoveryMessage = message
+        showsPrivateKeyForm = true
+        onPreferredSheetExpansionChange(false)
     }
 
     private func openChats(_ setup: AccountSetupModel) {
@@ -86,7 +133,7 @@ struct ImportIdentityView: View {
             if appState.pendingAccountSetup != nil || appState.activeAccount?.accountIdHex != setup.accountID {
                 openingSetup = nil
             } else {
-                onChatsOpened()
+                onChatsOpened?()
             }
         }
     }
@@ -97,46 +144,53 @@ struct ImportIdentityView: View {
 
         ScrollView {
             VStack(alignment: .leading) {
-                OnboardingRecoverySection(isRecovering: $isRecoveringSetup)
-                    .disabled(model.isImporting)
+                if let selectedRecoveryProfile {
+                    OnboardingRecoveryProfileSummary(account: selectedRecoveryProfile)
+                        .padding(.bottom, 16)
+                }
+                if let recoveryMessage {
+                    Text(verbatim: recoveryMessage)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal)
+                        .padding(.bottom, 16)
+                }
                 Text("Private Key")
                     .font(.headline)
                     .padding(.leading)
 
-                HStack {
-                    privateKeyField(identity: $model.identity)
+                WNInputWithFooter {
+                    HStack {
+                        privateKeyField(identity: $model.identity)
 
-                    if !isBusy && (isKeyFocused || normalizedIdentity.isEmpty) {
-                        Button {
-                            if isKeyFocused {
-                                isKeyFocused = false
-                            } else {
-                                showScanner = true
+                        if !isBusy && (isKeyFocused || normalizedIdentity.isEmpty) {
+                            Button {
+                                if isKeyFocused {
+                                    isKeyFocused = false
+                                } else {
+                                    showScanner = true
+                                }
+                            } label: {
+                                Image(systemName: isKeyFocused ? "xmark" : "qrcode.viewfinder")
+                                    .contentTransition(.symbolEffect(.replace))
                             }
-                        } label: {
-                            Image(systemName: isKeyFocused ? "xmark" : "qrcode.viewfinder")
-                                .contentTransition(.symbolEffect(.replace))
+                            .compatibleGlassCircleButtonStyle()
+                            .controlSize(.large)
+                            .preservesKeyboardOnTap()
+                            .transition(.opacity)
+                            .accessibilityLabel(isKeyFocused ? "Dismiss Keyboard" : "Scan QR Code")
                         }
-                        .compatibleGlassCircleButtonStyle()
-                        .controlSize(.large)
-                        .preservesKeyboardOnTap()
-                        .transition(.opacity)
-                        .accessibilityLabel(isKeyFocused ? "Dismiss Keyboard" : "Scan QR Code")
                     }
-                }
-                .animation(.default, value: isKeyFocused)
-                .animation(.default, value: normalizedIdentity.isEmpty)
-
-                if keyState == .invalid {
-                    Text("That private key isn't valid. Check it and try again.")
-                        .font(.footnote)
-                        .foregroundStyle(.red)
-                        .padding(.leading)
-                } else {
-                    Text("It starts with nsec.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .padding(.leading)
+                    .animation(.default, value: isKeyFocused)
+                    .animation(.default, value: normalizedIdentity.isEmpty)
+                } footer: {
+                    if keyState == .invalid {
+                        Text("That private key isn't valid. Check it and try again.")
+                            .wnInputFooter(isError: true)
+                    } else {
+                        Text("It starts with nsec.")
+                            .wnInputFooter()
+                    }
                 }
                 signInAction
                     .padding(.top)
@@ -153,11 +207,19 @@ struct ImportIdentityView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 WNIconButton(
-                    title: isPushed ? "Back" : "Close",
-                    systemImage: isPushed ? "chevron.backward" : "xmark",
+                    title: isPushed || hasRecoveryProfiles ? "Back" : "Close",
+                    systemImage: isPushed || hasRecoveryProfiles ? "chevron.backward" : "xmark",
                     chrome: .container
                 ) {
-                    dismiss()
+                    if hasRecoveryProfiles {
+                        isKeyFocused = false
+                        showsPrivateKeyForm = false
+                        selectedRecoveryProfile = nil
+                        recoveryMessage = nil
+                        onPreferredSheetExpansionChange(true)
+                    } else {
+                        dismiss()
+                    }
                 }
                 .disabled(isBusy)
             }
@@ -184,6 +246,7 @@ struct ImportIdentityView: View {
         }
         .onChange(of: isKeyFocused) {
             // Coordinate compact sizing with keyboard dismissal, not the focus change.
+            guard showsPrivateKeyForm || !hasRecoveryProfiles else { return }
             guard isKeyFocused || !isKeyboardVisible else { return }
             onPreferredSheetExpansionChange(isKeyFocused)
         }
@@ -193,7 +256,7 @@ struct ImportIdentityView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { notification in
             guard isKeyboardVisible else { return }
             isKeyboardVisible = false
-            if !isKeyFocused {
+            if !isKeyFocused && (showsPrivateKeyForm || !hasRecoveryProfiles) {
                 withAnimation(KeyboardFrameChange.animation(from: notification)) {
                     onPreferredSheetExpansionChange(false)
                 }
@@ -223,11 +286,19 @@ struct ImportIdentityView: View {
         WNOnboardingButton(title: "Sign In", isLoading: model.isImporting) {
             isKeyFocused = false
             Task {
-                await model.runImport(using: appState, dismiss: { dismiss() })
+                await model.runImport(using: appState, dismiss: completeImport)
             }
         }
         .disabled(!canSubmit && !model.isImporting)
         .accessibilityLabel(model.isImporting ? "Signing In" : "Sign In")
+    }
+
+    private func completeImport() {
+        if let onChatsOpened {
+            onChatsOpened()
+        } else {
+            dismiss()
+        }
     }
 
     private func privateKeyField(identity: Binding<String>) -> some View {
@@ -236,6 +307,9 @@ struct ImportIdentityView: View {
                 text: identity,
                 isFocused: $isKeyFocused,
                 showsAccessory: !isBusy,
+                placeholder: selectedRecoveryProfile == nil
+                    ? L10n.string("Enter private key")
+                    : L10n.string("Enter this profile’s private key"),
                 onFocusRequest: { onPreferredSheetExpansionChange(true) },
                 onPaste: { token, resultingIdentity in
                     model.recordPastedClipboardToken(
@@ -247,7 +321,7 @@ struct ImportIdentityView: View {
                     guard canSubmit else { return }
                     isKeyFocused = false
                     Task {
-                        await model.runImport(using: appState, dismiss: { dismiss() })
+                        await model.runImport(using: appState, dismiss: completeImport)
                     }
                 }
             )

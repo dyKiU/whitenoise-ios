@@ -846,6 +846,9 @@ final class AppState {
     /// screen that started the wipe. Hosted by `RootView`. Observed by SwiftUI.
     var pendingWipeReport: WipeReport?
 
+    /// Root-hosted presentation survives Settings disappearing during account exit.
+    var accountExitIntent: AccountExitIntent?
+
     /// Non-destructively signs out of the active account: clears its native
     /// push registration, deactivates it in Marmot, and opens profile selection. The account row, keys, encrypted store, media,
     /// and drafts stay on device so the Profiles screen can sign it back in.
@@ -854,7 +857,7 @@ final class AppState {
     /// block the user from signing out.
     @MainActor
     @discardableResult
-    func signOut() async -> Bool {
+    func signOut(onError: ((Toast) -> Void)? = nil) async -> Bool {
         guard let signingOut = activeAccountRef else { return false }
         guard AccountExitGate.canBegin(
             isReady: phase == .ready,
@@ -863,7 +866,7 @@ final class AppState {
             isRuntimeSuspending: isRuntimeSuspending,
             hasRuntimeClient: client != nil
         ), !isSigningOut else {
-            present(.error(L10n.string("Couldn't sign out")))
+            (onError ?? present)(.error(L10n.string("Couldn't sign out")))
             return false
         }
         isSigningOut = true
@@ -892,7 +895,7 @@ final class AppState {
         // below.
         notifications.cancelForegroundBatches(accountRef: signingOut)
         guard let exitingClient = client else {
-            present(.error(L10n.string("Couldn't sign out")))
+            (onError ?? present)(.error(L10n.string("Couldn't sign out")))
             return false
         }
         let nativePushWasEnabled = (
@@ -919,7 +922,7 @@ final class AppState {
                     accountRef: signingOut,
                     wasEnabled: nativePushWasEnabled
                 )
-                present(.error(L10n.string("Couldn't sign out"), message: message))
+                (onError ?? present)(.error(L10n.string("Couldn't sign out"), message: message))
                 return false
             }
         } catch {
@@ -928,7 +931,7 @@ final class AppState {
                 accountRef: signingOut,
                 wasEnabled: nativePushWasEnabled
             )
-            present(UserFacingError.toast(title: L10n.string("Couldn't sign out"), error: error))
+            (onError ?? present)(UserFacingError.toast(title: L10n.string("Couldn't sign out"), error: error))
             return false
         }
 
@@ -1053,7 +1056,7 @@ final class AppState {
     /// settings-read gate and the `.ready` gate the audit-log delete uses.
     @MainActor
     @discardableResult
-    func signOutAndWipeActiveAccount() async -> Bool {
+    func signOutAndWipeActiveAccount(onError: ((Toast) -> Void)? = nil) async -> Bool {
         guard let wipingRef = activeAccountRef else { return false }
         guard DestructiveWipeGate.canBegin(
             isReady: phase == .ready,
@@ -1062,7 +1065,7 @@ final class AppState {
             isRuntimeSuspending: isRuntimeSuspending,
             hasRuntimeClient: client != nil
         ), !isSigningOut else {
-            present(.error(L10n.string("Couldn't wipe profile")))
+            (onError ?? present)(.error(L10n.string("Couldn't wipe profile")))
             return false
         }
         isSigningOut = true
@@ -1084,7 +1087,7 @@ final class AppState {
         // reschedule for the *new* active account is not suppressed.
         notifications.cancelForegroundBatches(accountRef: wipingRef)
         guard let exitingClient = client else {
-            present(.error(L10n.string("Couldn't wipe profile")))
+            (onError ?? present)(.error(L10n.string("Couldn't wipe profile")))
             return false
         }
         let nativePushWasEnabled = (
@@ -1113,7 +1116,7 @@ final class AppState {
                 accountRef: wipingRef,
                 wasEnabled: nativePushWasEnabled
             )
-            present(UserFacingError.toast(title: L10n.string("Couldn't wipe profile"), error: error))
+            (onError ?? present)(UserFacingError.toast(title: L10n.string("Couldn't wipe profile"), error: error))
             return false
         }
 
@@ -1130,9 +1133,7 @@ final class AppState {
             from: outcome,
             additionalLocalFailures: localCleanupFailures
         )
-        if report.clean {
-            present(.success(L10n.string("Profile wiped from this device")))
-        } else {
+        if !report.clean {
             pendingWipeReport = report
         }
         return true
@@ -1810,6 +1811,69 @@ final class AppState {
         _ = try? await lease.client.marmot.clearPushRegistration(accountRef: account.label)
         try await lease.client.marmot.removeAccount(accountRef: account.label)
         pendingAccountSetupReadiness.removeValue(forKey: account.label)
+    }
+
+    func recoverOnboardingSetup(accountID: String) async throws {
+        guard !isSigningOut else { throw MarmotKitError.OnboardingActionUnavailable }
+        let lease = try await runtimeLifecycle.beginUserInitiatedForegroundRuntimeMutation()
+        defer { runtimeLifecycle.endForegroundRuntimeMutation(lease) }
+        guard try await lease.client.onboardingRecoveryRequired(accountRef: accountID) else {
+            throw MarmotKitError.OnboardingActionUnavailable
+        }
+        if let model = pendingAccountSetup, model.accountID == accountID {
+            model.suspend()
+            await model.drain()
+        }
+        guard !isSigningOut else { throw MarmotKitError.OnboardingActionUnavailable }
+        _ = try await lease.client.recoverOnboarding(accountRef: accountID)
+        signInAttempts.finish(accountID)
+        if pendingAccountSetup?.accountID == accountID { pendingAccountSetup = nil }
+        onboardingRecoveryAccounts.removeAll { $0.accountIdHex == accountID }
+        // Recovery has committed; a later refresh failure must not report it as failed.
+        try? await refreshAccounts(refreshUnreadSummaries: false)
+    }
+
+    /// Remove only an explicitly selected, inactive profile with a broken setup.
+    @MainActor
+    func removeOnboardingRecoveryAccount(_ account: AccountSummaryFfi) async throws {
+        guard !isSigningOut, account.localSigning,
+              activeAccountRef != account.label,
+              onboardingRecoveryAccounts.contains(where: { $0.accountIdHex == account.accountIdHex }) else {
+            throw MarmotKitError.OnboardingActionUnavailable
+        }
+        let lease = try await runtimeLifecycle.beginUserInitiatedForegroundRuntimeMutation()
+        defer { runtimeLifecycle.endForegroundRuntimeMutation(lease) }
+        guard try await lease.client.onboardingRecoveryRequired(accountRef: account.accountIdHex) else {
+            throw MarmotKitError.OnboardingActionUnavailable
+        }
+        guard !isSigningOut, activeAccountRef != account.label else {
+            throw MarmotKitError.OnboardingActionUnavailable
+        }
+        isSigningOut = true
+        defer {
+            finishAccountExit()
+            scheduleNativePushRegistrationIfEnabled()
+        }
+        if let model = pendingAccountSetup, model.accountID == account.accountIdHex {
+            model.suspend()
+            await model.drain()
+        }
+        await notificationCoordinator.cancelNativePushRegistrationTask()
+        _ = try? await lease.client.marmot.clearPushRegistration(accountRef: account.label)
+        try await lease.client.marmot.removeAccount(accountRef: account.label)
+        signInAttempts.finish(account.accountIdHex)
+        if pendingAccountSetup?.accountID == account.accountIdHex { pendingAccountSetup = nil }
+        onboardingRecoveryAccounts.removeAll { $0.accountIdHex == account.accountIdHex }
+        accountSetupSnapshots.removeAll { $0.accountIdHex == account.accountIdHex }
+        pendingAccountSetupReadiness.removeValue(forKey: account.label)
+        conversationDraftStore.removeDrafts(accountRef: account.label)
+        await conversationDraftStore.flush()
+        MessageHideStore.clearAll(accountRef: account.label)
+        ChatMuteStore.clearAll(accountIdHex: account.accountIdHex)
+        profileStore.clearContactNicknames(ownerAccountIdHex: account.accountIdHex)
+        profileStore.clearForAccountRemoval(accountIdHex: account.accountIdHex)
+        // Removal has committed; a later refresh failure must not report it as failed.
+        try? await refreshAccounts(refreshUnreadSummaries: false)
     }
 
     @MainActor

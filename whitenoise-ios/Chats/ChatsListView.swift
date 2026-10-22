@@ -38,6 +38,8 @@ struct ChatsListView: View {
     @State private var conversationSource = ConversationSourcePreference.shared
     @State private var showNewChat = false
     @State private var showSettings = false
+    @State private var showAddProfile = false
+    @State private var dismissAddProfileAfterSettingsRemoval = false
     @State private var path: [ChatNavigationTarget] = []
     @State private var search = ChatListSearchPresentation()
     @State private var identifierQuery = RecipientQueryModel()
@@ -336,7 +338,10 @@ struct ChatsListView: View {
             }
             .navigationDestination(isPresented: $showSettings) {
                 if let viewModel {
-                    SettingsView(chatsViewModel: viewModel)
+                    SettingsView(chatsViewModel: viewModel, onAddProfile: {
+                        secondarySheetVisible = true
+                        showAddProfile = true
+                    })
                 }
             }
             #if WN_EXPERIMENTAL_DEVICE_SYNC
@@ -352,6 +357,19 @@ struct ChatsListView: View {
                 chatListEditMode = .inactive
                 scope = .active
                 listViewport.requestTop()
+            }
+            .sheet(isPresented: $showAddProfile, onDismiss: {
+                secondarySheetVisible = false
+                dismissAddProfileAfterSettingsRemoval = false
+            }) {
+                AddProfileSheet(onCompletion: completeAddedProfile)
+            }
+            .task(id: dismissAddProfileAfterSettingsRemoval && !showSettings) {
+                guard dismissAddProfileAfterSettingsRemoval, !showSettings else { return }
+                // Let Settings leave the navigation stack beneath the opaque sheet first.
+                await Task.yield()
+                guard !Task.isCancelled, dismissAddProfileAfterSettingsRemoval, !showSettings else { return }
+                showAddProfile = false
             }
             .task(id: subscriptionScope) {
                 // The inbox needs the block list so a direct chat with a
@@ -424,6 +442,16 @@ struct ChatsListView: View {
         .task { consumePendingChat() }
     }
 
+    private func completeAddedProfile() {
+        guard showAddProfile, !dismissAddProfileAfterSettingsRemoval else { return }
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            showSettings = false
+            dismissAddProfileAfterSettingsRemoval = true
+        }
+    }
+
     /// Navigate into a chat requested via `AppState.pendingChatId`, closing any
     /// presenting sheets (composer, account switcher and its nested QR/profile
     /// sheets) so the pushed conversation lands on top.
@@ -438,6 +466,7 @@ struct ChatsListView: View {
         guard let newId = appState.pendingChatId else { return }
         let performance = appState.navigation.pendingChatPerformance
         showNewChat = false
+        showAddProfile = false
         showSettings = false
         exitSearch()
         scope = .active
