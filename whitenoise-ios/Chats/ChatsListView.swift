@@ -341,7 +341,7 @@ struct ChatsListView: View {
             }
             #if WN_EXPERIMENTAL_DEVICE_SYNC
                 .task(id: appState.automaticChatOwner) {
-                    automaticChats = nil
+                    guard appState.automaticChatOwner.ready else { return }
                     guard let model = try? appState.makeAutomaticChatListModel() else { return }
                     automaticChats = model
                     model.start()
@@ -571,10 +571,18 @@ struct ChatsListView: View {
     ) -> some View {
         #if WN_EXPERIMENTAL_DEVICE_SYNC
             let rows = conversationSource.showsSharedChats ? [] : rows
+            let isLoading = conversationSource.showsSharedChats
+                ? automaticChats?.snapshot == nil && automaticChats?.error == nil : viewModel.isLoading
+            let loadError = conversationSource.showsSharedChats
+                ? (automaticChats?.snapshot == nil ? automaticChats?.error.map { _ in L10n.string("Chat unavailable") } : nil)
+                : viewModel.loadError
+        #else
+            let isLoading = viewModel.isLoading
+            let loadError = viewModel.loadError
         #endif
-        if viewModel.isLoading && rows.isEmpty && !hasAutomaticRows {
+        if isLoading && rows.isEmpty && !hasAutomaticRows {
             ProgressView()
-        } else if let error = viewModel.loadError, !hasAutomaticRows {
+        } else if let error = loadError, !hasAutomaticRows {
             ContentUnavailableView(
                 "Couldn't load chats",
                 systemImage: "exclamationmark.triangle",
@@ -630,8 +638,9 @@ struct ChatsListView: View {
                         title: pairedChatTitle
                     )
                     .task(
-                        id: [automaticChats?.accountRef ?? ""]
-                            + (automaticChats?.pairedRows.compactMap(\.directPeerAccountIdHex) ?? [])
+                        id: AutomaticChatProfileScope(
+                            owner: appState.automaticChatOwner,
+                            peerAccountIds: automaticChats?.pairedRows.compactMap(\.directPeerAccountIdHex) ?? [])
                     ) {
                         guard !Task.isCancelled, let model = automaticChats,
                             model.isCurrentOwner, model.accountRef == appState.activeAccountRef
@@ -1793,12 +1802,12 @@ struct ChatDestination: View {
         destination
             #if WN_EXPERIMENTAL_DEVICE_SYNC
                 .task(id: appState.automaticChatOwner) {
-                    if let automaticDestination {
-                        appState.releaseAutomaticConversationModel(automaticDestination, groupIdHex: target.groupIdHex)
-                    }
-                    automaticDestination = nil
+                    guard appState.automaticChatOwner.ready else { return }
                     guard let model = try? appState.makeAutomaticConversationModel(groupIdHex: target.groupIdHex)
                     else { return }
+                    if let previous = automaticDestination, previous !== model {
+                        appState.releaseAutomaticConversationModel(previous, groupIdHex: target.groupIdHex)
+                    }
                     automaticDestination = model
                     model.start()
                 }

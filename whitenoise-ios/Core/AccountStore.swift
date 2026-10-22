@@ -57,21 +57,65 @@ final class AccountStore {
             accountChatSharingModel = model
         }
         private(set) var automaticChatListModel: AccountChatListViewModel?
+        private var automaticChatListContinuity: PairedChatListContinuity?
         private(set) var automaticConversationModels: [String: AccountConversationViewModel] = [:]
+        private var automaticConversationContinuities: [String: PairedConversationContinuity] = [:]
 
-        func holdAutomaticChatList(_ model: AccountChatListViewModel) {
-            automaticChatListModel?.invalidate()
+        func automaticConversationContinuity(groupIdHex: String) throws -> PairedConversationContinuity {
+            guard let account = activeAccountRef else { throw AutomaticChatPresentationError.retired }
+            if let held = automaticConversationContinuities[groupIdHex], !held.retired { return held }
+            automaticConversationContinuities.removeValue(forKey: groupIdHex)
+            if automaticConversationContinuities.count >= 16 {
+                guard let evicted = automaticConversationContinuities.keys.sorted().first(where: {
+                    automaticConversationModels[$0] == nil
+                        && automaticConversationContinuities[$0]?.pendingTexts.isEmpty == true
+                        && automaticConversationContinuities[$0]?.draft.isEmpty == true
+                }) else { throw AutomaticChatPresentationError.unavailable }
+                automaticConversationContinuities.removeValue(forKey: evicted)?.invalidate()
+            }
+            let state = PairedConversationContinuity(accountRef: account, groupIdHex: groupIdHex)
+            automaticConversationContinuities[groupIdHex] = state
+            return state
+        }
+
+        func automaticListContinuity() throws -> PairedChatListContinuity {
+            guard let account = activeAccountRef else { throw AutomaticChatPresentationError.retired }
+            if let held = automaticChatListContinuity, !held.retired { return held }
+            let state = PairedChatListContinuity(accountRef: account)
+            automaticChatListContinuity = state
+            return state
+        }
+
+        func holdAutomaticChatList(_ model: AccountChatListViewModel) throws {
+            guard model.accountRef == activeAccountRef else { throw AutomaticChatPresentationError.retired }
+            if let previous = automaticChatListContinuity, previous !== model.continuity {
+                previous.invalidate()
+            }
+            automaticChatListContinuity = model.continuity
+            if let previous = automaticChatListModel, previous !== model {
+                if previous.continuity === model.continuity { previous.suspend() } else { previous.invalidate() }
+            }
             automaticChatListModel = model
         }
         func holdAutomaticConversation(_ model: AccountConversationViewModel, groupIdHex: String) throws {
+            guard model.accountRef == activeAccountRef, model.groupIdHex == groupIdHex else {
+                throw AutomaticChatPresentationError.retired
+            }
             guard automaticConversationModels[groupIdHex] != nil || automaticConversationModels.count < 16
             else { throw AutomaticChatPresentationError.unavailable }
-            automaticConversationModels[groupIdHex]?.invalidate()
+            _ = try automaticConversationContinuity(groupIdHex: groupIdHex)
+            if let previous = automaticConversationContinuities[groupIdHex], previous !== model.continuity {
+                previous.invalidate()
+            }
+            automaticConversationContinuities[groupIdHex] = model.continuity
+            if let previous = automaticConversationModels[groupIdHex] {
+                if previous.continuity === model.continuity { previous.suspend() } else { previous.invalidate() }
+            }
             automaticConversationModels[groupIdHex] = model
         }
         func releaseAutomaticConversation(_ model: AccountConversationViewModel, groupIdHex: String) {
             guard automaticConversationModels[groupIdHex] === model else { return }
-            model.invalidate()
+            model.suspend()
             automaticConversationModels.removeValue(forKey: groupIdHex)
         }
 
@@ -284,13 +328,23 @@ final class AccountStore {
             return scope
         }
 
-        private func retireDeviceLinkingScope() {
+        private func retireDeviceLinkingScope(preservingConversationState: Bool = false) {
             // Synchronous negative epoch also fences A→B→A and factories not yet returned.
             deviceLinkingOwnerEpoch = UUID()
-            automaticChatListModel?.invalidate()
+            if preservingConversationState { automaticChatListModel?.suspend() } else { automaticChatListModel?.invalidate() }
             automaticChatListModel = nil
-            for model in automaticConversationModels.values { model.invalidate() }
+            if !preservingConversationState {
+                automaticChatListContinuity?.invalidate()
+                automaticChatListContinuity = nil
+            }
+            for model in automaticConversationModels.values {
+                if preservingConversationState { model.suspend() } else { model.invalidate() }
+            }
             automaticConversationModels.removeAll()
+            if !preservingConversationState {
+                for state in automaticConversationContinuities.values { state.invalidate() }
+                automaticConversationContinuities.removeAll()
+            }
             for reader in synchronizedHistoryModels.values { reader.invalidate() }
             synchronizedHistoryModels.removeAll()
             historyConsentReviewModel?.invalidate()
@@ -315,8 +369,8 @@ final class AccountStore {
             deviceLinkingRetirement = Task { try await scope.cancel() }
         }
 
-        func cancelDeviceLinking() async throws {
-            retireDeviceLinkingScope()
+        func cancelDeviceLinking(preservingConversationState: Bool = false) async throws {
+            retireDeviceLinkingScope(preservingConversationState: preservingConversationState)
             try await retryDeviceLinkingCleanup()
         }
 

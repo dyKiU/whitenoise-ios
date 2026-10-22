@@ -8,6 +8,11 @@
         let ready: Bool
     }
 
+    struct AutomaticChatProfileScope: Hashable {
+        let owner: AutomaticChatOwner
+        let peerAccountIds: [String]
+    }
+
     @MainActor extension AppState {
         var automaticChatOwner: AutomaticChatOwner {
             AutomaticChatOwner(
@@ -20,19 +25,33 @@
         func makeAutomaticChatListModel() throws -> AccountChatListViewModel {
             let (client, account, current) = try automaticChatContext()
             if let held = accountStore.automaticChatListModel, held.isCurrentOwner { return held }
-            let model = AccountChatListViewModel(accountRef: account, runtime: client, isCurrent: current)
-            accountStore.holdAutomaticChatList(model)
+            let model = AccountChatListViewModel(
+                accountRef: account, runtime: client,
+                continuity: try accountStore.automaticListContinuity(),
+                isPresentationCurrent: { [weak self] in
+                    self?.activeAccountRef == account && self?.isAccountExitInProgress == false
+                        && self?.isErasingAppData == false
+                }, isCurrent: current)
+            do { try accountStore.holdAutomaticChatList(model) } catch {
+                model.suspend()
+                throw error
+            }
             return model
         }
 
         func makeAutomaticConversationModel(groupIdHex: String) throws -> AccountConversationViewModel {
             let (client, account, current) = try automaticChatContext()
             if let held = accountStore.automaticConversationModels[groupIdHex], held.isCurrentOwner { return held }
+            let continuity = try accountStore.automaticConversationContinuity(groupIdHex: groupIdHex)
             let model = AccountConversationViewModel(
                 accountRef: account, groupIdHex: groupIdHex,
-                runtime: client, observations: client, isCurrent: current)
+                runtime: client, observations: client, continuity: continuity,
+                isPresentationCurrent: { [weak self] in
+                    self?.activeAccountRef == account && self?.isAccountExitInProgress == false
+                        && self?.isErasingAppData == false
+                }, isCurrent: current)
             do { try accountStore.holdAutomaticConversation(model, groupIdHex: groupIdHex) } catch {
-                model.invalidate()
+                model.suspend()
                 throw error
             }
             return model

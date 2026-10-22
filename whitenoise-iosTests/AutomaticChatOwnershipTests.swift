@@ -93,7 +93,7 @@ import Testing
             store.activeAccountRef = "synthetic-account"
             let factory = DelayedAccountChatFactory()
             let model = AccountChatListViewModel(accountRef: "synthetic-account", runtime: factory)
-            store.holdAutomaticChatList(model)
+            try store.holdAutomaticChatList(model)
             model.start()
             #expect(await waitFor { factory.isWaiting })
             store.activeAccountRef = "another-account"
