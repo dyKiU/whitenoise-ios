@@ -1,6 +1,13 @@
 name: Tests
 
 on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: Full suite or only the two real account-attention creation variants
+        type: choice
+        options: [full, attention-creation]
+        default: full
   pull_request:
     paths:
       - "whitenoise-ios/**"
@@ -115,7 +122,17 @@ jobs:
       - name: Run tests
         # End the step before the job deadline so failure artifacts can upload.
         timeout-minutes: 40
-        run: ./scripts/test-with-relay.sh
+        env:
+          TEST_RUNNER_WN_RUN_ATTENTION_CREATION_DIAGNOSTIC: "1"
+          TEST_SCOPE: ${{ github.event_name == 'workflow_dispatch' && inputs.scope || 'full' }}
+        run: |
+          case "$TEST_SCOPE" in
+            full) ./scripts/test-with-relay.sh ;;
+            attention-creation)
+              ./scripts/test-with-relay.sh -only-testing:whitenoise-iosTests/AccountAttentionCreationTests
+              ;;
+            *) exit 2 ;;
+          esac
 
       - name: Export native test execution counts
         if: always()
