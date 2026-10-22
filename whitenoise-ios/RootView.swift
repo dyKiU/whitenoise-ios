@@ -26,8 +26,13 @@ nonisolated enum RootPresentation: Hashable {
 /// flow (when no accounts exist), and the main app once at least one
 /// identity is set up.
 struct RootView: View {
+    private enum RootSheet: Hashable {
+        case signIn, signUp, erasureRecovery
+    }
+
     @Environment(AppState.self) private var appState
     @State private var showSignIn = false
+    @State private var visibleRootSheets: Set<RootSheet> = []
 
     var body: some View {
         let presentation = RootPresentation.resolve(
@@ -44,10 +49,12 @@ struct RootView: View {
         .toastHost()
         // Keep the presenter alive when Chats replaces Welcome behind the sheet.
         .sheet(isPresented: $showSignIn, onDismiss: {
+            visibleRootSheets.remove(.signIn)
             appState.diagnosticsConsent.onboardingVisible = false
             appState.cancelProductOnboardingIfAbandoned()
         }) {
             InitialSignInSheet()
+                .onAppear { visibleRootSheets.insert(.signIn) }
         }
         .onChange(of: presentation) { _, current in
             if current != .onboarding { showSignIn = false }
@@ -58,23 +65,30 @@ struct RootView: View {
                 appState.restoreSignUpPresentation = presented
                 if !presented { appState.closeSignUpDraft() }
             }
-        )) {
+        ), onDismiss: {
+            visibleRootSheets.remove(.signUp)
+        }) {
             NavigationStack { CreateIdentityView() }
                 .appAppearance()
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
                 .presentationSizing(.page)
+                .onAppear { visibleRootSheets.insert(.signUp) }
         }
         .task(id: appState.runtimeEventsGeneration) {
             await appState.observeRuntimeEvents()
         }
         .sheet(isPresented: Binding(
-            get: { appState.erasureState.shouldPresentRecovery(
-                activeAccountRef: appState.activeAccountRef,
-                runtimeReady: appState.canUseRuntimeForLocalForegroundWork
-            ) },
-            set: { if !$0 { appState.erasureState.needsRecovery = false } }
-        )) { EraseAppDataView(isRecovery: true).appAppearance() }
+            get: { shouldPresentErasureRecovery },
+            // Recovery state belongs to the erasure operation, not sheet dismissal.
+            set: { _ in }
+        ), onDismiss: {
+            visibleRootSheets.remove(.erasureRecovery)
+        }) {
+            EraseAppDataView(isRecovery: true)
+                .appAppearance()
+                .onAppear { visibleRootSheets.insert(.erasureRecovery) }
+        }
         // Results precede profile selection in the same presenter, so the
         // chooser cannot race either the sign-out sheet or cleanup reporting.
         .sheet(isPresented: Binding(
@@ -104,6 +118,20 @@ struct RootView: View {
         }
     }
 
+    private var shouldPresentErasureRecovery: Bool {
+        appState.erasureState.shouldPresentRecovery(
+            activeAccountRef: appState.activeAccountRef,
+            runtimeReady: appState.canUseRuntimeForLocalForegroundWork
+        )
+    }
+
+    private var canPresentProfiles: Bool {
+        // Keep the chooser deferred through other root sheets' dismissal animations.
+        visibleRootSheets.isEmpty && !showSignIn
+            && !(appState.restoreSignUpPresentation && appState.phaseOwnsLiveRuntime)
+            && !shouldPresentErasureRecovery
+    }
+
     private var needsSettingsProfileSelection: Bool {
         appState.phase == .ready
             && appState.activeAccountRef == nil
@@ -111,12 +139,14 @@ struct RootView: View {
     }
 
     private var accountExitPresentation: AccountExitPresentation? {
-        AccountExitPresentation.resolve(
+        let presentation = AccountExitPresentation.resolve(
             intent: appState.accountExitIntent,
             hasReport: appState.pendingWipeReport != nil,
             needsProfileSelection: needsSettingsProfileSelection,
             isExiting: appState.isAccountExitInProgress
         )
+        if presentation == .profileSelection, !canPresentProfiles { return nil }
+        return presentation
     }
 
     @ViewBuilder
@@ -135,7 +165,7 @@ struct RootView: View {
             if needsSettingsProfileSelection {
                 NavigationStack {
                     // No profile is active until the user explicitly chooses.
-                    SettingsView(onAddProfile: {})
+                    SettingsView(onAddProfile: {}, recordsScreenView: false)
                         .disabled(true)
                 }
             } else {

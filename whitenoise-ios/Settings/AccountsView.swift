@@ -18,7 +18,7 @@ struct AccountsView: View {
         onAddProfile: @escaping () -> Void
     ) {
         _initiallyActiveAccountRef = State(initialValue: activeAccountRef)
-        _selectedDetent = State(initialValue: signedInAccountCount >= 4 ? .large : .medium)
+        _selectedDetent = State(initialValue: requiresSelection || signedInAccountCount >= 4 ? .large : .medium)
         self.showsCloseButton = showsCloseButton
         self.requiresSelection = requiresSelection
         self.onAddProfile = onAddProfile
@@ -31,11 +31,13 @@ struct AccountsView: View {
                     Button {
                         Task {
                             let returnsToSettings = requiresSelection
+                                && appState.accountStore.returnsToSettingsAfterSelection
                             await appState.activateAccount(account.label)
-                            if appState.activeAccountRef == account.label {
-                                if returnsToSettings { appState.openSettingsAfterProfileSelection = true }
-                                if showsCloseButton { dismiss() }
+                            guard appState.activeAccountRef == account.label else { return }
+                            if returnsToSettings {
+                                appState.openSettingsAfterProfileSelection = true
                             }
+                            if showsCloseButton, !requiresSelection { dismiss() }
                         }
                     } label: {
                         AccountSummaryRow(account: account, usesCompactLayout: true)
@@ -43,6 +45,17 @@ struct AccountsView: View {
                     .buttonStyle(.plain)
                     .listRowBackground(Color(uiColor: .tertiarySystemFill))
                     .disabled(appState.isAccountExitInProgress)
+                }
+            } header: {
+                if requiresSelection {
+                    Text("You’ve signed out of your previous profile. Choose another profile to continue, or tap Add Profile to sign in or create a new account.")
+                        .font(.body)
+                        .foregroundStyle(Color(uiColor: .secondaryLabel))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textCase(nil)
+                        .padding(.vertical, 16)
+                        .listRowInsets(EdgeInsets())
                 }
             }
         }
@@ -56,11 +69,11 @@ struct AccountsView: View {
         })
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
-        .productScreen(.settings, section: .account)
+        .productScreen(.settings, section: .account, isEnabled: !requiresSelection)
         .localizedNavigationTitle(requiresSelection ? "Choose a profile" : "Switch Profile")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if showsCloseButton {
+            if showsCloseButton, !requiresSelection {
                 ToolbarItem(placement: .cancellationAction) {
                     WNIconButton(
                         title: "Close",
@@ -73,10 +86,10 @@ struct AccountsView: View {
             }
         }
         .task { await appState.refreshAccountUnreadSummaries() }
-        .presentationDetents([.medium, .large], selection: $selectedDetent)
-        .presentationDragIndicator(.visible)
-        .presentationContentInteraction(.resizes)
+        .presentationDetents(requiresSelection ? [.large] : [.medium, .large], selection: $selectedDetent)
+        .presentationDragIndicator(requiresSelection ? .hidden : .visible)
         .interactiveDismissDisabled(requiresSelection)
+        .presentationContentInteraction(.resizes)
     }
 
     private var orderedAccounts: [AccountSummaryFfi] {

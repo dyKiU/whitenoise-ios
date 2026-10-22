@@ -56,6 +56,7 @@ struct SettingsView: View {
     @State private var showAccounts = false
     @State private var addProfileAfterSwitcherCloses = false
     let onAddProfile: () -> Void
+    var recordsScreenView = true
     @State private var supportEntry = SupportChatEntryModel()
     @State private var supportRequestID: UUID?
 
@@ -111,7 +112,7 @@ struct SettingsView: View {
                 showDeleteProfile = false
             }
         }
-        .productScreen(.settings)
+        .productScreen(.settings, isEnabled: recordsScreenView)
         .localizedNavigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .task(id: appState.activeAccount?.accountIdHex) {
