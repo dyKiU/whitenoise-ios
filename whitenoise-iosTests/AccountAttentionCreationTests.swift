@@ -21,7 +21,13 @@ struct AccountAttentionCreationTests {
             && components.query == nil && components.fragment == nil
             && (components.path.isEmpty || components.path == "/"))
         let client = try MarmotClient.testClient(relayUrls: [relay], relayPolicy: .allowLoopback)
-        let appState = AppState.test(client: client)
+        // Keep system permission UI outside this owned-relay lifetime check.
+        let notifications = AppNotifications(
+            requestAuthorizationHandler: { false },
+            authorizationStatusProvider: { .denied },
+            remoteNotificationRegistrar: {}
+        )
+        let appState = AppState.test(client: client, notifications: notifications)
         appState.accountAttentionEnabledForTesting = useAttention
         recordStage("bootstrap_begin", useAttention: useAttention)
         await appState.bootstrap()
