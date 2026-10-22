@@ -154,10 +154,17 @@
       var originalFailure: Error?
       do {
         for (index, store) in stores.enumerated() {
+          #if WN_CURRENT_SDK_API
+              var runtimeOptions = MarmotOptions(deployment: marmotDeploymentWhiteNoise())
+          #else
+              var runtimeOptions = MarmotOptions()
+          #endif
+          runtimeOptions.relayPolicy = .allowLoopback
+          runtimeOptions.clientName = "native-real-packet-qr"
+          runtimeOptions.secretStore = store
           let runtime = try Marmot.newWithConfiguration(
             rootPath: root.appendingPathComponent(["a", "b", "c"][index]).path, relayUrls: [relay],
-            options: MarmotOptions(
-              relayPolicy: .allowLoopback, clientName: "native-real-packet-qr", secretStore: store))
+            options: runtimeOptions)
           runtimes.append(runtime)
           try await runtime.start()
         }

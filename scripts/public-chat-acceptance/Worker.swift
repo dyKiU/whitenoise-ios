@@ -123,11 +123,17 @@ struct PublicChatWorker {
         try markerBytes.write(to: marker)
       }
       let credentials = try TestCredentials(root: root)
+      #if WN_CURRENT_SDK_API
+          var runtimeOptions = MarmotOptions(deployment: marmotDeploymentWhiteNoise())
+      #else
+          var runtimeOptions = MarmotOptions()
+      #endif
+      runtimeOptions.relayPolicy = .allowLoopback
+      runtimeOptions.clientName = "isolated-public-chat-test"
+      runtimeOptions.secretStore = credentials
       let client = try Marmot.newWithConfiguration(
         rootPath: root.appendingPathComponent("runtime").path, relayUrls: [relay],
-        options: MarmotOptions(
-          relayPolicy: .allowLoopback,
-          clientName: "isolated-public-chat-test", secretStore: credentials))
+        options: runtimeOptions)
       runtime = client
       try await client.start()
       var account: String?

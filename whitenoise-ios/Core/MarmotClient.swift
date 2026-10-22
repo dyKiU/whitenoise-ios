@@ -175,15 +175,22 @@ nonisolated final class MarmotClient: Sendable {
         self.productConfig = .current()
         self.secretStore = secretStore
         self.relayPolicy = relayPolicy
+        #if WN_CURRENT_SDK_API
+            var runtimeOptions = MarmotOptions(deployment: marmotDeploymentWhiteNoise())
+        #else
+            var runtimeOptions = MarmotOptions()
+        #endif
+        runtimeOptions.relayPolicy = relayPolicy
+        runtimeOptions.cursorPersistence = cursorPersistence
+        runtimeOptions.clientName = "whitenoise"
+        runtimeOptions.secretStore = secretStore
+        runtimeOptions.attachmentAcquisitionMode = .hostManaged
+        runtimeOptions.moderationReportConfig = ModerationReportBuildConfig.current()?.ffi
         self.marmot = try Marmot.newWithConfiguration(
             rootPath: rootPath,
             relayUrls: relayUrls,
             options: Self.pairingOptions(
-                MarmotOptions(
-                    relayPolicy: relayPolicy, cursorPersistence: cursorPersistence, clientName: "whitenoise",
-                    secretStore: secretStore, attachmentAcquisitionMode: .hostManaged,
-                    moderationReportConfig: ModerationReportBuildConfig.current()?.ffi
-                ), runtimeRelays: relayUrls
+                runtimeOptions, runtimeRelays: relayUrls
             )
         )
         moderationReportingAvailable = marmot.moderationReportingAvailable()

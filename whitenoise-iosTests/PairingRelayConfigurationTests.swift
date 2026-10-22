@@ -5,7 +5,13 @@ import Testing
 
 struct PairingRelayConfigurationTests {
     @Test func standardRuntimeUsesSeparatePairingRoutesAndPreservesOtherOptions() {
-        let options = MarmotOptions(cursorPersistence: .frozen, clientName: "whitenoise")
+        #if WN_CURRENT_SDK_API
+            var options = MarmotOptions(deployment: marmotDeploymentWhiteNoise())
+        #else
+            var options = MarmotOptions()
+        #endif
+        options.cursorPersistence = .frozen
+        options.clientName = "whitenoise"
         let configured = MarmotClient.pairingOptions(options, runtimeRelays: MarmotClient.seedRelays)
         #expect(configured.cursorPersistence == .frozen)
         #expect(configured.clientName == "whitenoise")
@@ -16,7 +22,13 @@ struct PairingRelayConfigurationTests {
     }
 
     @Test func customRuntimeDoesNotAcquirePublicPairingFallbacks() {
-        let options = MarmotOptions(relayPolicy: .allowLoopback, cursorPersistence: .frozen)
+        #if WN_CURRENT_SDK_API
+            var options = MarmotOptions(deployment: marmotDeploymentWhiteNoise())
+        #else
+            var options = MarmotOptions()
+        #endif
+        options.relayPolicy = .allowLoopback
+        options.cursorPersistence = .frozen
         let configured = MarmotClient.pairingOptions(options, runtimeRelays: ["ws://127.0.0.1:7000"])
         #expect(configured.relayPolicy == .allowLoopback)
         #expect(configured.cursorPersistence == .frozen)
