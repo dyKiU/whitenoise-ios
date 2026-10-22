@@ -7,17 +7,20 @@ struct AccountsView: View {
     @State private var initiallyActiveAccountRef: String?
     @State private var selectedDetent: PresentationDetent
     let showsCloseButton: Bool
+    let requiresSelection: Bool
     let onAddProfile: () -> Void
 
     init(
         activeAccountRef: String?,
         signedInAccountCount: Int,
         showsCloseButton: Bool = false,
+        requiresSelection: Bool = false,
         onAddProfile: @escaping () -> Void
     ) {
         _initiallyActiveAccountRef = State(initialValue: activeAccountRef)
         _selectedDetent = State(initialValue: signedInAccountCount >= 4 ? .large : .medium)
         self.showsCloseButton = showsCloseButton
+        self.requiresSelection = requiresSelection
         self.onAddProfile = onAddProfile
     }
 
@@ -27,9 +30,11 @@ struct AccountsView: View {
                 ForEach(orderedAccounts, id: \.label) { account in
                     Button {
                         Task {
+                            let returnsToSettings = requiresSelection
                             await appState.activateAccount(account.label)
-                            if appState.activeAccountRef == account.label, showsCloseButton {
-                                dismiss()
+                            if appState.activeAccountRef == account.label {
+                                if returnsToSettings { appState.openSettingsAfterProfileSelection = true }
+                                if showsCloseButton { dismiss() }
                             }
                         }
                     } label: {
@@ -52,7 +57,7 @@ struct AccountsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .productScreen(.settings, section: .account)
-        .localizedNavigationTitle("Switch Profile")
+        .localizedNavigationTitle(requiresSelection ? "Choose a profile" : "Switch Profile")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if showsCloseButton {
@@ -71,6 +76,7 @@ struct AccountsView: View {
         .presentationDetents([.medium, .large], selection: $selectedDetent)
         .presentationDragIndicator(.visible)
         .presentationContentInteraction(.resizes)
+        .interactiveDismissDisabled(requiresSelection)
     }
 
     private var orderedAccounts: [AccountSummaryFfi] {
