@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import MarmotKit
+import UserNotifications
 @testable import whitenoise_ios
 
 @MainActor
