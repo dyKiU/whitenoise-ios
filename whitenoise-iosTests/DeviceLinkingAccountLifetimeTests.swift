@@ -260,6 +260,23 @@ import Testing
             }
         }
 
+        @Test func cancellingVerificationPreservesUnrelatedConversationDraftAndPendingToken() async throws {
+            try await withFactoryRuntime { app, _ in
+                let continuity = try app.accountStore.automaticConversationContinuity(groupIdHex: "synthetic-chat")
+                continuity.draft = "Synthetic unsent draft"
+                continuity.pendingTexts["original-token"] = PairedPendingText(
+                    id: "original-token", text: "Synthetic pending message", replyToMessageIdHex: nil,
+                    acceptedMessageIdHex: String(repeating: "a", count: 64), status: .queued)
+                let verification = app.makeDeviceVerificationViewModel()
+                try await verification.cancel()
+                let retained = try app.accountStore.automaticConversationContinuity(groupIdHex: "synthetic-chat")
+                #expect(retained === continuity)
+                #expect(!continuity.retired)
+                #expect(retained.draft == "Synthetic unsent draft")
+                #expect(retained.pendingTexts["original-token"]?.acceptedMessageIdHex == String(repeating: "a", count: 64))
+            }
+        }
+
         private func withFactoryRuntime(_ body: (AppState, MarmotClient) async throws -> Void) async throws {
             let directory = FileManager.default.temporaryDirectory.appendingPathComponent(
                 "LinkingFactoryControl-\(UUID())")
