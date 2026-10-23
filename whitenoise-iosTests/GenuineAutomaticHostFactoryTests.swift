@@ -386,7 +386,7 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
         guard let bytes = try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys]),
             let line = String(data: bytes, encoding: .utf8)
         else { return }
-        fputs("WN_FACTORY_SEMANTIC_V1 " + line + "\n", stderr)
+        FileHandle.standardError.write(Data(("WN_FACTORY_SEMANTIC_V1 " + line + "\n").utf8))
     }
 
     func testExistingRosterWNPAIR2RequiresSiblingApprovalAndSharesHistory() async throws {
