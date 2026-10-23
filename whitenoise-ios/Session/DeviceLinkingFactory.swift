@@ -25,7 +25,7 @@
                 },
                 cancel: { [weak self] in
                     guard let self, current() else { throw CancellationError() }
-                    try await self.accountStore.cancelDeviceLinking()
+                    try await self.accountStore.cancelDeviceLinking(preservingConversationState: true)
                 },
                 cleanupFailure: { [weak self] in self?.accountStore.retiringDeviceLinkingScope?.cleanupError != nil },
                 approve: { [weak self] request, target in
@@ -69,7 +69,7 @@
                 cancel: { [weak self] in
                     guard let self else { throw MarmotKitError.DeviceLinkingClosed }
                     if current() {
-                        try await self.accountStore.cancelDeviceLinking()
+                        try await self.accountStore.cancelDeviceLinking(preservingConversationState: true)
                     } else {
                         try await self.accountStore.retryDeviceLinkingCleanup(for: original)
                     }
@@ -98,7 +98,7 @@
             let model = DeviceEnrollmentApprovalViewModel(original: original, isCurrent: current) { [weak self] in
                 guard let self else { throw MarmotKitError.DeviceLinkingClosed }
                 if current() {
-                    try await self.accountStore.cancelDeviceLinking()
+                    try await self.accountStore.cancelDeviceLinking(preservingConversationState: true)
                 } else {
                     try await self.accountStore.retryDeviceLinkingCleanup(for: original)
                 }
@@ -118,7 +118,7 @@
                 // Clear this adopted owner on activation failure; a retired
                 // result must never cancel a different current account scope.
                 if accountStore.deviceLinkingScope === owner {
-                    try await accountStore.cancelDeviceLinking()
+                    try await accountStore.cancelDeviceLinking(preservingConversationState: true)
                 } else {
                     try await owner.cancel()
                 }
@@ -137,7 +137,7 @@
                 // Clear this adopted owner on activation failure; a retired
                 // result must never cancel a different current account scope.
                 if accountStore.deviceLinkingScope === owner {
-                    try await accountStore.cancelDeviceLinking()
+                    try await accountStore.cancelDeviceLinking(preservingConversationState: true)
                 } else {
                     try await owner.cancel()
                 }

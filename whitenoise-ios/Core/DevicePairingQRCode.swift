@@ -5,6 +5,12 @@
 
     /// A purpose-tagged transport envelope, never a source of pairing authority.
     nonisolated enum DevicePairingQRCode {
+        /// Only a bounded transport format check; Core validates the actual attempt.
+        static func isAutomaticBootstrap(_ bytes: Data) -> Bool {
+            guard bytes.count <= 1024, let code = String(data: bytes, encoding: .utf8) else { return false }
+            return code.hasPrefix("WNPAIR1:") || code.hasPrefix("WNPAIR2:")
+        }
+
         static let prefix = "whitenoise-pairing:v1:"
         static let maximumUTF8Bytes = 2200
         static let compressedPrefix = "whitenoise-pairing:v2:deflate:"

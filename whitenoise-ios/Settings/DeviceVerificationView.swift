@@ -191,7 +191,7 @@
 
         private func decodedPacket(_ packet: String) throws -> Data {
             let bytes = try DeviceVerificationPacketInput.decode(packet)
-            guard bytes.count <= 1024, String(data: bytes, encoding: .utf8)?.hasPrefix("WNPAIR1:") == true
+            guard DevicePairingQRCode.isAutomaticBootstrap(bytes)
             else { throw DeviceVerificationPacketInput.Error.invalidPacket }
             return bytes
         }

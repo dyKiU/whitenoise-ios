@@ -120,15 +120,15 @@ nonisolated final class MarmotClient: Sendable {
         }
 
         func beginDeviceLinkingSession(accountRef: String) async throws -> DeviceLinkingSession {
-            try await marmot.beginDeviceLinkingSession(accountRef: accountRef)
+            try await marmot.beginAutomaticDeviceLinkingSession(accountRef: accountRef)
         }
 
         func approveDeviceLinkingSession(accountRef: String, request: Data, target: Data?) async throws
             -> DeviceLinkingSession
         {
-            if let code = String(data: request, encoding: .utf8), code.hasPrefix("WNPAIR1:") {
-                return try await marmot.approveAutomaticDeviceLinkingSession(
-                    accountRef: accountRef, code: code, target: target)
+            if DevicePairingQRCode.isAutomaticBootstrap(request), let code = String(data: request, encoding: .utf8) {
+                return try await marmot.scanAutomaticDeviceLinkingSession(
+                    accountRef: accountRef, code: code)
             }
             return try await marmot.approveDeviceLinkingSession(
                 accountRef: accountRef, request: request, target: target)
