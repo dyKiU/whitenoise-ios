@@ -5,6 +5,13 @@
     @testable import whitenoise_ios
 
     @Suite @MainActor struct DevicePairingQRCodeTests {
+        @Test func compactBootstrapFitsOneQRAndRoundTrips() throws {
+            let packet = Data(("WNPAIR1:" + String(repeating: "a", count: 1016)).utf8).base64EncodedString()
+            let payload = try DevicePairingQRCode.payload(packet: packet)
+            #expect(payload.utf8.count <= DevicePairingQRCode.maximumUTF8Bytes)
+            #expect(try DevicePairingQRCode.packet(from: payload) == packet)
+        }
+
         @Test func opaqueBinaryPacketRoundTripsWithoutChangingNativeBytes() throws {
             let bytes = Data([0, 255, 1, 128, 42])
             let payload = try DevicePairingQRCode.payload(packet: bytes.base64EncodedString())

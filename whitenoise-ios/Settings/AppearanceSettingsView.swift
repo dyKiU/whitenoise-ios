@@ -4,6 +4,7 @@ struct AppearanceSettingsView: View {
     @Environment(AppAppearanceStore.self) private var appearance
     @AppStorage(ComposerReturnKeyBehavior.storageKey) private var sendsOnReturn = false
     @State private var languageRawValue = AppLanguage.currentRawValue
+    @State private var conversationSource = ConversationSourcePreference.shared
     @State private var linkPreviewSettings = LinkPreviewSettingsStore.shared
 
     var body: some View {
@@ -39,6 +40,20 @@ struct AppearanceSettingsView: View {
             } footer: {
                 Text("System follows your device language. Other choices update White Noise immediately.")
             }
+
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                Section {
+                    WNToggle(
+                        "Show shared chats",
+                        isOn: Binding(
+                            get: { conversationSource.showsSharedChats },
+                            set: { conversationSource.setShowsSharedChats($0) }
+                        )
+                    )
+                } footer: {
+                    Text("Show chats shared from linked devices instead of chats on this device.")
+                }
+            #endif
 
             Section {
                 WNToggle("Return Key Sends", isOn: $sendsOnReturn)

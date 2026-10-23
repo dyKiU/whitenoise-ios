@@ -37,6 +37,12 @@
             try requireActive()
         }
 
+        func approveAndShareChats(displayedRevision: UInt64) async throws {
+            try requireActive()
+            try await approval.approveAndShareChats(displayedRevision: displayedRevision)
+            try requireActive()
+        }
+
         func receiveEnrollmentPacket(displayedRevision: UInt64, packet: Data) async throws {
             try requireActive()
             try await approval.receiveEnrollmentPacket(displayedRevision: displayedRevision, packet: packet)
@@ -57,7 +63,11 @@
                 task = cleanup
             } else {
                 let approval = self.approval
-                task = Task { try await approval.cancel() }
+                task = Task {
+                    do { try await approval.cancel() } catch MarmotKitError.DeviceLinkingClosed {
+                        // The SDK has already retired this exact original and its transport.
+                    }
+                }
                 cleanup = task
             }
             do {

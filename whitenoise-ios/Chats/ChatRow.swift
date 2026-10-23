@@ -8,11 +8,10 @@ import UIKit
 /// relative timestamp.
 struct ChatRow: View {
     @Environment(AppState.self) private var appState
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let item: ChatsListViewModel.Item
 
     var body: some View {
-        HStack(alignment: dynamicTypeSize.isAccessibilitySize ? .top : .center, spacing: 12) {
+        ChatListRowLayout {
             GroupAvatarBubble(
                 groupIdHex: item.id,
                 imageHashHex: encryptedImageHashHex,
@@ -28,74 +27,44 @@ struct ChatRow: View {
                 if item.isPinned { PinnedChatAvatarBadge() }
             }
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 5) {
-                    Text(title)
-                        .font(.headline)
-                        .redacted(reason: item.isTitlePending ? .placeholder : [])
-                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
-                        .fixedSize(horizontal: false, vertical: true)
-                    if item.isMuted {
-                        Image(systemName: MuteBadgePresentation.systemImageName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(Text(L10n.string("Muted")))
-                    }
-                    if item.isDisbanding {
-                        Image(systemName: "hourglass")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(Text(L10n.string("Ending group…")))
-                    } else if item.isDisbanded {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(Text(L10n.string("Group ended")))
-                    } else if item.departureStatus == .leaving {
-                        Image(systemName: "hourglass")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(Text(L10n.string("Leaving…")))
-                    } else if case .membershipEnded(let membership) = item.departureStatus {
-                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(
-                                membership == .left
-                                    ? Text("Left chat")
-                                    : Text("Removed from chat")
-                            )
-                    }
-                    Spacer(minLength: 8)
-                    if let timestamp {
-                        Text(timestamp)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-
-                HStack(alignment: .top, spacing: 5) {
-                    previewText
-                        .font(.subheadline)
+        } content: {
+            ChatRowDetails(
+                title: title, isTitlePending: item.isTitlePending,
+                preview: preview, timestamp: timestamp, status: status
+            ) {
+                if item.isMuted {
+                    Image(systemName: MuteBadgePresentation.systemImageName)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: 8)
-                    switch status {
-                    case .invitation:
-                        ChatInviteBadge()
-                    case .unread(let count):
-                        UnreadCountBadge(count: count)
-                    case .none:
-                        EmptyView()
-                    }
+                        .accessibilityLabel(Text(L10n.string("Muted")))
+                }
+                if item.isDisbanding {
+                    Image(systemName: "hourglass")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(Text(L10n.string("Ending group…")))
+                } else if item.isDisbanded {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(Text(L10n.string("Group ended")))
+                } else if item.departureStatus == .leaving {
+                    Image(systemName: "hourglass")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(Text(L10n.string("Leaving…")))
+                } else if case .membershipEnded(let membership) = item.departureStatus {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(
+                            membership == .left
+                                ? Text("Left chat")
+                                : Text("Removed from chat")
+                        )
                 }
             }
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
         .accessibilityValue(item.isPinned ? L10n.string("Pinned") : "")
     }
@@ -139,19 +108,6 @@ struct ChatRow: View {
         )
     }
 
-    private var previewText: Text {
-        var body = Text(verbatim: preview.body)
-        if let symbolName = preview.systemImageName {
-            body = Text(Image(systemName: symbolName)) + Text(verbatim: " ") + body
-        }
-        if let prefix = preview.prefix {
-            return Text(verbatim: prefix + ": ")
-                .bold()
-                + body
-        }
-        return body
-    }
-
     static func previewPresentation(
         for item: ChatsListViewModel.Item,
         activeAccountIdHex: String?,
@@ -190,23 +146,11 @@ struct ChatRow: View {
                 body: body.isEmpty ? L10n.string("Group membership updated") : body
             )
         }
-        let symbolName = body.isEmpty ? nil : item.previewSymbolName
-        if latest.sender == activeAccountIdHex {
-            return body.isEmpty
-                ? ChatRowPreviewPresentation(prefix: nil, body: L10n.string("You sent a message"))
-                : ChatRowPreviewPresentation(prefix: L10n.string("You"), body: body, systemImageName: symbolName)
-        }
-        if item.isDirectMessage == false, !body.isEmpty {
-            let projectedName = ContentSanitizer.displayName(latest.senderDisplayName)
-            let fallbackName = ContentSanitizer.displayName(senderName(latest.sender))
-            if let name = projectedName ?? fallbackName {
-                return ChatRowPreviewPresentation(prefix: name, body: body, systemImageName: symbolName)
-            }
-        }
-        return ChatRowPreviewPresentation(
-            prefix: nil,
-            body: body.isEmpty ? L10n.string("New message") : body,
-            systemImageName: symbolName
+        return ChatRowPreviewPresentation.message(
+            body: body, systemImageName: item.previewSymbolName,
+            sender: latest.sender, senderDisplayName: latest.senderDisplayName,
+            isDirectMessage: item.isDirectMessage, activeAccountIdHex: activeAccountIdHex,
+            senderName: senderName
         )
     }
 
@@ -230,6 +174,28 @@ nonisolated struct ChatRowPreviewPresentation: Equatable {
         self.prefix = prefix
         self.body = body
         self.systemImageName = systemImageName
+    }
+
+    static func message(
+        body: String, systemImageName: String?, sender: String, senderDisplayName: String?,
+        isDirectMessage: Bool?, activeAccountIdHex: String?, senderName: (String) -> String
+    ) -> Self {
+        let symbol = body.isEmpty ? nil : systemImageName
+        if sender == activeAccountIdHex {
+            return body.isEmpty
+                ? Self(prefix: nil, body: L10n.string("You sent a message"))
+                : Self(prefix: L10n.string("You"), body: body, systemImageName: symbol)
+        }
+        if isDirectMessage == false, !body.isEmpty {
+            let projectedName = ContentSanitizer.displayName(senderDisplayName)
+            let fallbackName = ContentSanitizer.displayName(senderName(sender))
+            if let name = projectedName ?? fallbackName {
+                return Self(prefix: name, body: body, systemImageName: symbol)
+            }
+        }
+        return Self(
+            prefix: nil, body: body.isEmpty ? L10n.string("New message") : body,
+            systemImageName: symbol)
     }
 }
 

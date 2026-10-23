@@ -40,19 +40,23 @@ nonisolated private final class IsolatedNativeSecretStore: SecretStore, @uncheck
 }
 
 @MainActor final class NativeSecretStoreBoundaryTests: XCTestCase {
+    private var relayURL: String {
+        ProcessInfo.processInfo.environment["WN_NATIVE_TEST_RELAY_URL"] ?? "ws://127.0.0.1:18181"
+    }
+
     func testExplicitStoreReceivesActualIdentityAndSurvivesFreshRuntime() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("NativeSecretStore-\(UUID())")
         defer { try? FileManager.default.removeItem(at: root) }
         let store = IsolatedNativeSecretStore()
         let client = try MarmotClient(
-            rootPath: root.path, relayUrls: ["ws://127.0.0.1:18181"], cursorPersistence: .advance,
+            rootPath: root.path, relayUrls: [relayURL], cursorPersistence: .advance,
             telemetryConfig: .current(), secretStore: store, relayPolicy: .allowLoopback)
         let account: String
         do {
             try await client.marmot.start()
             let identity = try await client.marmot.createIdentity(
-                defaultRelays: ["ws://127.0.0.1:18181"],
-                bootstrapRelays: ["ws://127.0.0.1:18181"], inboxRelays: ["ws://127.0.0.1:18181"])
+                defaultRelays: [relayURL],
+                bootstrapRelays: [relayURL], inboxRelays: [relayURL])
             account = identity.accountIdHex
             XCTAssertEqual(store.writeCount, 1)
             XCTAssertTrue(try store.hasSecretForAccountId(accountIdHex: account))
@@ -81,13 +85,13 @@ nonisolated private final class IsolatedNativeSecretStore: SecretStore, @uncheck
         defer { try? FileManager.default.removeItem(at: root) }
         let store = IsolatedNativeSecretStore(refuseWrites: true)
         let client = try MarmotClient(
-            rootPath: root.path, relayUrls: ["ws://127.0.0.1:18181"], cursorPersistence: .advance,
+            rootPath: root.path, relayUrls: [relayURL], cursorPersistence: .advance,
             telemetryConfig: .current(), secretStore: store, relayPolicy: .allowLoopback)
         do {
             try await client.marmot.start()
             let identity = try await client.marmot.createIdentity(
-                defaultRelays: ["ws://127.0.0.1:18181"],
-                bootstrapRelays: ["ws://127.0.0.1:18181"], inboxRelays: ["ws://127.0.0.1:18181"])
+                defaultRelays: [relayURL],
+                bootstrapRelays: [relayURL], inboxRelays: [relayURL])
             try await client.marmot.removeAccount(accountRef: identity.accountIdHex)
             XCTFail("Explicit callback refusal must not silently fall back to the platform store")
         } catch { XCTAssertEqual(store.writeCount, 1) }
@@ -97,14 +101,14 @@ nonisolated private final class IsolatedNativeSecretStore: SecretStore, @uncheck
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("NativeDefaultBoundary-\(UUID())")
         defer { try? FileManager.default.removeItem(at: root) }
         let client = try MarmotClient(rootPath: root.path, relayUrls: [])
-        let before = await client.classifyRelayEndpoints(["ws://127.0.0.1:18181"])
+        let before = await client.classifyRelayEndpoints([relayURL])
         XCTAssertEqual(before.count, 1)
         XCTAssertNotEqual(before.first?.policy, .allowed)
         let accounts = try await client.listAccounts()
         XCTAssertTrue(accounts.isEmpty)
         try await client.marmot.shutdownAndClose()
         let reopened = try client.freshRuntime()
-        let after = await reopened.classifyRelayEndpoints(["ws://127.0.0.1:18181"])
+        let after = await reopened.classifyRelayEndpoints([relayURL])
         XCTAssertEqual(after, before)
         let reopenedAccounts = try await reopened.listAccounts()
         XCTAssertTrue(reopenedAccounts.isEmpty)

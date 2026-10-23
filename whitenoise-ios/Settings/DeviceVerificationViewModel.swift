@@ -3,6 +3,32 @@
     import MarmotKit
     import Observation
 
+    /// Retained by the destination while cancellation replaces the account-owned verification model.
+    @MainActor @Observable
+    final class DeviceVerificationCancellation {
+        private(set) var isWorking = false
+        private(set) var failure: DeviceVerificationFailure?
+
+        func cancel(
+            operation: @MainActor () async throws -> Void,
+            onCancelled: @MainActor () -> Void
+        ) async {
+            guard !isWorking else { return }
+            isWorking = true
+            failure = nil
+            defer {
+                isWorking = false
+                // Leaving this screen does not clear the account-owned cleanup fence.
+                onCancelled()
+            }
+            do {
+                try await operation()
+            } catch {
+                failure = DeviceVerificationFailure(error)
+            }
+        }
+    }
+
     @MainActor @Observable
     final class DeviceVerificationViewModel {
         @ObservationIgnored private let beginOriginal: @MainActor () async throws -> any DeviceVerificationSession
@@ -82,6 +108,20 @@
         }
 
         func begin() async throws { try await start(beginOriginal) }
+
+        /// Scanning starts transport only; comparison and device approval remain explicit.
+        func scanAndSync(request: Data) async throws {
+            guard isActive, verificationSupported, owner == nil, !isStarting,
+                request.count <= 1024, String(data: request, encoding: .utf8)?.hasPrefix("WNPAIR1:") == true
+            else { throw MarmotKitError.DeviceLinkingNotReady }
+            try await loadTargets()
+            guard !Task.isCancelled, targets.count <= 1 else { throw MarmotKitError.DeviceLinkingNotReady }
+            if let target = targets.first {
+                try await approve(request: request, target: target.selector)
+            } else {
+                try await approveFirstDeviceSetup(request: request)
+            }
+        }
 
         private func start(_ factory: @escaping @MainActor () async throws -> any DeviceVerificationSession)
             async throws
