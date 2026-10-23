@@ -112,7 +112,7 @@
         /// Scanning starts transport only; comparison and device approval remain explicit.
         func scanAndSync(request: Data) async throws {
             guard isActive, verificationSupported, owner == nil, !isStarting,
-                request.count <= 1024, String(data: request, encoding: .utf8)?.hasPrefix("WNPAIR1:") == true
+                DevicePairingQRCode.isAutomaticBootstrap(request)
             else { throw MarmotKitError.DeviceLinkingNotReady }
             try await loadTargets()
             guard !Task.isCancelled, targets.count <= 1 else { throw MarmotKitError.DeviceLinkingNotReady }

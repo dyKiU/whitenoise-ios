@@ -5,8 +5,16 @@
     @testable import whitenoise_ios
 
     @Suite @MainActor struct DevicePairingQRCodeTests {
-        @Test func compactBootstrapFitsOneQRAndRoundTrips() throws {
-            let packet = Data(("WNPAIR1:" + String(repeating: "a", count: 1016)).utf8).base64EncodedString()
+        @Test func automaticBootstrapSupportsBothTransportRolesAndRejectsUnrelatedOrOversizedData() {
+            #expect(DevicePairingQRCode.isAutomaticBootstrap(Data("WNPAIR1:synthetic-request".utf8)))
+            #expect(DevicePairingQRCode.isAutomaticBootstrap(Data("WNPAIR2:synthetic-rendezvous".utf8)))
+            #expect(!DevicePairingQRCode.isAutomaticBootstrap(Data("npub1unrelated".utf8)))
+            #expect(!DevicePairingQRCode.isAutomaticBootstrap(Data(("WNPAIR2:" + String(repeating: "a", count: 1017)).utf8)))
+        }
+
+        @Test(arguments: ["WNPAIR1:", "WNPAIR2:"])
+        func compactBootstrapFitsOneQRAndRoundTrips(_ bootstrapPrefix: String) throws {
+            let packet = Data((bootstrapPrefix + String(repeating: "a", count: 1016)).utf8).base64EncodedString()
             let payload = try DevicePairingQRCode.payload(packet: packet)
             #expect(payload.utf8.count <= DevicePairingQRCode.maximumUTF8Bytes)
             #expect(try DevicePairingQRCode.packet(from: payload) == packet)
