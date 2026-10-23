@@ -16,10 +16,13 @@
             guard !isWorking else { return }
             isWorking = true
             failure = nil
-            defer { isWorking = false }
+            defer {
+                isWorking = false
+                // Leaving this screen does not clear the account-owned cleanup fence.
+                onCancelled()
+            }
             do {
                 try await operation()
-                onCancelled()
             } catch {
                 failure = DeviceVerificationFailure(error)
             }

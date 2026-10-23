@@ -100,13 +100,13 @@ import Testing
             #expect(dismissed && !cancellation.isWorking && cancellation.failure == nil)
         }
 
-        @Test func failedCancellationStaysVisibleAndCanRetryCleanup() async {
+        @Test func failedCancellationDismissesAndRetainsCleanupFailure() async {
             let cancellation = DeviceVerificationCancellation()
             var dismissed = false
             await cancellation.cancel(
                 operation: { throw MarmotKitError.DeviceLinkingRuntimeUnavailable },
                 onCancelled: { dismissed = true })
-            #expect(!dismissed && !cancellation.isWorking && cancellation.failure == .runtimeUnavailable)
+            #expect(dismissed && !cancellation.isWorking && cancellation.failure == .runtimeUnavailable)
             await cancellation.cancel(operation: {}, onCancelled: { dismissed = true })
             #expect(dismissed && cancellation.failure == nil)
         }
