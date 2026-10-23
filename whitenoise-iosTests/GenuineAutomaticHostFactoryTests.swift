@@ -373,6 +373,22 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
         return (group, text)
     }
 
+    private func factorySemanticObservation(
+        stage: String, cause: String, bootstrap: String,
+        rosterReady: Bool, scannerFresh: Bool, historiesCommitted: Bool, missingChatsAbsent: Bool
+    ) {
+        // Closed synthetic categories only: no packet, account, SAS, history text or error description.
+        let value: [String: Any] = [
+            "schema": 1, "stage": stage, "cause": cause, "bootstrap": bootstrap,
+            "roster_ready": rosterReady, "scanner_fresh": scannerFresh,
+            "histories_committed": historiesCommitted, "missing_chats_absent": missingChatsAbsent,
+        ]
+        guard let bytes = try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys]),
+            let line = String(data: bytes, encoding: .utf8)
+        else { return }
+        fputs("WN_FACTORY_SEMANTIC_V1 " + line + "\n", stderr)
+    }
+
     func testExistingRosterWNPAIR2RequiresSiblingApprovalAndSharesHistory() async throws {
         try await threeDeviceFixture { hosts in
             // This is a real first enrollment, not a pre-paired or reconstructed permission fixture.
@@ -380,6 +396,7 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
             let a = hosts[0]
             let b = hosts[1]
             let c = hosts[2]
+            var semanticRosterReady = true
             for host in [a, b] {
                 let targets = try await host.client.marmot.deviceLinkingTargets(
                     accountRef: try XCTUnwrap(host.account).accountIdHex)
@@ -387,6 +404,7 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
                 guard targets.count == 1 else { throw FactoryFailure.invariant }
                 XCTAssertEqual(targets[0].deviceCount, 2)
                 guard targets[0].deviceCount == 2 else { throw FactoryFailure.invariant }
+                semanticRosterReady = semanticRosterReady && targets.count == 1 && targets[0].deviceCount == 2
             }
             let cTargets = try await c.client.marmot.deviceLinkingTargets(
                 accountRef: try XCTUnwrap(c.account).accountIdHex)
@@ -396,21 +414,50 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
             for (index, host) in hosts.enumerated() {
                 history.append(try await self.originalHistory(host, index: index))
             }
+            var semanticMissingChatsAbsent = true
             for index in 0..<2 {
                 let absentFromC = try await self.hasPairedChat(c, group: history[index].0)
                 let absentFromExisting = try await self.hasPairedChat(hosts[index], group: history[2].0)
                 XCTAssertFalse(absentFromC)
                 XCTAssertFalse(absentFromExisting)
                 guard !absentFromC, !absentFromExisting else { throw FactoryFailure.invariant }
+                semanticMissingChatsAbsent = semanticMissingChatsAbsent && !absentFromC && !absentFromExisting
             }
-            let display = try await a.begin()
+            func observeFactory(_ stage: String, _ cause: String, _ bootstrap: String) {
+                self.factorySemanticObservation(
+                    stage: stage, cause: cause, bootstrap: bootstrap,
+                    rosterReady: semanticRosterReady, scannerFresh: cTargets.isEmpty,
+                    historiesCommitted: history.count == 3, missingChatsAbsent: semanticMissingChatsAbsent)
+            }
+            let display: FactoryOwner
+            do {
+                display = try await a.begin()
+            } catch MarmotKitError.DeviceLinkingNotReady {
+                observeFactory("begin", "not-ready", "none")
+                XCTFail("factory-semantic-existing-roster-begin-not-ready")
+                return // The outer real fixture still closes every original host before returning its failure.
+            }
             let code = try display.setupPacket()
             // The prefix comes from the actual SDK-owned existing-roster factory, never a rewritten code.
-            XCTAssertTrue(String(data: code, encoding: .utf8)?.hasPrefix("WNPAIR2:") == true)
+            let semanticBootstrap = String(data: code, encoding: .utf8)
+            let semanticKind = semanticBootstrap?.hasPrefix("WNPAIR2:") == true ? "wnpair2"
+                : (semanticBootstrap?.hasPrefix("WNPAIR1:") == true ? "wnpair1" : "other")
+            observeFactory("begin", semanticKind == "wnpair2" ? "ok" : "wrong-bootstrap", semanticKind)
+            XCTAssertTrue(
+                String(data: code, encoding: .utf8)?.hasPrefix("WNPAIR2:") == true,
+                "factory-semantic-existing-roster-begin-bootstrap")
             guard String(data: code, encoding: .utf8)?.hasPrefix("WNPAIR2:") == true else {
-                throw FactoryFailure.invariant
+                return // The unchanged failing assertion above terminates the scenario; fixture cleanup still runs.
             }
-            let scanner = try await c.scan(code)
+            let scanner: FactoryOwner
+            do {
+                scanner = try await c.scan(code)
+            } catch MarmotKitError.DeviceLinkingInvalidPacket {
+                observeFactory("scan", "invalid-packet", semanticKind)
+                XCTFail("factory-semantic-existing-roster-scan-invalid-packet")
+                return // Preserve failure while allowing the same outer fixture to retire all three hosts.
+            }
+            observeFactory("scan", "ok", semanticKind)
             try await self.wait {
                 display.latestSnapshot?.phase == .comparisonAvailable && scanner.latestSnapshot?.phase == .comparisonAvailable
             }
@@ -487,6 +534,7 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
             catch is CancellationError { }
             catch MarmotKitError.DeviceLinkingClosed { }
             XCTAssertNil(original.cleanupError)
+            observeFactory("complete", "ok", semanticKind)
         }
     }
 
