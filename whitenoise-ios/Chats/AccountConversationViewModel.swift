@@ -136,10 +136,15 @@ import Observation
                 startPendingStatusObservation()
                 return accepted
             } catch {
-                if isCurrentOwner, owner === original {
-                    pendingTexts[token] = nil
-                } else if !continuity.retired {
+                let interrupted = error is CancellationError
+                    || (error as? MarmotKitError)?.isTransientStartupReadinessFailure == true
+                if !continuity.retired, interrupted || !isCurrentOwner || owner !== original {
+                    // Cancellation can arrive before the host retires its owner.
+                    // Reconcile uncertain admission with the original token, never a new send.
                     pendingTexts[token]?.needsAdmissionReconciliation = true
+                    startPendingStatusObservation()
+                } else if isCurrentOwner, owner === original {
+                    pendingTexts[token] = nil
                 }
                 throw error
             }

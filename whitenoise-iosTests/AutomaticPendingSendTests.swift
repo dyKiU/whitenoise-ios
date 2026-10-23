@@ -425,6 +425,31 @@ import Testing
             #expect(replacement.pendingTexts.count == 1)
         }
 
+        @Test func interruptedAdmissionKeepsPendingTokenWhileOriginalOwnerIsStillCurrent() async throws {
+            let state = PendingSendState()
+            state.forgetStatus()
+            let sender = PendingSender(state: state)
+            sender.interruptNextAdmission()
+            let model = AccountConversationViewModel(
+                accountRef: "synthetic-account", groupIdHex: group, runtime: sender,
+                observations: PendingFactory(original: PendingConversation(snapshot(sequence: 1))))
+            model.start()
+            defer { model.invalidate() }
+            #expect(await waitFor { model.snapshot != nil })
+            do {
+                _ = try await model.sendText("Synthetic interrupted message")
+                Issue.record("Expected interrupted native admission")
+            } catch is CancellationError {
+            }
+            let token = try #require(sender.submittedTokens.first)
+            #expect(model.isCurrentOwner)
+            #expect(model.pendingTexts[token]?.needsAdmissionReconciliation == true)
+            #expect(model.pendingTexts[token]?.text == "Synthetic interrupted message")
+            await model.refreshPendingStatus()
+            #expect(sender.submittedTokens == [token, token])
+            #expect(model.pendingTexts[token]?.acceptedMessageIdHex == state.eventId)
+        }
+
         @Test func newerOriginalWindowRefreshesRejectedTokenWithoutManualStatusAction() async throws {
             let (model, original, state) = try await ready()
             defer { model.invalidate() }
