@@ -7,9 +7,11 @@ import XCTest
 #if os(macOS)
 @testable import whitenoise_mac
 private typealias FactoryOwner = DeviceLinkingScope
+        private typealias FactoryApproval = NativeDeviceLinkingApprovalScope
 #else
 @testable import whitenoise_ios
 private typealias FactoryOwner = DeviceLinkingAccountScope
+        private typealias FactoryApproval = DeviceLinkingApprovalScope
 #endif
 
 private enum FactoryFailure: Error { case unavailable, deadline, invariant, secretMissing }
@@ -52,6 +54,16 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
         #else
         state.accountStore.deviceLinkingScope
         #endif
+    }
+    var approval: FactoryApproval? {
+        #if os(macOS)
+        state.deviceLinkingApprovalScope
+        #else
+        state.accountStore.deviceLinkingApprovalScope
+        #endif
+    }
+    func pendingApproval() async throws -> FactoryApproval {
+        try await state.pendingOwnedDeviceLinkingApproval()
     }
     init(root: URL) throws {
         let memory = FactorySecrets()
@@ -309,6 +321,174 @@ nonisolated private final class FactorySecrets: SecretStore, Sendable {
     }
     func testForwardFactoriesShareBothPreviouslyAbsentChats() async throws { try await fixture { try await self.pair($0, reverse: false) } }
     func testReverseFactoriesShareBothPreviouslyAbsentChats() async throws { try await fixture { try await self.pair($0, reverse: true) } }
+
+    private func threeDeviceFixture(_ body: @MainActor ([FactoryHost]) async throws -> Void) async throws {
+        guard ProcessInfo.processInfo.environment["WN_AUTOMATIC_HOST_FACTORY_ACCEPTANCE"] == "1" else {
+            throw XCTSkip("Requires the separately selected real automatic host-factory relay gate")
+        }
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("AutomaticHostRoster-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false,
+            attributes: [.posixPermissions: 0o700])
+        var hosts: [FactoryHost] = []
+        var failure: Error?
+        do {
+            for index in 0..<3 {
+                let host = try FactoryHost(root: root.appendingPathComponent(String(index)))
+                hosts.append(host)
+                try await host.start()
+            }
+            let first = try await hosts[0].client.marmot.createIdentity(defaultRelays: [FactoryHost.relay],
+                bootstrapRelays: [FactoryHost.relay], inboxRelays: [FactoryHost.relay])
+            let secret = try hosts[0].secrets.loadSecret(label: first.label, accountIdHex: first.accountIdHex)
+            try await hosts[0].select(first)
+            for host in hosts.dropFirst() {
+                try await onboard(host, secret: secret, expected: first.accountIdHex)
+                let actual = try XCTUnwrap(try host.client.marmot.listAccounts().only)
+                guard actual.accountIdHex == first.accountIdHex else { throw FactoryFailure.invariant }
+                try await host.select(actual)
+            }
+            try await body(hosts)
+        } catch { failure = error }
+        for host in hosts {
+            do { try await host.close() } catch { if failure == nil { failure = error } }
+        }
+        if failure != nil { XCTFail("Existing-roster host factory runtime or exact cleanup failed"); return }
+        try FileManager.default.removeItem(at: root)
+    }
+
+    private func originalHistory(_ host: FactoryHost, index: Int) async throws -> (String, String) {
+        let account = try XCTUnwrap(host.account)
+        let text = "Synthetic existing-roster history \(index)"
+        let group = try await host.client.marmot.createGroup(accountRef: account.accountIdHex,
+            name: "Synthetic existing-roster chat", memberRefs: [], description: nil)
+        let token = "existing-roster-prior-\(index)"
+        _ = try await host.client.marmot.sendTextWithClientToken(accountRef: account.accountIdHex,
+            groupIdHex: group, text: text, clientToken: token)
+        try await wait {
+            guard let status = try host.client.marmot.localSendStatus(accountRef: account.accountIdHex,
+                groupIdHex: group, clientToken: token) else { return false }
+            if case .completed(let receipt) = status { return !receipt.messageIds.isEmpty }
+            return false
+        }
+        return (group, text)
+    }
+
+    func testExistingRosterWNPAIR2RequiresSiblingApprovalAndSharesHistory() async throws {
+        try await threeDeviceFixture { hosts in
+            // This is a real first enrollment, not a pre-paired or reconstructed permission fixture.
+            try await self.pair(Array(hosts.prefix(2)), reverse: false)
+            let a = hosts[0]
+            let b = hosts[1]
+            let c = hosts[2]
+            for host in [a, b] {
+                let targets = try await host.client.marmot.deviceLinkingTargets(
+                    accountRef: try XCTUnwrap(host.account).accountIdHex)
+                XCTAssertEqual(targets.count, 1)
+                guard targets.count == 1 else { throw FactoryFailure.invariant }
+                XCTAssertEqual(targets[0].deviceCount, 2)
+                guard targets[0].deviceCount == 2 else { throw FactoryFailure.invariant }
+            }
+            let cTargets = try await c.client.marmot.deviceLinkingTargets(
+                accountRef: try XCTUnwrap(c.account).accountIdHex)
+            XCTAssertTrue(cTargets.isEmpty)
+            guard cTargets.isEmpty else { throw FactoryFailure.invariant }
+            var history: [(String, String)] = []
+            for (index, host) in hosts.enumerated() {
+                history.append(try await self.originalHistory(host, index: index))
+            }
+            for index in 0..<2 {
+                let absentFromC = try await self.hasPairedChat(c, group: history[index].0)
+                let absentFromExisting = try await self.hasPairedChat(hosts[index], group: history[2].0)
+                XCTAssertFalse(absentFromC)
+                XCTAssertFalse(absentFromExisting)
+                guard !absentFromC, !absentFromExisting else { throw FactoryFailure.invariant }
+            }
+            let display = try await a.begin()
+            let code = try display.setupPacket()
+            // The prefix comes from the actual SDK-owned existing-roster factory, never a rewritten code.
+            XCTAssertTrue(String(data: code, encoding: .utf8)?.hasPrefix("WNPAIR2:") == true)
+            guard String(data: code, encoding: .utf8)?.hasPrefix("WNPAIR2:") == true else {
+                throw FactoryFailure.invariant
+            }
+            let scanner = try await c.scan(code)
+            try await self.wait {
+                display.latestSnapshot?.phase == .comparisonAvailable && scanner.latestSnapshot?.phase == .comparisonAvailable
+            }
+            let left = try XCTUnwrap(display.latestSnapshot)
+            let right = try XCTUnwrap(scanner.latestSnapshot)
+            let ld = try XCTUnwrap(left.decimals)
+            let rd = try XCTUnwrap(right.decimals)
+            XCTAssertEqual(ld.first, rd.first); XCTAssertEqual(ld.second, rd.second); XCTAssertEqual(ld.third, rd.third)
+            guard ld.first == rd.first, ld.second == rd.second, ld.third == rd.third else {
+                throw FactoryFailure.invariant
+            }
+            try await display.confirmComparison(displayedRevision: left.revision)
+            try await scanner.confirmComparison(displayedRevision: right.revision)
+            try await self.wait {
+                display.latestSnapshot?.phase == .verificationCompleteEnrollmentPending
+                    && scanner.latestSnapshot?.phase == .verificationCompleteEnrollmentPending
+            }
+            try await scanner.continueLinkingAndShareChats(displayedRevision: try XCTUnwrap(scanner.latestSnapshot).revision)
+            try await display.continueLinkingAndShareChats(displayedRevision: try XCTUnwrap(display.latestSnapshot).revision)
+            var sibling: FactoryApproval?
+            try await self.wait {
+                do { sibling = try await b.pendingApproval(); return true }
+                catch MarmotKitError.DeviceLinkingNotReady { return false }
+            }
+            let original = try XCTUnwrap(sibling)
+            XCTAssertTrue(b.approval === original)
+            guard b.approval === original else { throw FactoryFailure.invariant }
+            let observed = try await original.snapshot()
+            guard observed.revision < UInt64.max else { throw FactoryFailure.invariant }
+            var staleRejected = false
+            do { try await original.approveAndShareChats(displayedRevision: observed.revision + 1) }
+            catch MarmotKitError.DeviceLinkingStaleRevision { staleRejected = true }
+            XCTAssertTrue(staleRejected)
+            guard staleRejected else { throw FactoryFailure.invariant }
+            let review = try await original.reviewMetadata(displayedRevision: observed.revision)
+            XCTAssertEqual(review.existingDeviceCount, 2)
+            guard review.existingDeviceCount == 2 else { throw FactoryFailure.invariant }
+            // A/C agreement does not stand in for existing B's separate reviewed sharing consent.
+            XCTAssertNotEqual(display.latestSnapshot?.phase, .enrollmentComplete)
+            XCTAssertNotEqual(scanner.latestSnapshot?.phase, .enrollmentComplete)
+            guard display.latestSnapshot?.phase != .enrollmentComplete,
+                scanner.latestSnapshot?.phase != .enrollmentComplete else { throw FactoryFailure.invariant }
+            for index in 0..<2 {
+                let premature = try await self.hasPairedChat(c, group: history[index].0)
+                XCTAssertFalse(premature)
+                guard !premature else { throw FactoryFailure.invariant }
+            }
+            try await original.approveAndShareChats(displayedRevision: observed.revision)
+            try await self.wait {
+                let phase = try await original.snapshot().phase
+                return display.latestSnapshot?.phase == .enrollmentComplete
+                    && scanner.latestSnapshot?.phase == .enrollmentComplete && phase == .settled
+            }
+            for host in hosts {
+                try await self.wait {
+                    let targets = try await host.client.marmot.deviceLinkingTargets(
+                        accountRef: try XCTUnwrap(host.account).accountIdHex)
+                    return targets.count == 1 && targets[0].deviceCount == 3
+                }
+            }
+            for destination in 0..<3 {
+                for source in 0..<3 where source != destination {
+                    try await self.wait {
+                        let found = try await self.hasPairedChat(hosts[destination], group: history[source].0)
+                        guard found else { return false }
+                        return try await self.paired(hosts[destination], group: history[source].0, text: history[source].1)
+                    }
+                }
+            }
+            for host in hosts { try await host.cancel(); XCTAssertNil(host.owner); XCTAssertNil(host.approval) }
+            try await self.retired(display)
+            try await self.retired(scanner)
+            do { _ = try await original.snapshot(); XCTFail("Retired sibling approval remained usable") }
+            catch is CancellationError { }
+            catch MarmotKitError.DeviceLinkingClosed { }
+            XCTAssertNil(original.cleanupError)
+        }
+    }
 
     private func retired(_ owner: FactoryOwner) async throws {
         XCTAssertNil(owner.latestSnapshot)
