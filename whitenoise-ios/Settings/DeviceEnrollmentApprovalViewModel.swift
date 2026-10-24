@@ -75,8 +75,6 @@
                     try await refresh()
                 case .approve:
                     try await approveReviewed(displayedRevision: displayedRevision)
-                case .approveAndShareChats:
-                    try await approveReviewedAndShareChats(displayedRevision: displayedRevision)
                 case .receivePacket:
                     guard snapshot?.phase == .approvedAwaitingPacket, snapshot?.revision == displayedRevision else {
                         throw MarmotKitError.DeviceLinkingStaleRevision

@@ -35,7 +35,7 @@ struct PrivateKeyAutoFillTests {
         #expect(harness.model.pastes == 0)
         #expect(UIPasteboard.general.changeCount == changeCount)
 
-        harness.field.delegate?.textFieldShouldReturn?(harness.field)
+        _ = harness.field.delegate?.textFieldShouldReturn?(harness.field)
         #expect(harness.model.submits == 1)
     }
 
