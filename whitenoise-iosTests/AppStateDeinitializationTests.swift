@@ -33,12 +33,12 @@ final class AppStateDeinitializationTests: XCTestCase {
                     XCTFail("Releasing the loader must not request media")
                     return Data()
                 }
-                weak var releasedLoader = loader
-                weak var releasedState = state
-                weak var releasedErasureState = state?.erasureState
-                weak var releasedDraftStore = state?.conversationDraftStore
-                weak var releasedNotifications = state?.notificationCoordinator
-                weak var releasedSetup = state?.pendingAccountSetup
+                weak let releasedLoader = loader
+                weak let releasedState = state
+                weak let releasedErasureState = state?.erasureState
+                weak let releasedDraftStore = state?.conversationDraftStore
+                weak let releasedNotifications = state?.notificationCoordinator
+                weak let releasedSetup = state?.pendingAccountSetup
 
                 state = nil
                 XCTAssertNotNil(releasedState)

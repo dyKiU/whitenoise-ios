@@ -47,7 +47,7 @@ import XCTest
         private func host(model: HistorySourcePickerModel, check: () -> Void) async throws {
             var host: UIHostingController<AnyView>? = UIHostingController(
                 rootView: AnyView(HistorySourcePickerView(model: model)))
-            weak var retiredHost = host
+            weak let retiredHost = host
             let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
             let previous = scene.keyWindow
             let window = UIWindow(windowScene: scene)

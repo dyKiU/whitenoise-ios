@@ -170,11 +170,11 @@ import XCTest
         }
         private func render(model: SynchronizedHistoryViewModel, fixture: ImportedHistoryFixture) async throws {
             var lifetime: ImportedHistoryGraphLifetime? = .init()
-            weak var retiredGraph = lifetime
+            weak let retiredGraph = lifetime
             var host: UIHostingController<AnyView>? = UIHostingController(
                 rootView: AnyView(ImportedHistoryHostedRoot(model: model, lifetime: try XCTUnwrap(lifetime))))
             lifetime = nil
-            weak var retiredHost = host
+            weak let retiredHost = host
             let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
             let previous = scene.keyWindow
             let window = UIWindow(windowScene: scene)

@@ -87,11 +87,11 @@ import XCTest
             _ model: HistorySourcePickerModel, fixture: SourcePickerFixture, bridge: URL
         ) async throws {
             var graph: GenuineSourcePickerGraph? = .init()
-            weak var retiredGraph = graph
+            weak let retiredGraph = graph
             var host: UIHostingController<AnyView>? = UIHostingController(
                 rootView: AnyView(GenuineSourcePickerRoot(model: model, graph: try XCTUnwrap(graph))))
             graph = nil
-            weak var retiredHost = host
+            weak let retiredHost = host
             let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
             let previous = scene.keyWindow
             let window = UIWindow(windowScene: scene)

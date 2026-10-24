@@ -47,7 +47,7 @@ final class SettingsModelDeinitializationTests: XCTestCase {
                 for (name, makeModel) in factories {
                     XCTContext.runActivity(named: name) { _ in
                         var model: AnyObject? = makeModel()
-                        weak var releasedModel = model
+                        weak let releasedModel = model
                         XCTAssertNotNil(releasedModel)
 
                         model = nil

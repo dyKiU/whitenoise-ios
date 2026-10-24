@@ -183,7 +183,7 @@ final class MediaImageZoomTests: XCTestCase {
         }
         let appState = AppState.test()
         var graphLifetime: NSObject? = NSObject()
-        weak var previousGraph = graphLifetime
+        weak let previousGraph = graphLifetime
         let host = UIHostingController(rootView: AnyView(MessageMediaFullscreenGalleryView(
             gallery: gallery, onLoadMedia: loader, onDismiss: {}).environment(appState)
             .onAppear { [graphLifetime] in withExtendedLifetime(graphLifetime) {} }))

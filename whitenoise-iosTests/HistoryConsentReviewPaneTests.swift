@@ -28,7 +28,7 @@ import XCTest
             let model = HistoryConsentReviewModel(loadOriginals: { [scope] }, isCurrent: { true })
             var host: UIHostingController<AnyView>? = UIHostingController(
                 rootView: AnyView(NavigationStack { HistoryConsentReviewView(model: model) }))
-            weak var retiredHost = host
+            weak let retiredHost = host
             let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
             let previous = scene.keyWindow
             let window = UIWindow(windowScene: scene)
