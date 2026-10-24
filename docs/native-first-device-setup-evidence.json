@@ -1,0 +1,203 @@
+{
+  "scope": "Explicit first-device setup attempt under original account/runtime owner; successful empty target read is presentation only, never eligibility or consent. Selected targets still require exact loaded selector. Core actual genesis policy and SelectionBusy remain authoritative.",
+  "base": "664110ea18c51635452e1eb88eba1bd3c8fad23b",
+  "source_stashes": {
+    "red": "5ca08e9b1e1c5c1feb1055173c2ee13b4b5ce3c8",
+    "green1": "615482d6d01d05c22be909ab6025f7153869d02f",
+    "green2": "a7c5c79471c18fa5732a73ef7daa85398133c047",
+    "sdk_local": "f9f8e86afff63edf234e3708f2cc07b2c4f43e7c",
+    "sdk_m5": "28066292656a71156ec521347e428981f58ad136",
+    "final": "f795bdf7e107aa8ca7771e372917f26cca97e7b6"
+  },
+  "runs": {
+    "red-v1": {
+      "source_base": "664110ea18c51635452e1eb88eba1bd3c8fad23b",
+      "source_inputs": 803,
+      "input_manifest_sha256": "51c1feb62666334b0f95b80d7804294281dd5add2e939464401b88a90584eb43",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 32.68,
+      "log_sha256": "ee83e1c01315c1570c2ac47bb57d244531db7bd5b7075a5ecf78bdadb9040e1d",
+      "physical_phone_changed": false,
+      "scope": "Explicit first-device setup attempt via original factory; empty targets are metadata, Core remains authoritative",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 9,
+        "passedTests": 7,
+        "failedTests": 2,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: expected error \".DeviceLinkingRuntimeUnavailable\" of type MarmotKitError, but \".DeviceLinkingNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.DeviceLinkingRuntimeUnavailable",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "DeviceVerificationViewModelTests/firstDeviceAttemptPreservesActualSdkMissingAccountRefusal()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceVerificationViewModelTests/firstDeviceAttemptPreservesActualSdkMissingAccountRefusal()",
+          "testName": "firstDeviceAttemptPreservesActualSdkMissingAccountRefusal()"
+        },
+        {
+          "failureText": "Expectation failed: model.offersFirstDeviceSetupAttempt\nmodel \u2192 whitenoise_ios.DeviceVerificationViewModel\noffersFirstDeviceSetupAttempt \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 9,
+          "testIdentifierString": "DeviceVerificationViewModelTests/firstDeviceSetupRequiresSuccessfulEmptyReadAndPreservesNilFactoryInput()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceVerificationViewModelTests/firstDeviceSetupRequiresSuccessfulEmptyReadAndPreservesNilFactoryInput()",
+          "testName": "firstDeviceSetupRequiresSuccessfulEmptyReadAndPreservesNilFactoryInput()"
+        }
+      ]
+    },
+    "green-v1": {
+      "source_base": "664110ea18c51635452e1eb88eba1bd3c8fad23b",
+      "source_inputs": 803,
+      "input_manifest_sha256": "1091e14346d09b050000f6b20c57a66ca5bdf867bfc0bbeda87995113e38e808",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 30.24,
+      "log_sha256": "87fba338e551077a1b998223a9170df478691f5817311802bc801d140b814613",
+      "physical_phone_changed": false,
+      "scope": "Explicit first-device setup attempt via original factory; empty targets are metadata, Core remains authoritative",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 9,
+        "passedTests": 9,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "green-v2": {
+      "source_base": "664110ea18c51635452e1eb88eba1bd3c8fad23b",
+      "source_inputs": 803,
+      "input_manifest_sha256": "f4b116d64ee69526abdb1462b5a3ef831553abe106ce5597a3353ca1be09ea7f",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 28.15,
+      "log_sha256": "a803d0ae4c32d3144575cea9d19478550fbe4a68353c26f2b9dd06f413ae3a67",
+      "physical_phone_changed": false,
+      "scope": "Explicit first-device setup attempt via original factory; empty targets are metadata, Core remains authoritative",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 10,
+        "passedTests": 10,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "affected-v2": {
+      "source_base": "664110ea18c51635452e1eb88eba1bd3c8fad23b",
+      "source_inputs": 803,
+      "input_manifest_sha256": "410d5e6dc6cc76c6a63e897e804f7fc814936ba1fa2090857ef9da945d1ed0fb",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 11.29,
+      "log_sha256": "2c6393bca17e039dd104d3861489d2427ff0efe84998f6bcd8049cb21a4f5675",
+      "physical_phone_changed": false,
+      "scope": "Explicit first-device setup attempt via original factory; empty targets are metadata, Core remains authoritative",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 58,
+        "passedTests": 58,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "catalog": {
+    "command": [
+      "xcrun",
+      "xcstringstool",
+      "sync",
+      "/Users/pj/project/build/ios-first-device-setup-localizations/Localizable.xcstrings",
+      "--stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/DeviceVerificationView.stringsdata",
+      "--skip-marking-strings-stale"
+    ],
+    "compiled_stringsdata_sha256": "9324bb5311bfc463aa95db00d79509d7de9e8b64c9ab4eb470bd241b8645c6f3",
+    "Apple_export_template": "/Users/pj/project/build/ios-verification-localizations/export/de.xcloc/Localized Contents/de.xliff",
+    "template_sha256": "e0ccbdbd16bab16d016d6ea38e4181e5928108872643b8fdece3a0f7c44dd432",
+    "original_catalog_sha256": "3a68f1d861a18aadc14858faab5fdcb7e2e0889438ad3cbb6965abaff44587af",
+    "original_entries": 1944,
+    "added": [
+      "Approve first-device setup"
+    ],
+    "imports": [
+      {
+        "language": "de",
+        "exit_code": 0,
+        "xliff_sha256": "3e645b8e7c9478599f097912705fa0cdcbabe5973fa18d45f23cea3764793a16",
+        "log_sha256": "24f58e5864f0b018a03ce1c17b1954ea9e11de45e1660db6b75c07d7cbfe087b"
+      },
+      {
+        "language": "es",
+        "exit_code": 0,
+        "xliff_sha256": "e561ccd55ad6a3c797009786cd6cd40390e806b627e187732ccdd8fddfc7e81a",
+        "log_sha256": "7558b82f04d0f9418fbd2740316f652a51e80d8e4360a85146dd3187c109fc19"
+      },
+      {
+        "language": "fr",
+        "exit_code": 0,
+        "xliff_sha256": "a14d0c00d592e70620ab2646c0896d9aae6e207171dcb97c34e5c1d358ee8b76",
+        "log_sha256": "bf7e589336f8c1494b8a9337f46e2a7806a50dc9a7aaafed8a99b222c150d5d4"
+      },
+      {
+        "language": "it",
+        "exit_code": 0,
+        "xliff_sha256": "205ca9cf0ad76f4e9c5bad8e98b158f537deb15e42e329e3c569451c2b246546",
+        "log_sha256": "2e3ec926668a834cbc8d14e30421663f551da866fad7389e36dfa81c0c650d8c"
+      },
+      {
+        "language": "pt",
+        "exit_code": 0,
+        "xliff_sha256": "5f5c676ed3a4b6473814c5dc97089eade1d76acbd2f12b1c4be7ed9d17146dad",
+        "log_sha256": "2d8ce5facf6fb0a3090ac0db1ac4c95d547896068b74c53fdc1a895e8b5cc338"
+      },
+      {
+        "language": "ru",
+        "exit_code": 0,
+        "xliff_sha256": "7f3aac3a27df4bf56615406c56f525902f0791ef69508d5cc3ffe3c21de94054",
+        "log_sha256": "c76146333e5889058e7a818aa25f4176ce7b3bea27158b248c599ddfffe1ff37"
+      },
+      {
+        "language": "tr",
+        "exit_code": 0,
+        "xliff_sha256": "4701ab3242ff886384aa817dc7e2ee2792d41a5cd29dd29d4f247e95d0fe20cb",
+        "log_sha256": "f7c3b4d41efd9ce3251dca55bed9087c11f5a3447f82cb54275c872ba45eed5f"
+      },
+      {
+        "language": "zh-Hans",
+        "exit_code": 0,
+        "xliff_sha256": "f732615d2835d3899d934cab0936dc478ea56cae8f3a22a9336b6b73626e384b",
+        "log_sha256": "e5e9d2ddba688ab30479591f6cb90f6f0cbc9dd80450b8c6c096a2abadfafb0f"
+      },
+      {
+        "language": "zh-Hant",
+        "exit_code": 0,
+        "xliff_sha256": "9836c2170dbecc9e701c31cdcc45bef74c73a3fa91b3446ca9387b84e0929bf0",
+        "log_sha256": "fce9dd40bc439239109d593722de25d8736597429787674700e1531d46aeaa37"
+      }
+    ],
+    "all_existing_entries_and_order_unchanged": true,
+    "preservation": "Only whole Apple sync/import-generated new entry retained; original raw top-level entry blocks preserved, no nested plural edits",
+    "catalog_sha256": "79559113ba0a4ba1117d36e8c8d3a35373b510d2c34936e0f1c0cd604e0f63ea"
+  },
+  "checks": [
+    "strict swift-format using Mac 4-space/120 configuration",
+    "strict SwiftLint 0.63.2: zero violations in three owned Swift files",
+    "git diff --check"
+  ],
+  "core_policy_paths": [
+    "crates/marmot-app/src/client/device_linking/setup.rs construct_setup_challenge",
+    "crates/cgka-engine/src/device_group_genesis.rs actual non-denied selection/accepted anchor SelectionBusy fence"
+  ],
+  "limits": [
+    "No new SDK, capability, enrollment UI or consent; no full PR claim",
+    "No physical/production operation; Xcode hosted Staging tests install their isolated test host",
+    "Failed first localization import used own unintended DerivedData; exact idle cache retired558303623 file bytes, failed log preserved; retry used existing cache"
+  ]
+}

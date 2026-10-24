@@ -9,13 +9,16 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
     // https://github.com/swiftlang/swift/issues/88036
     nonisolated deinit {}
 
-    static let shared = AppNotifications()
+    static let shared = AppNotifications(
+        remoteNotificationsAvailable: NativePushServerConfig.current() != nil
+    )
 
     private let notificationRequestScheduler: ((UNNotificationRequest) async throws -> Void)?
     private let notificationClock: () -> TimeInterval
     private let center: UNUserNotificationCenter
     private let requestAuthorizationHandler: (() async throws -> Bool)?
     private let authorizationStatusProvider: (() async -> UNAuthorizationStatus)?
+    let remoteNotificationsAvailable: Bool
     private let remoteNotificationRegistrar: (() -> Void)?
     private let applicationBadgeCountSetter: ((Int) async throws -> Void)?
     private let deliveredNotificationDescriptorsProvider:
@@ -37,6 +40,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         requestAuthorizationHandler: (() async throws -> Bool)? = nil,
         authorizationStatusProvider: (() async -> UNAuthorizationStatus)? = nil,
         remoteNotificationRegistrar: (() -> Void)? = nil,
+        remoteNotificationsAvailable: Bool = true,
         applicationBadgeCountSetter: ((Int) async throws -> Void)? = nil,
         deliveredNotificationDescriptorsProvider:
             (() async -> [DeliveredNotificationDescriptor])? = nil,
@@ -49,6 +53,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         self.notificationClock = notificationClock
         self.requestAuthorizationHandler = requestAuthorizationHandler
         self.authorizationStatusProvider = authorizationStatusProvider
+        self.remoteNotificationsAvailable = remoteNotificationsAvailable
         self.remoteNotificationRegistrar = remoteNotificationRegistrar
         self.applicationBadgeCountSetter = applicationBadgeCountSetter
         self.deliveredNotificationDescriptorsProvider = deliveredNotificationDescriptorsProvider
@@ -143,6 +148,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
     }
 
     func registerForRemoteNotifications() {
+        guard remoteNotificationsAvailable else { return }
         if let remoteNotificationRegistrar {
             remoteNotificationRegistrar()
             return
@@ -185,6 +191,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
 
     @discardableResult
     func registerForRemoteNotificationsIfAuthorized() async -> Bool {
+        guard remoteNotificationsAvailable else { return false }
         switch await authorizationStatus() {
         case .authorized, .provisional, .ephemeral:
             registerForRemoteNotifications()

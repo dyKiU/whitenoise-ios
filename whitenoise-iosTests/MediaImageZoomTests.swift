@@ -181,8 +181,12 @@ final class MediaImageZoomTests: XCTestCase {
             requestedIDs.append(item.id)
             return data
         }
-        let host = UIHostingController(rootView: MessageMediaFullscreenGalleryView(
-            gallery: gallery, onLoadMedia: loader, onDismiss: {}).environment(AppState.test()))
+        let appState = AppState.test()
+        var graphLifetime: NSObject? = NSObject()
+        weak var previousGraph = graphLifetime
+        let host = UIHostingController(rootView: AnyView(MessageMediaFullscreenGalleryView(
+            gallery: gallery, onLoadMedia: loader, onDismiss: {}).environment(appState)
+            .onAppear { [graphLifetime] in withExtendedLifetime(graphLifetime) {} }))
         let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
         let previousKeyWindow = scene.keyWindow
         let window = UIWindow(windowScene: scene)
@@ -209,6 +213,14 @@ final class MediaImageZoomTests: XCTestCase {
         attachment.name = "hosted-fullscreen-gallery-zoomed"
         attachment.lifetime = .keepAlways
         add(attachment)
+        // Drain the old graph, not a fixed delay, before releasing its injected account state.
+        host.rootView = AnyView(EmptyView())
+        graphLifetime = nil
+        window.isHidden = true
+        window.rootViewController = nil
+        previousKeyWindow?.makeKey()
+        try await waitForHostedUpdate(host) { previousGraph == nil }
+        withExtendedLifetime(appState) {}
     }
 
     /// `updateUIView` reassigns `onTap`, so clearing it after the tap proves

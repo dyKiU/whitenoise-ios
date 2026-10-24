@@ -1,0 +1,62 @@
+{
+  "source_base": "4216e21b559b47aadfd485c7e41a98c74a59e5de",
+  "tested_stash": "8dd770c1bf78e046434b4233c9d00901bbe6b87f",
+  "tested_paths": {
+    "whitenoise-ios.xcodeproj/project.pbxproj": "ccbc5d7cea2048eb583f2572ca272189e0895477d3e74d01fa92e24dc629d455",
+    "whitenoise-ios.xcodeproj/xcshareddata/xcschemes/Whitenoise (Hosted Automation).xcscheme": "44e3738dc47929ef5c45662cf37626cdd36a691a7a26331c21f06dce1d3073a9",
+    "whitenoise-iosUITests/HostedHistoryApprovalUITests.swift": "1f3eac231514a9c68117ab587a2a79fa1f0ff2eced3653c301d4183d0d7f71cb",
+    "whitenoise-iosTests/ExternalHostedUIControlTests.swift": "7d651d18a555c8d487a0067c7beedc4e1edd4da9f436c0b22e04de9cbec979db"
+  },
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "sdk_original_m5_stash": "05a8cf8bdbcce73342a05be414aa8994fbb21fbf",
+  "build": {
+    "exit_code": 0,
+    "seconds": 3.91,
+    "source_inputs": 865,
+    "log_sha256": "aa85a996dd6352f5b1003575ac8126a4d2cb9b46b06870139f5ea275bf789e68",
+    "scope": "Public XCTest UI runner provisioning only; no native approval executed"
+  },
+  "control": {
+    "unit_exit_code": 0,
+    "driver_exit_code": 0,
+    "seconds": 43.11,
+    "driver_install": "Normal simulator installation: attach-only UI test with no launch call; actual host lifetime asserted",
+    "logs": {
+      "unit": "2f9a87661fb257d04d771374e3b7e0208dff245b220afc457eb52729c14c04fc",
+      "driver": "4a2ff2c0016f3d39687c6f91ad8ce21fb7910c3aa9462fda2fe07c9bb2a636a6"
+    },
+    "unit": {
+      "result": "Passed",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "unit_failures": [],
+    "driver": {
+      "result": "Passed",
+      "totalTestCount": 1,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "driver_failures": []
+  },
+  "failures_retained": {
+    "control_v1": "UseDestinationArtifacts rejects simulators before zero-test driver; starting v2 before v1 host collection finished killed v1 host (own scheduling error)",
+    "control_v2": "Both host1/1 and driver1/1 passed, but clean v3 is authoritative nonoverlapping repeat"
+  },
+  "scope": "Public external XCUIElement.tap changed a harmless hosted control while same hosted unit finished normally; no SDK approval or native import action executed",
+  "qualification_limits": [
+    "Original live history approval still pending",
+    "Full PR required before merge",
+    "SDK overlays and app/extension signing identities unchanged",
+    "Opt-in automation scheme only; existing PR schemes unchanged"
+  ],
+  "checks": [
+    "project plutil lint",
+    "strict scoped SwiftLint",
+    "strict scoped swift-format",
+    "git diff --check"
+  ]
+}

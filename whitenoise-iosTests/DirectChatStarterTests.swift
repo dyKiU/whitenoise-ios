@@ -129,10 +129,24 @@ struct DirectChatStarterTests {
         }
     }
 
+    #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
+        @Test func obsoletePublicationOffersAnErrorInsteadOfSharingTheApp() {
+            let error = MarmotKitError.MissingKeyPackage(account: alice, reason: .obsoleteOnly)
+            let failure = StartChatFailurePresentation.failure(for: error)
+            let message = UserFacingError.message(for: error)
+            #expect(failure == .other(message: message))
+            #expect(StartChatPrompt.kind(for: failure) == .error(message: message))
+            #expect(!message.contains(alice))
+            #expect(!message.contains("MissingKeyPackage"))
+            #expect(!message.contains("obsolete_only"))
+            #expect(!message.lowercased().contains("isn't on white noise"))
+        }
+    #endif
+
     @Test func missingSetupErrorsMapToTheInvitePathOnTheDirectChatRoute() {
         #expect(
             StartChatFailurePresentation.failure(
-                for: MarmotKitError.MissingKeyPackage(account: alice)
+                for: missingKeyPackageNotFound(account: alice)
             ) == .missingSetup
         )
         #expect(

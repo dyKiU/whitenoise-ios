@@ -107,6 +107,56 @@ struct ProfileFollowTests {
         }
         #expect(result == nil)
     }
+
+    @Test func refreshUpdatesRemoteChangesWithoutBlankingKnownState() async {
+        let model = ProfileFollowModel()
+        await model.load(context: context) { true }
+        let gate = FollowReadGate()
+        let refresh = Task { await model.refresh(context: context) { await gate.read() } }
+        await gate.waitUntilReading()
+        #expect(model.isFollowing == true)
+        #expect(!model.isLoading)
+        gate.finish(false)
+        await refresh.value
+        #expect(model.isFollowing == false)
+        await model.refresh(context: context) { throw FollowFailure.offline }
+        #expect(model.isFollowing == false)
+        #expect(!model.loadFailed)
+    }
+
+    @Test func lateRemoteReadCannotOverwriteACompletedLocalMutation() async throws {
+        let model = ProfileFollowModel()
+        await model.load(context: context) { false }
+        let gate = FollowReadGate()
+        let refresh = Task { await model.refresh(context: context) { await gate.read() } }
+        await gate.waitUntilReading()
+        #expect(try await model.toggle(context: context) { $0 } == true)
+        gate.finish(false)
+        await refresh.value
+        #expect(model.isFollowing == true)
+    }
+
+    @Test func refreshCannotReadDuringPublishOrApplyAfterAccountTeardown() async throws {
+        let model = ProfileFollowModel()
+        await model.load(context: context) { false }
+        let publication = FollowReadGate()
+        let toggle = Task { try await model.toggle(context: context) { _ in await publication.read() } }
+        await publication.waitUntilReading()
+        await model.refresh(context: context) {
+            Issue.record("Refresh must not race the local publication")
+            return false
+        }
+        publication.finish(true)
+        _ = try await toggle.value
+
+        let gate = FollowReadGate()
+        let refresh = Task { await model.refresh(context: context) { await gate.read() } }
+        await gate.waitUntilReading()
+        await model.load(context: nil) { false }
+        gate.finish(true)
+        await refresh.value
+        #expect(model.isFollowing == nil)
+    }
 }
 
 private enum FollowFailure: Error { case offline }

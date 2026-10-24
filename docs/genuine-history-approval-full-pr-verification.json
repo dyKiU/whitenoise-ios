@@ -1,0 +1,138 @@
+{
+  "tested_commit": "b00fb141359bc8a3ea534130e640945fef3a8e38",
+  "sdk": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "runs": {
+    "ios-genuine-history-approval-b00fb14-full-v1": {
+      "source_base": "b00fb141359bc8a3ea534130e640945fef3a8e38",
+      "source_inputs": 868,
+      "input_manifest_sha256": "8aabc5b498aecfc46d840d45404f41af4d741496f096ba87cf8786ea3a11db23",
+      "profile": "local-history84113/experimentalflag1/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 0,
+      "seconds": 200.12,
+      "log_sha256": "b2ec57eb4a67dab629f851f70e77051beee6ec124ed71098e72eff12c2f7c6a7",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered experimental unit PR suite; live original hosted approval+native import acceptance has separate focused proof; no installed navigation/physical deployment",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2864,
+        "passedTests": 2859,
+        "failedTests": 0,
+        "skippedTests": 5
+      },
+      "test_failures": []
+    },
+    "ios-genuine-history-approval-b00fb14-full-published-v1": {
+      "source_base": "b00fb141359bc8a3ea534130e640945fef3a8e38",
+      "source_inputs": 868,
+      "input_manifest_sha256": "a558bcf1345727086d81cca9a5a7d5b1a2fe9bffbb7cdd546d089006acd5adff",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 65,
+      "seconds": 6.36,
+      "log_sha256": "c977b4e3869480c815b455114998c391f708d245ae832a0101a32ca45b2d788d",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signedb00fb14 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-genuine-history-approval-b00fb14-full-published-v2": {
+      "source_base": "b00fb141359bc8a3ea534130e640945fef3a8e38",
+      "source_inputs": 868,
+      "input_manifest_sha256": "a558bcf1345727086d81cca9a5a7d5b1a2fe9bffbb7cdd546d089006acd5adff",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 65,
+      "seconds": 13.66,
+      "log_sha256": "e9126540b4233f84a4149bef16b7da5fa8144f6bf18265050d58e937cf2f5663",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signedb00fb14 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-genuine-history-approval-b00fb14-full-published-v3": {
+      "source_base": "b00fb141359bc8a3ea534130e640945fef3a8e38",
+      "source_inputs": 868,
+      "input_manifest_sha256": "a558bcf1345727086d81cca9a5a7d5b1a2fe9bffbb7cdd546d089006acd5adff",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 65,
+      "seconds": 3.93,
+      "log_sha256": "5a3ef9a6bbc66cbd7d79821b059c1a96e30fc79ff225bc9670195975eeb511a6",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signedb00fb14 with canonical publishedSDK; no experimental native crypto acceptance"
+    },
+    "ios-genuine-history-approval-b00fb14-full-published-v4": {
+      "source_base": "b00fb141359bc8a3ea534130e640945fef3a8e38",
+      "source_inputs": 868,
+      "input_manifest_sha256": "a558bcf1345727086d81cca9a5a7d5b1a2fe9bffbb7cdd546d089006acd5adff",
+      "profile": "published0.12/experimentalflag0/Staging",
+      "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+      "exit_code": 0,
+      "seconds": 266.48,
+      "log_sha256": "1c3d3cd7f9f6d2ad371a24426d947fe6fe334bad35cebb6d4dfdf7c1375ae755",
+      "physical_phone_changed": false,
+      "scope": "Full unfiltered iOS PR suite at signedb00fb14 with canonical publishedSDK; no experimental native crypto acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2720,
+        "passedTests": 2717,
+        "failedTests": 0,
+        "skippedTests": 3
+      },
+      "test_failures": []
+    }
+  },
+  "skipped_tests": {
+    "ios-genuine-history-approval-b00fb14-full-v1": [
+      "ExternalHostedUIControlTests/testExternalDriverAttachesWithoutReplacingHostedApp()",
+      "GenuineHistoryApprovalPaneTests/testHostedExplicitOriginalApprovalCommitsRealRelayImport()",
+      "GenuineImportedHistoryPaneTests/testRealCommittedImportThroughAccountOwnedReaderAndHostedPane()",
+      "AccountAttentionCreationTests/generatedAccountReadinessWithAndWithoutAttention(useAttention:)",
+      "SignUpDraftStoreTests/submittedDraftAndDirectoryUseCompleteFileProtection()"
+    ],
+    "ios-genuine-history-approval-b00fb14-full-published-v4": [
+      "ExternalHostedUIControlTests/testExternalDriverAttachesWithoutReplacingHostedApp()",
+      "AccountAttentionCreationTests/generatedAccountReadinessWithAndWithoutAttention(useAttention:)",
+      "SignUpDraftStoreTests/submittedDraftAndDirectoryUseCompleteFileProtection()"
+    ]
+  },
+  "compile_only_failures": "Published v1/v2/v3 ran zero tests: three distinct stale FFI PCM variants after cohort switch; each exact diagnosed module retained while Xcode/lsof idle, no source change or broad cache cleanup. v4 passed identical canonical source inputs.",
+  "pcm_repairs": [
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "retained_path": "/Users/pj/project/build/retired-pcm/ios-genuine-history-approval-b00-published-v2/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "sha256": "ef4674e38cd4b55b641a6a2fa3058fbefff548e5da7de137a771ed3adc347859",
+      "bytes": 555656,
+      "xcode_idle": true,
+      "lsof_clear": true
+    },
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "retained_path": "/Users/pj/project/build/retired-pcm/ios-genuine-history-approval-b00-published-v3/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "sha256": "5b71458a65d18be7618ea0abbe253eedd8fd0c70dcc9873807060cda684f8e6c",
+      "bytes": 555656,
+      "xcode_idle": true,
+      "lsof_clear": true
+    },
+    {
+      "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "retained_path": "/Users/pj/project/build/retired-pcm/ios-genuine-history-approval-b00-published-v1/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "sha256": "23e294928b9a359c07a6858080532d2df04b4fd3998911f108b1d23f8e0d4ddb",
+      "bytes": 555704,
+      "xcode_idle": true,
+      "lsof_clear": true
+    }
+  ],
+  "sdk_restoration": {
+    "stash": "4e073d20fba0f02b82605f32097a847b563ae83a",
+    "hashes": {
+      "Packages/MarmotKit/MARMOT_VERSION": "bc26500dd12a74d981c8c4340e33c02c097846fa8bb9b964661e377e4bc4216d",
+      "Packages/MarmotKit/Package.swift": "4c379ba9d572adb649c9692466ebbc80204af9ca0bf5acd63256ff6e0fa29b50",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKit.swift": "ee50aae01fff2d451f3957181eb6643ceda9503e84899a89538684259348e36a",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift": "c2a560f7841709d13d560c6bb6a85bd8489df2ddb96683706dc7996826542843"
+    },
+    "byte_exact": true
+  },
+  "scope": "Full unfiltered Staging PR unit suites. Three opt-in hosted/native fixtures are excluded from ordinary experimental full run; their actual fresh-root public approval tap/import/reader acceptance is separately qualified in genuine-history-approval-pane-verification.json. Published profile has no experimental SDK authority.",
+  "limits": [
+    "No physical iPhone installation or installed-app navigation acceptance in these full PR gates.",
+    "No merge, capability change, SDK987 adoption or production storage operations."
+  ]
+}

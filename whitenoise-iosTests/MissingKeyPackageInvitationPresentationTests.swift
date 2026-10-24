@@ -31,9 +31,21 @@ struct MissingKeyPackageInvitationPresentationTests {
         }
     }
 
+    #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
+        @Test func obsoletePublicationDoesNotIdentifySomeoneAsAbsentFromWhiteNoise() {
+            let error = MarmotKitError.MissingKeyPackage(account: account, reason: .obsoleteOnly)
+            #expect(MissingKeyPackageInvitationPresentation.accountIdHex(for: error) == nil)
+            let message = UserFacingError.message(for: error)
+            #expect(message == L10n.string(
+                "This person has no compatible invitation key available. Ask them to open White Noise and try again."))
+            #expect(!message.contains(account))
+            #expect(!message.contains("MissingKeyPackage"))
+        }
+    #endif
+
     @Test func extractsAccountOnlyFromMissingKeyPackage() {
         #expect(
-            MissingKeyPackageInvitationPresentation.accountIdHex(for: MarmotKitError.MissingKeyPackage(account: account))
+            MissingKeyPackageInvitationPresentation.accountIdHex(for: missingKeyPackageNotFound(account: account))
                 == account
         )
         #expect(MissingKeyPackageInvitationPresentation.accountIdHex(for: MarmotKitError.Runtime(details: "offline")) == nil)
@@ -67,7 +79,7 @@ struct NewGroupMissingKeyPackageTests {
         model.groupSelection.add(member)
         let peerHex = peerHex
         model.createGroupForTesting = { _, _, _, _ in
-            throw MarmotKitError.MissingKeyPackage(account: peerHex)
+            throw missingKeyPackageNotFound(account: peerHex)
         }
         return (model, member)
     }

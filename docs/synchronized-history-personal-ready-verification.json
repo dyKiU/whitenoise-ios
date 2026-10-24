@@ -1,0 +1,56 @@
+{
+  "scope": "Signed-ready Personal Team Staging development build only; physical installation remains deferred. No new interactive application history consent/import acceptance.",
+  "build": {
+    "source_commit": "52c4f3870776fb06b7824bc9e0eddf34767fa37f",
+    "source_inputs": 842,
+    "input_manifest_sha256": "f348c7a08c2c7efa084359f64d9da4017ff41d3837434db288f9f334701885ce",
+    "mdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+    "installed_manifest_sha256": "bdf6ceabbccdc193e430fc925bcf4f45d91ba816d5cff80adbaf6e3a153816c4",
+    "exit_code": 0,
+    "seconds": 113.83,
+    "log_sha256": "8e28457e21061ad971ab2a8b060ff63d41a344c242fae65197f6f2394b044d20",
+    "phone_installation": false,
+    "rollback_app": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/rollback/ios-personal-signed-ready-before-history-reader-pane/whitenoise-ios.app",
+    "rollback_executable_sha256": "3962b39fa46a425fafb99d5d6ff0c63c05180858d9d739f996e5629fbe662b1b",
+    "profile": "matched84113/experimental1/PersonalTeamStaging",
+    "physical_installation_deferred": true,
+    "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+    "executable_sha256": "b8d64d680ab1354b89d7610edaecd93258d181ee52bac13bf6d936323206d375",
+    "signed_bundles": [
+      {
+        "name": "whitenoise-ios.app",
+        "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+        "executable_sha256": "b8d64d680ab1354b89d7610edaecd93258d181ee52bac13bf6d936323206d375",
+        "entitlements_sha256": "d7c961768c724fad457d83a4ddf29675804a4414b55f5c3550dba2f822b85fdc",
+        "profile_expiration": "2026-10-16T11:24:29",
+        "profile_sha256": "423162dbc20b2fbb4d44bbef2af684fb934440730a9cd5bf93e4ba040282a3ff"
+      },
+      {
+        "name": "NotificationServiceExtension.appex",
+        "bundle_id": "dev.ipf.whitenoise.ios.staging.personal.NotificationService",
+        "executable_sha256": "ffe7d77d80419a8dc2b2ed6ee7d32d2c02b7155507b28fcf2b2473cae9bcf589",
+        "entitlements_sha256": "7c6ccce56de4253ca606c85e920b8d45e5b5046c9b33e55efc394d7c7ed2470a",
+        "profile_expiration": "2026-10-16T11:24:27",
+        "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
+      }
+    ]
+  },
+  "builder_sha256": "90d28149af845b791a4360350f6869a509fc1f0b073a4156d7036cc2a61525a8",
+  "raw_local_prefix": "../build/results/ios-native-personal-history-reader-pane-v1",
+  "validation": [
+    "Previous app strict/deep code signature verified before app-only rollback copy",
+    "Exact source input hashes unchanged across build",
+    "Local SDK84113 source/features and both native archives validated by local-device-sync-settings.sh before build",
+    "App and extension strict/deep signature verification",
+    "Both application identifiers match actual bundle IDs and Personal Team profile identities",
+    "Required development app group present and unsupported Personal Team capabilities absent",
+    "App and extension provisioning profiles recorded with SHA256 and expiry"
+  ],
+  "postgate_delta": "This evidence file only",
+  "full_qualification": "docs/synchronized-history-full-pr-verification.json",
+  "limits": [
+    "No physical installation, TestFlight/production app modification or account data copying",
+    "Ready development provisioning expires as recorded; rebuilding or renewal may be needed later",
+    "History UI is source-attested bounded presentation, separate from live authenticated rows and original transfer/consent grants"
+  ]
+}

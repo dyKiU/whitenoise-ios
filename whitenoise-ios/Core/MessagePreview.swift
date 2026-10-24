@@ -157,6 +157,25 @@ enum MessagePreview {
         return L10n.string("New message")
     }
 
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        static func body(
+            _ message: PairedChatMessageFfi,
+            mentionDisplayName: MarkdownMentionResolver? = nil
+        ) -> String {
+            if message.deleted { return MessageDeletionPresentation.text(source: .unknown) }
+            guard message.canonicalChat else { return L10n.string("Unsupported message") }
+            if !message.content.isEmpty {
+                if let label = RemoteGiphyMedia.envelopePreviewText(for: message.content) { return label }
+                return flattenedBody(
+                    plaintext: message.content, tokens: message.contentTokens,
+                    mentionDisplayName: mentionDisplayName)
+            }
+            let media = ChatListAttachmentPresentation.metadata(for: message.mediaAttachments)
+            return ChatListAttachmentPresentation.label(kind: media.kind, count: media.count)
+                ?? L10n.string("New message")
+        }
+    #endif
+
     /// Previews show markdown stripped of syntax when parsed tokens exist.
     /// Tokenless records preserve plaintext except for known canonical mentions,
     /// which still render with the profile name used by normal chat messages.
@@ -225,6 +244,18 @@ enum MessagePreview {
 }
 
 nonisolated enum ChatListAttachmentPresentation {
+    static func metadata(for attachments: [MediaAttachmentOutcomeFfi]) -> (kind: ChatListAttachmentKindFfi?, count: UInt32) {
+        let kinds = Set(attachments.map { outcome -> ChatListAttachmentKindFfi in
+            guard case .accepted(_, let reference) = outcome else { return .mixed }
+            let mime = reference.mediaType.lowercased()
+            if mime.hasPrefix("image/") { return .photo }
+            if mime.hasPrefix("video/") { return .video }
+            if mime.hasPrefix("audio/") { return .audio }
+            return .file
+        })
+        return (kinds.count == 1 ? kinds.first : nil, UInt32(clamping: attachments.count))
+    }
+
     static func label(kind: ChatListAttachmentKindFfi?, count: UInt32) -> String? {
         guard kind != nil || count > 0 else { return nil }
         if count > 1 {

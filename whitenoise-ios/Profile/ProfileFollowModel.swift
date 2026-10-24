@@ -52,6 +52,7 @@ final class ProfileFollowModel {
         publish: (Bool) async throws -> Bool
     ) async throws -> Bool? {
         guard self.context == context, let isFollowing, !isLoading, !isUpdating else { return nil }
+        generation += 1
         let request = generation
         isUpdating = true
         defer { if generation == request { isUpdating = false } }
@@ -63,6 +64,26 @@ final class ProfileFollowModel {
         } catch {
             guard generation == request, !Task.isCancelled else { return nil }
             throw error
+        }
+    }
+
+    /// Refresh the native directory cache without blanking an already displayed relationship.
+    func refresh(
+        context: ProfileFollowContext,
+        read: () async throws -> Bool
+    ) async {
+        guard self.context == context, !isLoading, !isUpdating else { return }
+        generation += 1
+        let request = generation
+        do {
+            let value = try await read()
+            guard generation == request, !Task.isCancelled else { return }
+            isFollowing = value
+            loadFailed = false
+        } catch {
+            // Keep known state during transient failures; unknown state still offers Retry.
+            guard generation == request, !Task.isCancelled else { return }
+            loadFailed = isFollowing == nil
         }
     }
 }

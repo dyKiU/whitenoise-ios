@@ -1,0 +1,200 @@
+{
+  "scope": "Separate A/C opaque transport pane on original held account-owned enrollment model; actual SDK capability captured from current client remainsfalse on e6, so pane is unavailable. No B review or native grant.",
+  "base": "9dc7e2413d761f27613f515394a64506872ef0c4",
+  "stashes": {
+    "sdk_local": "76e7a9db47b3f12a5489e149af9e3d0fc07a80c2",
+    "red": "da26e045d4f0211867f2a50c8e557a37d74de4fa",
+    "initial_green_m5": "6d9ab4d23ea8d9272ec463f9e578378106dcb8b8",
+    "green3": "6884b6f1ab0d56dfe52ff08e0fde6ac91ea55308",
+    "final": "061237be160a8483e0f76e2f82e587fb808adefe"
+  },
+  "runs": {
+    "red-v2": {
+      "source_base": "9dc7e2413d761f27613f515394a64506872ef0c4",
+      "source_inputs": 804,
+      "input_manifest_sha256": "47a950e202b0a05022a42a4dd37099b8708a3fe1da35ed27f198dfedc9ad3187",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 29.22,
+      "log_sha256": "5a5151cafdbf0d7a2c35b6f1f3c83def62853659fe3a2427a03b3c08b0655124",
+      "physical_phone_changed": false,
+      "scope": "Original A/C bounded opaque enrollment transport with authoritative SDK capability unchanged",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 10,
+        "passedTests": 9,
+        "failedTests": 1,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Caught error: .DeviceLinkingNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 10,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/transportActionsUseOriginalRevisionAndBoundedOpaqueBytes()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/transportActionsUseOriginalRevisionAndBoundedOpaqueBytes()",
+          "testName": "transportActionsUseOriginalRevisionAndBoundedOpaqueBytes()"
+        }
+      ]
+    },
+    "green-v2": {
+      "source_base": "9dc7e2413d761f27613f515394a64506872ef0c4",
+      "source_inputs": 804,
+      "input_manifest_sha256": "3073085cce29ce40ec0d4e7cfb97785dbe1ea9ce118cec23088bc68a2d2a01af",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 24.97,
+      "log_sha256": "8f480151d3937f8c357832d2c6f175a62744062869e634d172ee6d0ec584d186",
+      "physical_phone_changed": false,
+      "scope": "Original A/C bounded opaque enrollment transport with authoritative SDK capability unchanged",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 10,
+        "passedTests": 10,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "green-v3": {
+      "source_base": "9dc7e2413d761f27613f515394a64506872ef0c4",
+      "source_inputs": 805,
+      "input_manifest_sha256": "533c40732e325a5d6b9774b5fb78337c5acf2f1a6065189ba947b4ff20304335",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 77.55,
+      "log_sha256": "3dbed718a190a613bda14eb1f64a7508412190bfbac5e6a9f00c8c74dd233c07",
+      "physical_phone_changed": false,
+      "scope": "Original A/C bounded opaque enrollment transport with authoritative SDK capability unchanged",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 13,
+        "passedTests": 13,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "affected-v4": {
+      "source_base": "9dc7e2413d761f27613f515394a64506872ef0c4",
+      "source_inputs": 805,
+      "input_manifest_sha256": "4e4196c8fe1babe46d207b40e3ea375e379132bfcabf5ed3e60cb3961b82450d",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 25.88,
+      "log_sha256": "d91f07693d5d7d0f73f58c89352770d91386c60e14511626b64f782be4e55003",
+      "physical_phone_changed": false,
+      "scope": "Original A/C bounded opaque enrollment transport with authoritative SDK capability unchanged",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 63,
+        "passedTests": 63,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "catalog": {
+    "command": [
+      "xcrun",
+      "xcstringstool",
+      "sync",
+      "/Users/pj/project/build/ios-enrollment-transport-localizations/Localizable.xcstrings",
+      "--stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/DeviceVerificationView.stringsdata",
+      "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/whitenoise-ios.build/Debug-Staging-iphonesimulator/whitenoise-ios.build/Objects-normal/arm64/DeviceEnrollmentTransportView.stringsdata",
+      "--skip-marking-strings-stale"
+    ],
+    "compiled_stringsdata_sha256": "6cd3ddf7fb345a1406781ae8762251e9183d510d72e4777fac05a57fd2634786",
+    "Apple_export_template": "/Users/pj/project/build/ios-verification-localizations/export/de.xcloc/Localized Contents/de.xliff",
+    "template_sha256": "e0ccbdbd16bab16d016d6ea38e4181e5928108872643b8fdece3a0f7c44dd432",
+    "original_catalog_sha256": "79559113ba0a4ba1117d36e8c8d3a35373b510d2c34936e0f1c0cd604e0f63ea",
+    "original_entries": 1945,
+    "added": [
+      "Device enrollment",
+      "Finalize enrollment",
+      "Enrollment action failed. Retry or cancel."
+    ],
+    "imports": [
+      {
+        "language": "de",
+        "exit_code": 0,
+        "xliff_sha256": "dccbb496de78f86fa73fc1a9b3d9bfbcf0864ec59b5cabf05999b952339c7398",
+        "log_sha256": "5989050f7be1717782c4c37615ae1cc1cda476bf75eb800a5868e90151fd8745"
+      },
+      {
+        "language": "es",
+        "exit_code": 0,
+        "xliff_sha256": "aa774060b3a0c7434a708c9890a04a295b0c3ec096b93967918d05a4059666ad",
+        "log_sha256": "82eb9be75243e6e9ca34e63286f081fdd80df5282b0efe0e2674a0e5c8a4e502"
+      },
+      {
+        "language": "fr",
+        "exit_code": 0,
+        "xliff_sha256": "c78912399ed815aa777da5edddb1fac4ed5f1155136be1d2bbaf4d946c53c417",
+        "log_sha256": "f43dedfad25c1e5ea383529f6ebfd1a3152ee84e1e577244a350a8d8193c97b8"
+      },
+      {
+        "language": "it",
+        "exit_code": 0,
+        "xliff_sha256": "ce694f43bab235ad780afe6b150cd20e996a3db6e21ac995df3d9485a62bb433",
+        "log_sha256": "c7f1b5f8208e02124203a75e34ec295a060c5fe3afcfa8727fd4854c4e9aa107"
+      },
+      {
+        "language": "pt",
+        "exit_code": 0,
+        "xliff_sha256": "18b5783c54032817f2203e55ce73aa696e31e33ac31999c10c62e0b526418dd8",
+        "log_sha256": "7eeb8fcb31a86793d9c35b3dcc7ddaec063e5895c65b95f308fc756953b33fde"
+      },
+      {
+        "language": "ru",
+        "exit_code": 0,
+        "xliff_sha256": "e89202f906bfc19bb402b04699c48c1df737ab8cc2cf7369387eaa1fc52ff489",
+        "log_sha256": "5c0b23a8640f1e84da8c93376a10b698f4d3015dfb9500522edb9c3852378f37"
+      },
+      {
+        "language": "tr",
+        "exit_code": 0,
+        "xliff_sha256": "2c8732092fefb7b4da216b264b02b073e247507bd5986ea69457d5a9f23eff68",
+        "log_sha256": "da84613b09f226539709d26a81b50d00918854d558fab9def47d6d880c7cac80"
+      },
+      {
+        "language": "zh-Hans",
+        "exit_code": 0,
+        "xliff_sha256": "2c06bf3c8ed2eea5f8e657f92d738c1ec86994accdd8ed448162c2ce6f068967",
+        "log_sha256": "2957df9608e97eaba439a845d2ce9af53272c9c9adf4636bdda6eeb1219b2c22"
+      },
+      {
+        "language": "zh-Hant",
+        "exit_code": 0,
+        "xliff_sha256": "15ea0bafc2f0e972c41d874232f5feb4531d7616eb3d43da364461227c3b364c",
+        "log_sha256": "cb1729384cd56c0334ee334d883206ff72e73d3a039befa30e444a917049b33b"
+      }
+    ],
+    "all_existing_entries_and_order_unchanged": true,
+    "preservation": "Only whole Apple sync/import-generated new entry retained; original raw top-level entry blocks preserved, no nested plural edits",
+    "catalog_sha256": "15cd7a89808f90c3eca697f76e15dba0f91671f5c6584f21ad7b68ae6766b9d3"
+  },
+  "checks": [
+    "strict scoped swift-format using Mac4space/120configuration",
+    "strict scoped SwiftLint0.63.2 zero violations",
+    "git diff --check"
+  ],
+  "qualification_notes": [
+    "v1runner preflight stalebase assertion before Xcode; no tests or semanticRED",
+    "REDv2actual10=9pass1fail defaultdeny; unchangedGREEN10/10",
+    "Expanded13/13 includes actualAppState A-B-A/suspension, cleanupretry/malformedinput and actualSDKcapabilityfalse control",
+    "Final affected63/63 includes one presentationclear of enrollment sheet on owner retirement plus three localized keys"
+  ],
+  "limits": [
+    "Generated protocol controls with injected true presentation capability never SDKpermission; productioncapturesactualfalse",
+    "No full PR/visual/native enrollment acceptance; no B review UI/newSDK/physical orproduction action",
+    "No manual app adoption; Xcode hostedStaging tests install theirisolated testhost",
+    "Opaque packets<=16KiB, exact rendered revision forwarded; originalSDK owns phase/permission"
+  ]
+}

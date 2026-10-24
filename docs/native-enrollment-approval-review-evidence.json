@@ -1,0 +1,172 @@
+{
+  "sdk_source": "3fab3184d8cc089c7a3d24988443ff2d38ee93a5",
+  "base": "95c4810dc43b8417cfb173b0f7529b369be409ee",
+  "red_source_stash": "ccdad01c20a8758265d8cd40fc1262dadb85dc28",
+  "initial_green_source_stash": "037ff9864ff2722b1f0a60e4ef4c5f7f8c08dd81",
+  "controls_source_stash": "d78e5ed97bfb8a213be6dcc09d2518fc9aa19a08",
+  "final_source_stash": "9a88e31385f791633a189784f0ab2476240058c2",
+  "m5_sdk4_stash": "4573bf451b85eb3a03f1500d8eb79e3d03807b53",
+  "m5_original_e6_sdk4_stash": "4b648dfb1d7038116a4629f84604a0d350aaa0f8",
+  "phases": [
+    {
+      "phase": "red-v1",
+      "source_base": "95c4810dc43b8417cfb173b0f7529b369be409ee",
+      "source_inputs": 807,
+      "input_manifest_sha256": "87ec97adf4b6855871ab25f65999600c282632fc5b5a575b199bc41d3ffa918d",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 127.1,
+      "log_sha256": "1f8ce719498c97073a662ef59f67f6d8f8280e7c9c4ad09609cd3aebd3951c2f",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2,
+        "passedTests": 0,
+        "failedTests": 2,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Caught error: .DeviceLinkingNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 2,
+          "testIdentifierString": "DeviceEnrollmentApprovalReviewTests/originalReviewForwardPreservesCapturedRevisionAndReadOnlyMetadata()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentApprovalReviewTests/originalReviewForwardPreservesCapturedRevisionAndReadOnlyMetadata()",
+          "testName": "originalReviewForwardPreservesCapturedRevisionAndReadOnlyMetadata()"
+        },
+        {
+          "failureText": "Caught error: .DeviceLinkingNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "DeviceEnrollmentApprovalReviewTests/reviewedModelRequiresExplicitActionOnSameOriginalRevision()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentApprovalReviewTests/reviewedModelRequiresExplicitActionOnSameOriginalRevision()",
+          "testName": "reviewedModelRequiresExplicitActionOnSameOriginalRevision()"
+        }
+      ]
+    },
+    {
+      "phase": "green-v1",
+      "source_base": "95c4810dc43b8417cfb173b0f7529b369be409ee",
+      "source_inputs": 807,
+      "input_manifest_sha256": "8a393b6c5d40c81a4b5270e9915b4b67b4175205b6e382cb44c2707bb528498a",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 24.61,
+      "log_sha256": "6ce23c3b81ebfc8b63f3268cd8b1fe95b3bee8b12a80a0a3bfc1bc7a0a2a838f",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2,
+        "passedTests": 2,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "phase": "green-v2",
+      "source_base": "95c4810dc43b8417cfb173b0f7529b369be409ee",
+      "source_inputs": 807,
+      "input_manifest_sha256": "4f52f49b0ece8564c07e88c9a121479e44666c81fb142f4d63f28ef11cdd4e31",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 15.24,
+      "log_sha256": "bbbd173cfdec3c9cfae53d5fbf120d82e832bcfc83ee435fabfb2a5885ec1b9b",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 7,
+        "passedTests": 7,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    {
+      "phase": "affected-v2",
+      "source_base": "95c4810dc43b8417cfb173b0f7529b369be409ee",
+      "source_inputs": 807,
+      "input_manifest_sha256": "4f52f49b0ece8564c07e88c9a121479e44666c81fb142f4d63f28ef11cdd4e31",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 8.45,
+      "log_sha256": "67572b982cbf6617a4f9d73f1e9731f951a5d2099d34c4ac007fc5e22577f008",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 70,
+        "passedTests": 67,
+        "failedTests": 3,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: !verification.enrollmentSupported\nverification.enrollmentSupported \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 63,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/actualSdkCapabilityCannotOfferEnrollmentTransportFromHeldSession()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/actualSdkCapabilityCannotOfferEnrollmentTransportFromHeldSession()",
+          "testName": "actualSdkCapabilityCannotOfferEnrollmentTransportFromHeldSession()"
+        },
+        {
+          "failureText": "Expectation failed: !capabilities.enrollmentSupported\ncapabilities.enrollmentSupported \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 11,
+          "testIdentifierString": "NativeDeviceLinkingRuntimeTests/matchedRuntimeReportsVerificationWithoutAdvertisingEnrollment()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeDeviceLinkingRuntimeTests/matchedRuntimeReportsVerificationWithoutAdvertisingEnrollment()",
+          "testName": "matchedRuntimeReportsVerificationWithoutAdvertisingEnrollment()"
+        },
+        {
+          "failureText": "Expectation failed: an error was expected but none was thrown: MarmotKitError.DeviceLinkingNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 65,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/unsupportedTransportNeverInvokesOriginal()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/unsupportedTransportNeverInvokesOriginal()",
+          "testName": "unsupportedTransportNeverInvokesOriginal()"
+        }
+      ]
+    },
+    {
+      "phase": "affected-v3",
+      "source_base": "95c4810dc43b8417cfb173b0f7529b369be409ee",
+      "source_inputs": 807,
+      "input_manifest_sha256": "bc0b40be7cb8601320242e5b0b82585df17d7923b5cb909a175abd39dd030938",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 15.69,
+      "log_sha256": "f087d13ef2be59480d6c116247a198745acde95d9b8042592b0c4011aa48e3d3",
+      "physical_phone_changed": false,
+      "scope": "Original approval custody; generated controls and actual account/runtime lifetime, not SDK enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 70,
+        "passedTests": 70,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  ],
+  "final_owned_hashes": {
+    "whitenoise-ios/Session/DeviceLinkingApprovalScope.swift": "cfca1935b41a2dc8a2eea12c76300de9191957794028896f993ac7fa4c48ed6d",
+    "whitenoise-ios/Settings/DeviceEnrollmentApprovalViewModel.swift": "9936988e0b5213ef66c7cc9c8d1f3e666f3fe89a34376cf7bd52ae331547a1af",
+    "whitenoise-iosTests/DeviceEnrollmentApprovalReviewTests.swift": "81547f1c9e8dccd00fe715b4d6d630dc242e04e68b42608126bf16bbaa67a734",
+    "whitenoise-iosTests/DeviceEnrollmentViewModelTests.swift": "e098c590f10047059195534fc5d253ed7604d612c7103434cdce544812b5b733",
+    "whitenoise-iosTests/NativeDeviceLinkingRuntimeTests.swift": "a3df560df96a60e26ff20f4e7025dfc3e32687a5c274ec1b68a8c4953d0a3d9b"
+  },
+  "scope": "Original approval reviewMetadata before/after guards; pending same-revision review only, explicit approveReviewed never refresh/decode approval. Actual AppState A-B-A, suspension/same-account runtime restart, malformed review, SDK errors, phase replacement and exact failed cleanup retry.",
+  "counts": "Focused7 methods/11 parameterized executions; affected70 methods, repeated runs are not unique tests.",
+  "fixture_corrections": "Affected-v2 67/70 retained3 old e6 capability assumptions. Two existing testfiles corrected to actual qualifiedSDK capability/held model and explicit false-capability negative control; no app capability toggle.",
+  "tooling": "RED executed0/2 as intended then secondary simctl diagnostic collection failed. Initial packaging stage refused untracked8KiBSwiftPM markers; second lacked rustc-version PATH; third packaging-only stage passes explicit installed1.97.1 PATH.",
+  "checks": "Pinned strictSwiftLint0.63.2 on5 ownedSwiftfiles, canonicalMac swift-format config and git diff --check pass.",
+  "limits": "Generated original-handle controls with actual isolated AppState lifetime, not native A/B/C crypto acceptance. No UI, full PR, physical phone, final integrated SDK installation or publication qualification."
+}

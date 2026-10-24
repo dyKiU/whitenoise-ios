@@ -1,0 +1,82 @@
+{
+  "base_commit": "156bbb1e8a2d0acc8a93acd60e0ff11cf381596f",
+  "original_red_stash": "77a3d2e09f148defdc0a96619a95f3a64bae52bb",
+  "red_to_green_changed_inputs": [
+    "whitenoise-ios/Session/DeviceLinkingAccountScope.swift"
+  ],
+  "scope": "Host original-session forwarding controls and actual account retirement only; full new PR, native pairing, enrollment and delivery remain unqualified",
+  "tested_owned_inputs": {
+    "whitenoise-ios/Session/DeviceLinkingAccountScope.swift": "41cb65136f5bdcfb86b49a0aaf66a72ba1f26284757647552812bffddcd3d880",
+    "whitenoise-iosTests/DeviceLinkingOwnedActionTests.swift": "7da780920996cb9b8ae4cb0ec295243cfc20a30938006f8799b2a29fcf326302"
+  },
+  "gates": [
+    {
+      "phase": "red-v4",
+      "source_inputs": 782,
+      "verified_sources": {
+        "current_owned_worktree": 779,
+        "preserved_M5_metadata": 2,
+        "git:77a3d2e09f148defdc0a96619a95f3a64bae52bb": 1
+      },
+      "profile": "local-e6/experimentalflag1/Staging",
+      "input_manifest_sha256": "fc3d8308f44165fff8f28084b31abb43b2e65a2e8d647e685203e4e7324dc01f",
+      "log_sha256": "1187fb5a739e5aa87e5e10e066911b8204e25951985cbd6180ec1fd02d984976",
+      "exit_code": 65,
+      "seconds": 123.62,
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 4,
+        "passedTests": 1,
+        "failedTests": 3,
+        "skippedTests": 0
+      }
+    },
+    {
+      "phase": "green-v1",
+      "source_inputs": 782,
+      "verified_sources": {
+        "current_owned_worktree": 780,
+        "preserved_M5_metadata": 2
+      },
+      "profile": "local-e6/experimentalflag1/Staging",
+      "input_manifest_sha256": "f7c6b840836d924afffd636293a562f9c157603c8b14ed0c9bdac36337fb34b8",
+      "log_sha256": "85bb746a3d2ec1225f964e676f3a5c4a4ad4530eebddb7aa1fe721eb12ac982b",
+      "exit_code": 0,
+      "seconds": 26.31,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 4,
+        "passedTests": 4,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    },
+    {
+      "phase": "affected-v1",
+      "source_inputs": 782,
+      "verified_sources": {
+        "current_owned_worktree": 780,
+        "preserved_M5_metadata": 2
+      },
+      "profile": "local-e6/experimentalflag1/Staging",
+      "input_manifest_sha256": "f7c6b840836d924afffd636293a562f9c157603c8b14ed0c9bdac36337fb34b8",
+      "log_sha256": "62ce89077f7e12c1b639f21becfe6659255161d955e318892e3637ef5f471513",
+      "exit_code": 0,
+      "seconds": 7.76,
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 37,
+        "passedTests": 37,
+        "failedTests": 0,
+        "skippedTests": 0
+      }
+    }
+  ],
+  "compile_only_attempts": "First three RED invocations ran zero tests due to diagnosed stale FFI PCM headers; only the named modules were retired after the build target stopped. These are not behavioral REDs.",
+  "comment_only_post_test_delta": {
+    "path": "whitenoise-iosTests/DeviceLinkingOwnedActionTests.swift",
+    "committed_sha256": "59ac54e73166e8f6e4042d4f0c4d338e5b6f1e6609262b74c7dce4b846a8058f",
+    "change": "Four comments explain generated superclass Sendable conformance and narrowly suppress the pinned linter rule; no executable changes",
+    "lint": "SwiftLint0.63.2 strict: zero violations for both owned Swift files"
+  }
+}

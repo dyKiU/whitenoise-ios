@@ -1,5 +1,5 @@
-import SwiftUI
 import MarmotKit
+import SwiftUI
 
 private enum SettingsDestination: String, CaseIterable, Hashable {
     case profile
@@ -77,6 +77,29 @@ struct SettingsView: View {
                 .relays,
                 .aiAgents,
             ])
+
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                if appState.client?.deviceLinkingCapabilities().verificationSupported == true {
+                    Section {
+                        NavigationLink {
+                            DeviceVerificationDestinationView()
+                        } label: {
+                            Label("Device verification", systemImage: "checkmark.shield")
+                        }
+                        .disabled(appState.activeAccountRef == nil)
+                        .accessibilityIdentifier("settings.deviceVerification")
+                    }
+                }
+            #endif
+
+            #if WN_EXPERIMENTAL_DEVICE_SYNC
+                if appState.client != nil, appState.activeAccountRef != nil {
+                    Section {
+                        AccountChatSharingEntryView(acquire: { try appState.makeAccountChatSharingModel() })
+                            .id(appState.accountStore.deviceLinkingOwnershipIdentity)
+                    }
+                }
+            #endif
 
             destinationSection([.support, .donate, .developerTools])
 
@@ -385,7 +408,8 @@ private struct AccountAvatarStack: View {
 nonisolated enum MarmotKitBuildLabel {
     static func text(tag: String, sha: String) -> String {
         let isSourceBuild = sha.hasSuffix("-dirty")
-        let shortHash = sha
+        let shortHash =
+            sha
             .replacingOccurrences(of: "-dirty", with: "")
             .prefix(8)
 

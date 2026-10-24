@@ -1,0 +1,146 @@
+{
+  "base": "b521481b78a08bae3b86cdb0f2ebf785b4a914f8",
+  "sdk": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "runs": {
+    "ios-history-recipient-query-red-v1": {
+      "source_base": "b521481b78a08bae3b86cdb0f2ebf785b4a914f8",
+      "source_inputs": 871,
+      "input_manifest_sha256": "9dd7ecd78f87b519fdb04715369c691a20e9ca5547fcb437eed7d8a19e17c238",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 17.67,
+      "log_sha256": "721c8f30c291c4a877bb476a93dc6d7937bcfa90de16d9c1ee4d15ff36f8376f",
+      "physical_phone_changed": false,
+      "scope": "Actual SDK current-recipient query typed input/runtime refusal through thin app adapter; no recipient authority/transfer/native success fixture"
+    },
+    "ios-history-recipient-query-red-v2": {
+      "source_base": "b521481b78a08bae3b86cdb0f2ebf785b4a914f8",
+      "source_inputs": 871,
+      "input_manifest_sha256": "9dd7ecd78f87b519fdb04715369c691a20e9ca5547fcb437eed7d8a19e17c238",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 67.8,
+      "log_sha256": "46c6dba31db93c2b24b1494e524df590f4d2270edd730a9b7dd0699834046e7e",
+      "physical_phone_changed": false,
+      "scope": "Actual SDK current-recipient query typed input/runtime refusal through thin app adapter; no recipient authority/transfer/native success fixture"
+    },
+    "ios-history-recipient-query-red-v3": {
+      "source_base": "b521481b78a08bae3b86cdb0f2ebf785b4a914f8",
+      "source_inputs": 871,
+      "input_manifest_sha256": "3f743425e65543c9d68cd2361181c74acce42649a4c5faa6a4ea872392fde188",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 65,
+      "seconds": 120.74,
+      "log_sha256": "3398b63489888c7bdd6ad115a6c0d24fa30f0dfe688db84c9dc5ede035bba72d",
+      "physical_phone_changed": false,
+      "scope": "Actual SDK current-recipient query typed input/runtime refusal through thin app adapter; no recipient authority/transfer/native success fixture",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2,
+        "passedTests": 0,
+        "failedTests": 2,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: expected error \".HistoryTransferNotReady\" of type MarmotKitError, but \".HistoryTransferUnsupported\" of type MarmotKitError was thrown instead: MarmotKitError.HistoryTransferNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "NativeHistoryRecipientQueryTests/malformedGroupRetainsNativeTypedRefusalWithoutAccountEffects()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryRecipientQueryTests/malformedGroupRetainsNativeTypedRefusalWithoutAccountEffects()",
+          "testName": "malformedGroupRetainsNativeTypedRefusalWithoutAccountEffects()"
+        },
+        {
+          "failureText": "Expectation failed: expected error \".HistoryTransferRuntimeUnavailable\" of type MarmotKitError, but \".HistoryTransferUnsupported\" of type MarmotKitError was thrown instead: MarmotKitError.HistoryTransferRuntimeUnavailable",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 2,
+          "testIdentifierString": "NativeHistoryRecipientQueryTests/validGroupMissingAccountRetainsRuntimeRefusalWithoutAccountEffects()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryRecipientQueryTests/validGroupMissingAccountRetainsRuntimeRefusalWithoutAccountEffects()",
+          "testName": "validGroupMissingAccountRetainsRuntimeRefusalWithoutAccountEffects()"
+        }
+      ]
+    },
+    "ios-history-recipient-query-green-v1": {
+      "source_base": "b521481b78a08bae3b86cdb0f2ebf785b4a914f8",
+      "source_inputs": 871,
+      "input_manifest_sha256": "b54941336f2d336b2f6487db3bc6ef8be236b884671773963c3df78d0839039a",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 28.23,
+      "log_sha256": "0920c154bd8bdb905990a47236ca2de8eb5ab19bea118eea6f64d2a24054eb6e",
+      "physical_phone_changed": false,
+      "scope": "Actual SDK current-recipient query typed input/runtime refusal through thin app adapter; no recipient authority/transfer/native success fixture",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 2,
+        "passedTests": 2,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-history-recipient-query-affected-v1": {
+      "source_base": "b521481b78a08bae3b86cdb0f2ebf785b4a914f8",
+      "source_inputs": 871,
+      "input_manifest_sha256": "b54941336f2d336b2f6487db3bc6ef8be236b884671773963c3df78d0839039a",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 9.08,
+      "log_sha256": "22cf62c6449febcfbf666c3e8f6ddbfb41da752d05dc9771a66b58fbcdb395c7",
+      "physical_phone_changed": false,
+      "scope": "Affected query/original-history custody/runtime-constructor/account-reader ownership controls on matched987 SDK; no real transfer acceptance or whole-app matrix",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 22,
+        "passedTests": 22,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "new_feature_baseline": "The thin app query adapter was unimplemented and explicitly returned Unsupported. Its two real SDK acceptance controls failed, then passed unchanged through the actual native forward. This is not a defect claim against SDK policy.",
+  "test_sha256_unchanged": "f264ad80a6cc06add468f69e03a497b96330e7b73cd1a4b30c138abef942f6d0",
+  "preserved_candidates": {
+    "original_local": "a3fab84bde6e12593deb071ffd5b02659e5cea70",
+    "original_m5": "96fcab0112ebb66495f511eb07dd62a05ac8c1f8",
+    "corrected_red_local": "667de757e88ef5ab7556a5ca4ea18bbdaac38d62",
+    "corrected_red_m5": "a722943cbccaddad1955a60ea98bde9d716b1d8f",
+    "green_local": "30f84c7ff4150b669cda563da37642f34bb72c3c",
+    "green_m5": "962a56f6d1e76066491c30d9bc767641ecfd6f80"
+  },
+  "compile_only_failures": "red-v1 stale FFI PCM; red-v2 fixture used nonexistent close and threw within macro-inferred closure. Both zero-test outcomes retained. Fixture-only correction uses actual shutdownAndClose, with production baseline unchanged.",
+  "pcm_repair": {
+    "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+    "retained": "/Users/pj/project/build/retired-pcm/ios-recipient-query987-red-v1/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+    "sha256": "9a18914c53043d76a9a170ef174a5d554b45779e0bfd59fc3cf7c795d4eb673d",
+    "idle": true
+  },
+  "sdk_stage": {
+    "prior_sdk4_stash": "03854b412dc3d98e66f5549e1fd1750688c35e1f",
+    "prior_artifact": "/Users/pj/project/build/rollback/ios-sdk84113-before987/MarmotKit.xcframework",
+    "prior_artifacts_verified": true,
+    "new_local_build_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+    "stage_sha256": "a99ce51b684231e8361421f3b71776d4fac059a754c61f21de4387d481974337",
+    "package_only_log_sha256": "e52ae1a1f1e268ef709ac4f51beb0d3eb8ba51fcea5acaf57144dd40ecac57b7",
+    "first_attempt": "Packaging-only failed rustc version lookup missing PATH; no Rust build or native tests. Preserved ios-sdk987-staging-v1.log.",
+    "no_rust_build": true,
+    "m1_phone_84113_unchanged": true
+  },
+  "static_checks": [
+    "strict SwiftLint0.63.2",
+    "swift-format using Mac4-space/120 configuration",
+    "git diff --check"
+  ],
+  "scope": "Thin feature-only MarmotClient forward preserves native typed group/runtime refusals without account side effects. Query is current observation only; creates no transfer/consent. Affected22 include original consent custody, explicit callback constructor and reader account scopes; focused2 are repeated inside22, not24 unique tests.",
+  "remaining": [
+    "Real populated recipient choices and fresh original source transfer acceptance require the next account/chat-owned source-picker slice.",
+    "Full published/experimental matrix on final cohesive feature is required before integration or SDK promotion.",
+    "No UI, installed app, phone, positive consent, import or permission claim."
+  ]
+}

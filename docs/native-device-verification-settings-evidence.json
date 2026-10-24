@@ -1,0 +1,135 @@
+{
+  "settings_initial": {
+    "source_base": "0da8258f14aba4cc8bf39cfe735995a0ee0d2f7e",
+    "source_inputs": 792,
+    "input_manifest_sha256": "6afb4eec7321348d53cdc86579970e3690a830d9f3e8fb40e53bdf6d49e68f4b",
+    "profile": "local-e6/experimentalflag1/Staging",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 0,
+    "seconds": 77.56,
+    "log_sha256": "37f0eb4e9eb3efc8cda5a2255c62910b2dfdb331d24254caaaf1237392fdb214",
+    "physical_phone_changed": false,
+    "scope": "Account-owned verification model and affected original lifetime/transport/runtime controls; no fresh SDK pairing or enrollment acceptance",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 30,
+      "passedTests": 30,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "test_failures": []
+  },
+  "settings_final": {
+    "source_base": "0da8258f14aba4cc8bf39cfe735995a0ee0d2f7e",
+    "source_inputs": 792,
+    "input_manifest_sha256": "bcf4b09084b6b6e53fad55ae58b5e98552e7ffd409a4a3b3b8a88164fe732843",
+    "profile": "local-e6/experimentalflag1/Staging",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 0,
+    "seconds": 9.19,
+    "log_sha256": "6501c402e4ce59d6109230d6079fa25818c8f327b43021684142a984411435c5",
+    "physical_phone_changed": false,
+    "scope": "Account-owned verification model and affected original lifetime/transport/runtime controls; no fresh SDK pairing or enrollment acceptance",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 30,
+      "passedTests": 30,
+      "failedTests": 0,
+      "skippedTests": 0
+    },
+    "test_failures": []
+  },
+  "localization": {
+    "original_entries": 1926,
+    "new_entries": 18,
+    "translations": [
+      {
+        "language": "de",
+        "log_sha256": "737cc2ad66816841827ef8634fe105b654fd932a891dd4e985cef7d6d338a544",
+        "units": 18
+      },
+      {
+        "language": "es",
+        "log_sha256": "4217ac294375db044642dd745a9fcd85cd1018dfb1697515c0a38d26f4f602d3",
+        "units": 18
+      },
+      {
+        "language": "fr",
+        "log_sha256": "a0ff12f32c44bdeb742811a9374ca8829c0fd71cabee1d143a421992ddbc18c1",
+        "units": 18
+      },
+      {
+        "language": "it",
+        "log_sha256": "9b8375bb6eee295c35ba5c7b3bfa86a925b8c12943bf8071d3e2888c6392977d",
+        "units": 18
+      },
+      {
+        "language": "pt",
+        "log_sha256": "3a31da15a5b0c6129cde45632d27601dbb7d822d974d1790f3f1c6687727cfab",
+        "units": 18
+      },
+      {
+        "language": "ru",
+        "log_sha256": "e3765777de919bc3bc65a941f6b7d7eaf31919228b1a3f47a962ef552dcef571",
+        "units": 18
+      },
+      {
+        "language": "tr",
+        "log_sha256": "686d9e0dfc27f5f83eedd8b2f82aa518978de55795bc2fce2d6ef52acddd40da",
+        "units": 18
+      },
+      {
+        "language": "zh-Hans",
+        "log_sha256": "9753037490e11d90dc154ace8d29a53b084f6a2fc2a6ce27f1a4adb56d956ce2",
+        "units": 18
+      },
+      {
+        "language": "zh-Hant",
+        "log_sha256": "351f28c1ba4b188d2f7310ac52230e3af88515d2babb6a03092ca0bbb599e37f",
+        "units": 18
+      }
+    ],
+    "xcode_import_changed_original_plural_entries": 0,
+    "preservation": "Restored whole original raw top-level entry blocks from original catalog; no nested plural structure edited. Only 18 Xcode-export/import-generated new entry blocks retained.",
+    "catalog_sha256": "3a68f1d861a18aadc14858faab5fdcb7e2e0889438ad3cbb6965abaff44587af"
+  },
+  "export": {
+    "exit_code": 0,
+    "command": [
+      "xcrun",
+      "xcodebuild",
+      "-exportLocalizations",
+      "-project",
+      "whitenoise-ios.xcodeproj",
+      "-scheme",
+      "Whitenoise (Staging)",
+      "-derivedDataPath",
+      "/Users/pj/project/whitenoise-sync-ios-build",
+      "-sdk",
+      "iphonesimulator",
+      "-localizationPath",
+      "/Users/pj/project/build/ios-verification-localizations/export",
+      "-exportLanguage",
+      "de",
+      "-disableAutomaticPackageResolution",
+      "ARCHS=arm64",
+      "ONLY_ACTIVE_ARCH=YES",
+      "OTHER_SWIFT_FLAGS=$(inherited) -D WN_EXPERIMENTAL_DEVICE_SYNC",
+      "-jobs",
+      "2"
+    ],
+    "log_sha256": "6c098a885d86c4866bcba063072183d6a7bf054f98035d795b29bc8887cae035"
+  },
+  "first_import_failure": {
+    "exit_code": 64,
+    "log_sha256": "cb7b5355d968c91c058f6187994312bb47b969285a6ecf2c1f576506525bfb52",
+    "cause": "Missing explicit DerivedData/experimental flags produced a feature-off/e6 localization extraction failure. Preserved logs; only newly generated idle named cache330357828bytes removed after lsof audit."
+  },
+  "scope": "Verification-only Settings UI under original account/runtime scope. Explicit rendered revision and opaque packet ACK; no enrollment continuation, native permission DTO or persisted snapshot.30 generated-protocol/isolated lifecycle controls, not actual native pairing/visual acceptance. Full experimental and published gates follow signed UI slice.",
+  "owned_sha256": {
+    "whitenoise-ios/Settings/DeviceVerificationView.swift": "a44ba8085aa222aa769cdeb49085b153929a7f0bd735f96cd6592181582b153c",
+    "whitenoise-ios/Settings/SettingsView.swift": "3f6711c09f04f03209219347c6fc4fbcd42a1d5e4e788423487d6505f97a858e",
+    "Shared/Localizable.xcstrings": "3a68f1d861a18aadc14858faab5fdcb7e2e0889438ad3cbb6965abaff44587af"
+  },
+  "validation": "Swiftformat6.2.3 with Mac4spaces120 config and scoped strictSwiftLint0.63.2 pass. All1926 prior catalog entries retained raw;18×9 translations from actual compiler stringsdata→xcstringstool sync→Xcode XLIFF export/import. Xcode changed22 prior plurals during import, caught by verification and restored wholesale original entries. No nested plural edits. All SDK overrides unchanged. Dedicated simulator testhost may be installed/launched by Xcode; physical phone unchanged."
+}

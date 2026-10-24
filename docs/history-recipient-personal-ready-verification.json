@@ -1,0 +1,118 @@
+{
+  "scope": "Personal Team signed-ready recipient review build only; physical installation deferred and actual native imported-history UI acceptance open.",
+  "tested_source": "d3e182ad3145cf48075a36826e829bd421573e43",
+  "build": {
+    "source_commit": "d3e182ad3145cf48075a36826e829bd421573e43",
+    "disk_free_before": 15365885952,
+    "disk_free_after": 16384348160,
+    "source_inputs": 856,
+    "input_manifest_sha256": "2e02eaa627fff47e742fbc0698879a37d2c29a66d0f8a2f140f748ce7c2e132e",
+    "mdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+    "installed_manifest_sha256": "bdf6ceabbccdc193e430fc925bcf4f45d91ba816d5cff80adbaf6e3a153816c4",
+    "exit_code": 0,
+    "seconds": 136.98,
+    "log_sha256": "b4b6f5793226d1cfad16919216a85558b0a0a32e616facd5199546842bc98294",
+    "phone_installation": false,
+    "rollback_app": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/rollback/ios-personal-signed-ready-before-history-recipient/whitenoise-ios.app",
+    "rollback_executable_sha256": "b8d64d680ab1354b89d7610edaecd93258d181ee52bac13bf6d936323206d375",
+    "profile": "matched84113/experimental1/PersonalTeamStaging",
+    "physical_installation_deferred": true,
+    "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+    "executable_sha256": "712a33d1d420daa840738936d1f94169361dce6175d2f1d8dfe1fcc5b5ef2b98",
+    "signed_bundles": [
+      {
+        "name": "whitenoise-ios.app",
+        "bundle_id": "dev.ipf.whitenoise.ios.staging.personal",
+        "executable_sha256": "712a33d1d420daa840738936d1f94169361dce6175d2f1d8dfe1fcc5b5ef2b98",
+        "entitlements_sha256": "d7c961768c724fad457d83a4ddf29675804a4414b55f5c3550dba2f822b85fdc",
+        "entitlements_unchanged_from_prior_ready": true,
+        "strict_signature_verified": true,
+        "development_profile_with_provisioned_devices": true,
+        "profile_expiration": "2026-10-16T11:24:29",
+        "profile_sha256": "423162dbc20b2fbb4d44bbef2af684fb934440730a9cd5bf93e4ba040282a3ff"
+      },
+      {
+        "name": "NotificationServiceExtension.appex",
+        "bundle_id": "dev.ipf.whitenoise.ios.staging.personal.NotificationService",
+        "executable_sha256": "3fcc4d472b5fa510ed22951ad6da4c7b46cad443bc8088dc8ec98df05396c2bf",
+        "entitlements_sha256": "7c6ccce56de4253ca606c85e920b8d45e5b5046c9b33e55efc394d7c7ed2470a",
+        "entitlements_unchanged_from_prior_ready": true,
+        "strict_signature_verified": true,
+        "development_profile_with_provisioned_devices": true,
+        "profile_expiration": "2026-10-16T11:24:27",
+        "profile_sha256": "e08d30e2bc6fc39cbb7583e42ba22b774eea9728d853e92e74860f88cdd90736"
+      }
+    ]
+  },
+  "builder_sha256": "4cd0450604e8ddb8ff3622ab80b655634ede9bdcfed89d238d625f2f8f979886",
+  "signature_and_sdk_provenance": {
+    "sdk": "84113c20771a0092cb0e52ca094836375f9dd406",
+    "native_artifacts": {
+      "MarmotKit.xcframework/ios-arm64/libmarmot_uniffi.a": "28ac70b65c4ad937062628cb96543c6b22760907eb893c39a3504b18f913510c",
+      "MarmotKit.xcframework/ios-arm64-simulator/libmarmot_uniffi.a": "29bc6246a79d7f23e23eae6ca26bcaccda568f7be111a99b753dc088e86f69b2"
+    },
+    "bundle_identity_and_version_unchanged": {
+      "whitenoise-ios.app": {
+        "CFBundleIdentifier": "dev.ipf.whitenoise.ios.staging.personal",
+        "CFBundleShortVersionString": "2026.10.2",
+        "CFBundleVersion": "44"
+      },
+      "NotificationServiceExtension.appex": {
+        "CFBundleIdentifier": "dev.ipf.whitenoise.ios.staging.personal.NotificationService",
+        "CFBundleShortVersionString": "2026.10.2",
+        "CFBundleVersion": "44"
+      }
+    },
+    "signing": [
+      {
+        "name": "whitenoise-ios.app",
+        "display_sha256": "0f3c2ca2bb48cc74ed57e95c76127dff80fcf1b5a7ec1803ef7ea262a10cb409",
+        "authority": [
+          "Apple Development: peter@llamatree.co.uk (PCKD276XC2)",
+          "Apple Worldwide Developer Relations Certification Authority",
+          "Apple Root CA"
+        ],
+        "team": [
+          "PZ7CU4G6YG"
+        ],
+        "signature_format": [
+          "Format=app bundle with Mach-O thin (arm64)"
+        ],
+        "profile_unchanged": true
+      },
+      {
+        "name": "NotificationServiceExtension.appex",
+        "display_sha256": "33e184132216619da0183434b921101f309d2ce42ae408aad308ca0436db67b5",
+        "authority": [
+          "Apple Development: peter@llamatree.co.uk (PCKD276XC2)",
+          "Apple Worldwide Developer Relations Certification Authority",
+          "Apple Root CA"
+        ],
+        "team": [
+          "PZ7CU4G6YG"
+        ],
+        "signature_format": [
+          "Format=bundle with Mach-O thin (arm64)"
+        ],
+        "profile_unchanged": true
+      }
+    ]
+  },
+  "qualification": "docs/history-recipient-full-pr-verification.json",
+  "checks": [
+    "All856 source input hashes unchanged across build",
+    "Prior ready executable matched b8d64d... and strict/deep code signature before one necessary app-only rollback copy",
+    "Actual app and extension strict/deep signatures, team/application identifiers and development profiles verified",
+    "Exact entitlements\u2014including app group/keychain storage identity\u2014equal the prior ready app and extension; unsupported capabilities remain absent",
+    "Both profile hashes, bundle identities and marketing/build versions unchanged; expiry2026-10-16",
+    "SDK84113 installed metadata/source/features and packaged native hashes validated; no native SDK rebuild or shared Rust cache access"
+  ],
+  "raw_local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-native-personal-history-recipient-v1",
+  "limits": [
+    "No physical phone installation, TestFlight/production change, storage or Keychain copy, or manual app launch.",
+    "Necessary immediately previous ready app retained at recorded app-only rollback path; older existing rollback identities left untouched pending bounded inventory review. No full source or DerivedData archive added.",
+    "Ready provisioning expires at recorded times; later renewal may be required.",
+    "No new tests run for a build-only refresh; complete experimental2856/0/2 and published2714/0/2 suites qualified the unchanged runtime source.",
+    "Only this compact evidence JSON added after ready-build856 source freeze."
+  ]
+}

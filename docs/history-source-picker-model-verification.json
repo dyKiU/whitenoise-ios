@@ -1,0 +1,127 @@
+{
+  "base": "9df9f5944fff7661ff274bd7cec24a96ebc62caf",
+  "sdk": "98707713a2cc02828c2d66ed858588991896b9b0",
+  "runs": {
+    "ios-history-source-model-v1": {
+      "source_base": "9df9f5944fff7661ff274bd7cec24a96ebc62caf",
+      "source_inputs": 875,
+      "input_manifest_sha256": "cf77719aba29962e1cfcf7e3707a608a7256f4152e283dc1f7d798154cc0d903",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 117.59,
+      "log_sha256": "0520d80d56d9217258392e598ab5ccd66d7bf754e303f2024ade97e209bd8d76",
+      "physical_phone_changed": false,
+      "scope": "New source-picker acceptance controls on generated-protocol originals plus actual AccountStore/AppState lifecycle; no native positive authority/import fixture",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 10,
+        "passedTests": 10,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-history-source-model-v2": {
+      "source_base": "9df9f5944fff7661ff274bd7cec24a96ebc62caf",
+      "source_inputs": 875,
+      "input_manifest_sha256": "67b50d984722ceb24fe9a29568632b24374ace24a5676e075d560dc4db4422a2",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 26.54,
+      "log_sha256": "c2ea9101d85f782bdbf7257f80de0c45d03f25edd998f01304472e535fc7df00",
+      "physical_phone_changed": false,
+      "scope": "New source-picker acceptance controls on generated-protocol originals plus actual AccountStore/AppState lifecycle; no native positive authority/import fixture",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 11,
+        "passedTests": 11,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-history-source-model-v3": {
+      "source_base": "9df9f5944fff7661ff274bd7cec24a96ebc62caf",
+      "source_inputs": 875,
+      "input_manifest_sha256": "5b08b38140ab35ddf1aa554a5c613c78df0a8f42c1fffcac0de5dd525b447a6e",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 26.35,
+      "log_sha256": "d2e2984faea20dafe9962468fdbaf4a9122bc7197b46873bad09851124692e3e",
+      "physical_phone_changed": false,
+      "scope": "New source-picker acceptance controls on generated-protocol originals plus actual AccountStore/AppState lifecycle; no native positive authority/import fixture",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 12,
+        "passedTests": 12,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-history-source-model-affected-v1": {
+      "source_base": "9df9f5944fff7661ff274bd7cec24a96ebc62caf",
+      "source_inputs": 875,
+      "input_manifest_sha256": "67b50d984722ceb24fe9a29568632b24374ace24a5676e075d560dc4db4422a2",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 9.54,
+      "log_sha256": "b7309eef82836179418019fae3f83ca761f9edbc5cc2064d35d7a3c74037522b",
+      "physical_phone_changed": false,
+      "scope": "New source-picker acceptance controls on generated-protocol originals plus actual AccountStore/AppState lifecycle; no native positive authority/import fixture",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 40,
+        "passedTests": 40,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "ios-history-source-model-affected-v2": {
+      "source_base": "9df9f5944fff7661ff274bd7cec24a96ebc62caf",
+      "source_inputs": 875,
+      "input_manifest_sha256": "5b08b38140ab35ddf1aa554a5c613c78df0a8f42c1fffcac0de5dd525b447a6e",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 9.27,
+      "log_sha256": "284f30bb21ab9a14ee6f9043a0b7f66b79debf88ed77a4f69f15efbc545ed69e",
+      "physical_phone_changed": false,
+      "scope": "New source-picker acceptance controls on generated-protocol originals plus actual AccountStore/AppState lifecycle; no native positive authority/import fixture",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 41,
+        "passedTests": 41,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "new_feature_scope": "Acceptance tests for a new account/chat-owned source picker; first implementation passed. No artificial failing baseline or SDK defect claim. Generated-protocol lifetime controls plus actual native missing-account begin refusal. No populated native choices, positive consent/import, installed journey or full PR claim.",
+  "preserved_candidates": {
+    "initial_local": "34419ad23808c10a1940d68a237b5953e2fe8c06",
+    "initial_m5": "b8b3eaa4df5e51792ce4dba4ea29e70e09a54317",
+    "late_snapshot_local": "4a99a4e536a3e11f085bf55bb8c4395d9453d783",
+    "late_snapshot_m5": "b59e44396a2530f0c7043b77a9de7fc7c7a9de46",
+    "final_local": "9e0b7ea6687b842eac1c3ddbe26e1fc203f74d9e",
+    "final_m5": "7751c560e688fcece4cfd0d281bde281c70108d4"
+  },
+  "tested_paths": {
+    "whitenoise-ios/Core/MarmotClient.swift": "9e4a12ad61af18debd6b183cda726e561516ab3520a63d7facc6dc6b1f157518",
+    "whitenoise-ios/Session/HistoryConsentAccountLifetime.swift": "a248d66676f7256ae97bbec6970eea818ecd74512fae56f20525fc128b335887",
+    "whitenoise-ios/Session/HistorySourceFactory.swift": "afdd6c05fb731115ba9ac667474865a03af7aa13c56d6cd058cc5332d08f0fd3",
+    "whitenoise-ios/Conversation/HistorySourcePickerModel.swift": "cb2a3cd2a855b80b707a5bf078c2881243880aaf31172903b076d5dde1a9280a",
+    "whitenoise-iosTests/HistorySourcePickerModelTests.swift": "3b07ff0111a3b114f06e7d3eccc0543d5a8a334e1f449b8e070cbc071f0e05eb"
+  },
+  "ownership": "Successful current recipient observations only; explicit selection and fresh original SDK begin. Same held original and exact displayed revision for Continue. Actual A-B-A, scene suspension/runtime restart, late query/factory/snapshot, shared source/recipient negative cleanup and three destructive exit routes. No permission from query/display; SDK errors authoritative.",
+  "counts": "Final focused12 and affected41 overlap; not53 unique tests. Three destructive exit routes are parameterized in one reported method.",
+  "sdk_preservation": "Four generated987 overrides excluded from commit; M1 SDK84113 ready app/phone unchanged.",
+  "raw_prefix": "build/results/ios-history-source-model",
+  "full_integration": "Pending final cohesive pane/native-positive feature qualification."
+}

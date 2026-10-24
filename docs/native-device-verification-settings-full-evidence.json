@@ -1,0 +1,108 @@
+{
+  "signed_product": "3812b882b1e3333157dd69773afcc9c6930b4577",
+  "experimental": {
+    "source_base": "3812b882b1e3333157dd69773afcc9c6930b4577",
+    "source_inputs": 793,
+    "input_manifest_sha256": "7d7f7ab2aa80d0209c5bb6036072cf3bb6986b4d708d1c8f316268d377102f22",
+    "profile": "local-e6/experimentalflag1/Staging",
+    "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+    "exit_code": 0,
+    "seconds": 179.48,
+    "log_sha256": "bc7d96107075e8d20cdf08d9acb1343ae073569586dbbd2255e1b94ae1f04191",
+    "physical_phone_changed": false,
+    "scope": "Full experimental Staging regression for signed action slice; not fresh SDK pairing, enrollment or delivery acceptance",
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 2736,
+      "passedTests": 2734,
+      "failedTests": 0,
+      "skippedTests": 2
+    },
+    "test_failures": []
+  },
+  "published": {
+    "source_base": "3812b882b1e3333157dd69773afcc9c6930b4577",
+    "source_inputs": 793,
+    "input_manifest_sha256": "8dc6dd7f410af88d025549df0bb2bb40337fce5dac451968307dd46d99aef5f4",
+    "profile": "published-0.12.0/experimentalflag0/Staging",
+    "exit_code": 0,
+    "seconds": 266.14,
+    "log_sha256": "599d51116cbb06e46879442ecb6d90cf30d62abaa4364abe0f16ad94186af53a",
+    "physical_phone_changed": false,
+    "tests": {
+      "result": "Passed",
+      "totalTestCount": 2704,
+      "passedTests": 2702,
+      "failedTests": 0,
+      "skippedTests": 2
+    },
+    "test_failures": []
+  },
+  "published_zero_test_compile_failures": [
+    {
+      "source_base": "3812b882b1e3333157dd69773afcc9c6930b4577",
+      "source_inputs": 793,
+      "input_manifest_sha256": "8dc6dd7f410af88d025549df0bb2bb40337fce5dac451968307dd46d99aef5f4",
+      "profile": "published-0.12.0/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 6.8,
+      "log_sha256": "ce3a1fb784513c58de1c09f2b7584028ee1272db290342741189b54b88b6376d",
+      "physical_phone_changed": false
+    },
+    {
+      "source_base": "3812b882b1e3333157dd69773afcc9c6930b4577",
+      "source_inputs": 793,
+      "input_manifest_sha256": "8dc6dd7f410af88d025549df0bb2bb40337fce5dac451968307dd46d99aef5f4",
+      "profile": "published-0.12.0/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 8.69,
+      "log_sha256": "135e63b6e308f0bd59ff25c89e170a8a05b0440f355377f0a157251deb7994a9",
+      "physical_phone_changed": false
+    },
+    {
+      "source_base": "3812b882b1e3333157dd69773afcc9c6930b4577",
+      "source_inputs": 793,
+      "input_manifest_sha256": "8dc6dd7f410af88d025549df0bb2bb40337fce5dac451968307dd46d99aef5f4",
+      "profile": "published-0.12.0/experimentalflag0/Staging",
+      "exit_code": 65,
+      "seconds": 12.63,
+      "log_sha256": "fc4171f01a22d916237a1f9ac514418cc30a6247631d20cb17b8e319cdff8726",
+      "physical_phone_changed": false
+    }
+  ],
+  "exact_named_pcm_retirements": [
+    {
+      "original": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+      "preserved": "/Users/pj/project/build/ios-verification-settings-published-v1-stale-J4.pcm",
+      "sha256": "585dd58a343d9c2ab8b482f512718be2285235481def85dad1250c646a681ea2",
+      "pgrep_xcodebuild_exit": 1,
+      "lsof_exit": 1,
+      "scope": "Only exact compiler-named stale module moved after failed zero-test gate terminal; no broad cache deletion."
+    },
+    {
+      "original": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+      "preserved": "/Users/pj/project/build/ios-verification-settings-published-v2-stale-3F.pcm",
+      "sha256": "185b55f7a7866b8464afa18b7165c964e806148a62856f0ba99eed71c2cfbdcc",
+      "pgrep_xcodebuild_exit": 1,
+      "lsof_exit": 1
+    },
+    {
+      "original": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+      "preserved": "/Users/pj/project/build/ios-verification-settings-published-v3-stale-9148.pcm",
+      "sha256": "4c2cb0bbaea99c5cef483773e986224b7723c02c0f5b07fc20bd3b8416bf4428",
+      "pgrep_xcodebuild_exit": 1,
+      "lsof_exit": 1
+    }
+  ],
+  "sdk4_restoration": {
+    "stash": "97d1da19f720f2b07c1e04606bfd6511c63a8fdc",
+    "before_after_equal": {
+      "Packages/MarmotKit/MARMOT_VERSION": "69407d8c4c3a557e8d62fe8a7bd5112cd22526a6fdce69fcc802b4c9b1d82dbe",
+      "Packages/MarmotKit/Package.swift": "4c379ba9d572adb649c9692466ebbc80204af9ca0bf5acd63256ff6e0fa29b50",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKit.swift": "75227a7993a0fb374f63160a829d19767bdd617ee6881e3af638af9bf4754169",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift": "443a2f885c7ec3e3938f5068357a87c421ea7ff001db07a4c1118354d82e00ea"
+    },
+    "actual_published_gate_exit": 0
+  },
+  "limits": "Full regression cohorts only. No fresh native pairing, enrollment/chat delivery or visual/accessibility acceptance. Three compiler-named stale FFI module failures compiled zero tests; preserved separately. Tests used the existing dedicated simulator cache and may install/launch their isolated Staging host. Physical phone/production app unchanged; simulator experimental build/relaunch follows separately."
+}

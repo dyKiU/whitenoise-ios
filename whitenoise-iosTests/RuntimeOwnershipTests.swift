@@ -507,14 +507,14 @@ struct RuntimeOwnershipTests {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("MarmotLeaseTests-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        var first: Marmot? = try Marmot.newWithCursorPersistence(
+        var first: Marmot? = try runtimeLeaseMarmot(
             rootPath: root.path,
             relayUrls: ["wss://relay.invalid.test"],
             cursorPersistence: .advance
         )
 
         do {
-            _ = try Marmot.newWithCursorPersistence(
+            _ = try runtimeLeaseMarmot(
                 rootPath: root.path,
                 relayUrls: ["wss://relay.invalid.test"],
                 cursorPersistence: .frozen
@@ -527,7 +527,7 @@ struct RuntimeOwnershipTests {
         try await first?.shutdownAndClose()
         first = nil
 
-        let replacement = try Marmot.newWithCursorPersistence(
+        let replacement = try runtimeLeaseMarmot(
             rootPath: root.path,
             relayUrls: ["wss://relay.invalid.test"],
             cursorPersistence: .advance
@@ -592,4 +592,21 @@ struct RuntimeOwnershipTests {
         #expect(!gate.deliver(lateCollectionResult))
         #expect(delivered == ["timeout fallback"])
     }
+}
+
+private nonisolated func runtimeLeaseMarmot(
+    rootPath: String,
+    relayUrls: [String],
+    cursorPersistence: CursorPersistenceFfi
+) throws -> Marmot {
+    #if WN_CURRENT_SDK_API
+        return try Marmot.newWithCursorPersistence(
+            rootPath: rootPath, relayUrls: relayUrls, cursorPersistence: cursorPersistence,
+            deployment: marmotDeploymentWhiteNoise()
+        )
+    #else
+        return try Marmot.newWithCursorPersistence(
+            rootPath: rootPath, relayUrls: relayUrls, cursorPersistence: cursorPersistence
+        )
+    #endif
 }

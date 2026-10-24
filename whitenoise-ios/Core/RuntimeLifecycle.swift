@@ -600,6 +600,9 @@ final class RuntimeLifecycle {
     }
 
     func closeForAppErasure() async throws {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            try await appState?.accountStore.cancelDeviceLinking()
+        #endif
         if let client {
             try await client.marmot.shutdownAndClose()
             self.client = nil
@@ -607,7 +610,21 @@ final class RuntimeLifecycle {
         runtimeSuspendedForBackground = true
     }
 
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private func cancelDeviceLinkingBeforeRuntimeClose() async {
+            do {
+                try await appState?.accountStore.cancelDeviceLinking(preservingConversationState: true)
+            } catch {
+                // The exact retiring scope retains its cleanup error for explicit retry.
+                // Terminal Core shutdown must still release the shared SQLite lock.
+            }
+        }
+    #endif
+
     private func shutdownAndReleaseCurrentClient() async {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            await cancelDeviceLinkingBeforeRuntimeClose()
+        #endif
         if let appState {
             appState.conversationOpenPerformance?.finish(.cancelled, recorder: appState.productAnalytics)
             appState.conversationOpenPerformance?.accountContextReady(

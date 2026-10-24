@@ -1,0 +1,143 @@
+{
+  "base": "1e38aa86db6fed3f847f0673f453e2eb9118146a",
+  "sdk_source": "e6b0e9c159b632b8c07eb68f12f46c3bc930699c",
+  "sdk_local_original_stash": "f9f8e86afff63edf234e3708f2cc07b2c4f43e7c",
+  "sdk_m5_original_stash": "28066292656a71156ec521347e428981f58ad136",
+  "red_source_stash": "78aa4aa35cc4eae16a76e9fb3c8dd75072768180",
+  "green_source_stash": "f4594fd2a75ac26695a245d50c203ea7dfae508b",
+  "preserved_harness_runs": {
+    "red_v1": "zero tests: transfer-path mistake; unchanged RED corrected to actual target",
+    "red_v2": "zero tests: private phase setter in fixture; only corrected to existing setPhase method"
+  },
+  "runs": {
+    "red": {
+      "source_base": "1e38aa86db6fed3f847f0673f453e2eb9118146a",
+      "source_inputs": 802,
+      "input_manifest_sha256": "2d72114b2401535ef0ee7d0a0388bdf82727c51572662e109542af01661a3e2d",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 65,
+      "seconds": 105.79,
+      "log_sha256": "b35b344b921a66ab5c8c65ce20c169f5e80d3f441f6047352f57dddff0fa5053",
+      "physical_phone_changed": false,
+      "scope": "Original enrollment/approval models; generated controls with actual account/runtime lifecycle, no UI or real enrollment acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 8,
+        "passedTests": 2,
+        "failedTests": 6,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Expectation failed: original.isWaiting\noriginal \u2192 whitenoise_iosTests.(unknown context at $1219c4324).ScopeApproval\nisWaiting \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 6,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/actualAccountExitInvalidatesDelayedApprovalSnapshot()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/actualAccountExitInvalidatesDelayedApprovalSnapshot()",
+          "testName": "actualAccountExitInvalidatesDelayedApprovalSnapshot()"
+        },
+        {
+          "failureText": "Expectation failed: expected error \".DeviceLinkingRuntimeUnavailable\" of type MarmotKitError, but \".DeviceLinkingNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.DeviceLinkingRuntimeUnavailable",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 7,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/cancellationKeepsExactFailedOriginalCleanupRetryable()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/cancellationKeepsExactFailedOriginalCleanupRetryable()",
+          "testName": "cancellationKeepsExactFailedOriginalCleanupRetryable()"
+        },
+        {
+          "failureText": "Expectation failed: original.isWaiting\noriginal \u2192 whitenoise_iosTests.(unknown context at $1219c427c).EnrollmentSession\nisWaiting \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/delayedPacketCannotEscapeActualAppAccountReplacementAndReturn()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/delayedPacketCannotEscapeActualAppAccountReplacementAndReturn()",
+          "testName": "delayedPacketCannotEscapeActualAppAccountReplacementAndReturn()"
+        },
+        {
+          "failureText": "Expectation failed: original.isWaiting\noriginal \u2192 whitenoise_iosTests.(unknown context at $1219c427c).EnrollmentSession\nisWaiting \u2192 false",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 4,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/delayedPacketCannotEscapeSuspensionOrSameAccountRestart(restart:)",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/delayedPacketCannotEscapeSuspensionOrSameAccountRestart(restart:)",
+          "testName": "delayedPacketCannotEscapeSuspensionOrSameAccountRestart(restart:)"
+        },
+        {
+          "failureText": "Caught error: .DeviceLinkingNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 5,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/explicitOriginalApprovalNeverComesFromRefreshOrDecode()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/explicitOriginalApprovalNeverComesFromRefreshOrDecode()",
+          "testName": "explicitOriginalApprovalNeverComesFromRefreshOrDecode()"
+        },
+        {
+          "failureText": "Caught error: .DeviceLinkingNotReady",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 3,
+          "testIdentifierString": "DeviceEnrollmentViewModelTests/explicitSessionActionsForwardCapturedRevisionBytesAndError()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/DeviceEnrollmentViewModelTests/explicitSessionActionsForwardCapturedRevisionBytesAndError()",
+          "testName": "explicitSessionActionsForwardCapturedRevisionBytesAndError()"
+        }
+      ]
+    },
+    "green": {
+      "source_base": "1e38aa86db6fed3f847f0673f453e2eb9118146a",
+      "source_inputs": 802,
+      "input_manifest_sha256": "737e77d0a5da8b77987cf5ebb6b6c448911498b9af4ec51fe6588e35106cdb58",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 75.16,
+      "log_sha256": "570b964141fb22aa8bb77e6b8801c2edaa98a53bfbfc65fafae703fe30f4ba0a",
+      "physical_phone_changed": false,
+      "scope": "Original enrollment/approval models; generated controls with actual account/runtime lifecycle, no UI or real enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 8,
+        "passedTests": 8,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    },
+    "affected": {
+      "source_base": "1e38aa86db6fed3f847f0673f453e2eb9118146a",
+      "source_inputs": 802,
+      "input_manifest_sha256": "737e77d0a5da8b77987cf5ebb6b6c448911498b9af4ec51fe6588e35106cdb58",
+      "profile": "local-e6/experimentalflag1/Staging",
+      "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+      "exit_code": 0,
+      "seconds": 8.32,
+      "log_sha256": "9c39e7aedc6ec5412843342e54eea89e0f7edca4e73ae1539d14cb52ab64a95a",
+      "physical_phone_changed": false,
+      "scope": "Original enrollment/approval models; generated controls with actual account/runtime lifecycle, no UI or real enrollment acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 53,
+        "passedTests": 53,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "checks": [
+    "scoped swift-format strict with Mac4space120 configuration",
+    "SwiftLint0.63.2 scoped strict",
+    "git diff --check"
+  ],
+  "scope": "Original session and independent approval model actions; generated protocol controls through actual AppState/AccountStore lifecycle with isolated runtime storage.",
+  "limits": [
+    "No UI or advertised capability change",
+    "No actual native enrollment/ABC or selected-chat acceptance",
+    "B e6 snapshot provides revision/phase only; authoritative identity review API remains separate",
+    "No SDK artifacts, physical phone, production app, Cargo or publication changes",
+    "Focused affected qualification; no full PR claim"
+  ],
+  "tested_source_sha256": {
+    "whitenoise-ios/Core/AccountStore.swift": "3349c973d9ffd21d70cd2e4e43a1196d0add810dee2168a972495b2cd453fcff",
+    "whitenoise-ios/Session/DeviceLinkingFactory.swift": "1bc44dd610f6e69361f6fb6511528fb5b8287295820864e5d02f26018d2cc9f1",
+    "whitenoise-ios/Settings/DeviceEnrollmentViewModel.swift": "a625c8b6e44f7f9a7617dd81506c9a097b3d7ff2f25bfa180d0670d7c9d694f7",
+    "whitenoise-ios/Settings/DeviceEnrollmentApprovalViewModel.swift": "38d23f0bf24cc5feb08512d4f4f39b76a79130a10334c457ee998d082ee72315",
+    "whitenoise-iosTests/DeviceEnrollmentViewModelTests.swift": "134b9f21e4d6628028b714d4ad9630c9c375c6e160d641e0797f86f31824817c"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "base_source": "8288487b4188012877d14143bdafff5c217f8385",
+  "sdk": "14336e1f0c4067e8e13aff63877241ee29109c37",
+  "reported_regression": "User reports physical iPhone lock then return can replace verification controls with unavailable text.",
+  "cause": "The state-owned verification model can capture no client during runtime suspension. Destination identity previously followed account ownership only; restored runtime does not replace that captured model.",
+  "change": "Wait for a live runtime generation before presenting the model; key model presentation to both runtime generation and account ownership. Preserve background cleanup and retired original refusal.",
+  "tests": {
+    "passed": 53,
+    "failed": 0,
+    "skipped": 0,
+    "suites": 4,
+    "log_sha256": "edbc536abe678dfef672aa36b43d7e8d0c15ac5f978b113e7153c588ffa1e7fc",
+    "summary_sha256": "611471e3c60b2b5b3c8bc0d5268e64183641cb670ca228a3ddd5f1e9282cb12b"
+  },
+  "lint": "Pinned SwiftLint 0.63.2, scoped file passed strict lint.",
+  "limit": "Related tests establish existing ownership and teardown behavior, not rendered recovery on the physical phone. The reported lock/reopen journey still needs verification in the signed updated app. Unfinished original pairing is not resumed after native retirement."
+}

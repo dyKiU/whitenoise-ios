@@ -1,0 +1,238 @@
+{
+  "base": "217eccd584226c628c552b81fa013bfed66411d8",
+  "branch": "codex/ios-history-recipient-custody",
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "sdk4_preservation": {
+    "local": "c8360f803a53b1b1c39411c4c1f7963c9e88962a",
+    "m5": "202428397823bcb394658bdb86a8368fb72a68a5"
+  },
+  "source_candidates": {
+    "red": "ca2d88c3e0b6678323e4d02780eb202dc606ae0c",
+    "initial_green": "a4479bd11fee0f0141cfe5049d855bd5d04ef1a3",
+    "final": "6d31707a645d30f841b537796640b38c96626bda"
+  },
+  "tested_path_sha256": {
+    "whitenoise-ios/Core/AccountStore.swift": "04c25eb8d5699c53b5ecbf423f900dd0407bc91b534a94d06749d6e51fd2455e",
+    "whitenoise-ios/Core/MarmotClient.swift": "3e8a12685d2712561d2416171180b5d39a6752f71da881359b8433429d62d429",
+    "whitenoise-ios/Session/HistoryConsentAccountLifetime.swift": "4923ecebfdd2631ef37bd3b53b4fb3ee8df270634160a33cac1d4637482674de",
+    "whitenoise-ios/Session/HistoryConsentFactory.swift": "77ed8a23961712717b907d3b00bca70aea10ee98cf81f8ccbe6273cb5360a994",
+    "whitenoise-ios/Session/NativeHistoryConsentScope.swift": "ff752df41d2744b3427346547d82796f38639b3fbf386f47d8fed18b0cb917cc",
+    "whitenoise-iosTests/NativeHistoryConsentScopeTests.swift": "2c7208c297458c41e9c3fd66972d1fadf5e42621dbd4b952bc598ee862be2c89"
+  },
+  "runs": {
+    "red-v1": {
+      "remote_prefix": "/Users/pj/project/build/results/ios-history-recipient-custody-red-v1",
+      "local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-history-recipient-custody-red-v1",
+      "result": {
+        "source_base": "217eccd584226c628c552b81fa013bfed66411d8",
+        "source_inputs": 846,
+        "input_manifest_sha256": "c6f6874ff90a85bb7083aa420c0d49c63f641b3bcb34a0542ab83a794e64f169",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 4.86,
+        "log_sha256": "1df36bda094e0bd95165434edceb830cb5e40a69c475135b293887043a1837fa",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection"
+      }
+    },
+    "red-v2": {
+      "remote_prefix": "/Users/pj/project/build/results/ios-history-recipient-custody-red-v2",
+      "local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-history-recipient-custody-red-v2",
+      "result": {
+        "source_base": "217eccd584226c628c552b81fa013bfed66411d8",
+        "source_inputs": 846,
+        "input_manifest_sha256": "c6f6874ff90a85bb7083aa420c0d49c63f641b3bcb34a0542ab83a794e64f169",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 7.65,
+        "log_sha256": "85359e0e8a5f1986b98ff4030cd8608a20fbbc185aa55710b2f9d088072c4ff1",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection"
+      }
+    },
+    "red-v3": {
+      "remote_prefix": "/Users/pj/project/build/results/ios-history-recipient-custody-red-v3",
+      "local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-history-recipient-custody-red-v3",
+      "result": {
+        "source_base": "217eccd584226c628c552b81fa013bfed66411d8",
+        "source_inputs": 846,
+        "input_manifest_sha256": "c6f6874ff90a85bb7083aa420c0d49c63f641b3bcb34a0542ab83a794e64f169",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 11.29,
+        "log_sha256": "1d429478e0621ffb04bf4adee28b80e8ad917d0928388c655a7639646ba8eb1f",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection"
+      }
+    },
+    "red-v4": {
+      "remote_prefix": "/Users/pj/project/build/results/ios-history-recipient-custody-red-v4",
+      "local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-history-recipient-custody-red-v4",
+      "result": {
+        "source_base": "217eccd584226c628c552b81fa013bfed66411d8",
+        "source_inputs": 846,
+        "input_manifest_sha256": "c6f6874ff90a85bb7083aa420c0d49c63f641b3bcb34a0542ab83a794e64f169",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 124.2,
+        "log_sha256": "610c0f9fd7946ac4eb4ee551a66f4fc12db1a0852437aebb6f7b86f7977b49c4",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Failed",
+          "totalTestCount": 5,
+          "passedTests": 0,
+          "failedTests": 5,
+          "skippedTests": 0
+        },
+        "test_failures": [
+          {
+            "failureText": "Caught error: .HistoryTransferNotReady",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 2,
+            "testIdentifierString": "NativeHistoryConsentScopeTests/actualAccountFactoryRetainsBatchAndReusesOriginalRows()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryConsentScopeTests/actualAccountFactoryRetainsBatchAndReusesOriginalRows()",
+            "testName": "actualAccountFactoryRetainsBatchAndReusesOriginalRows()"
+          },
+          {
+            "failureText": "Expectation failed: expected error \".HistoryTransferClosed\" of type MarmotKitError, but \".HistoryTransferNotReady\" of type MarmotKitError was thrown instead: MarmotKitError.HistoryTransferClosed",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 5,
+            "testIdentifierString": "NativeHistoryConsentScopeTests/cancelledOriginalCannotApproveAgain()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryConsentScopeTests/cancelledOriginalCannotApproveAgain()",
+            "testName": "cancelledOriginalCannotApproveAgain()"
+          },
+          {
+            "failureText": "Caught error: .HistoryTransferNotReady",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 4,
+            "testIdentifierString": "NativeHistoryConsentScopeTests/explicitApprovalForwardsDisplayedRevisionToOriginal()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryConsentScopeTests/explicitApprovalForwardsDisplayedRevisionToOriginal()",
+            "testName": "explicitApprovalForwardsDisplayedRevisionToOriginal()"
+          },
+          {
+            "failureText": "Caught error: .HistoryTransferNotReady",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 1,
+            "testIdentifierString": "NativeHistoryConsentScopeTests/refreshRetainsExactReviewWithoutImplicitApproval()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryConsentScopeTests/refreshRetainsExactReviewWithoutImplicitApproval()",
+            "testName": "refreshRetainsExactReviewWithoutImplicitApproval()"
+          },
+          {
+            "failureText": "Caught error: .HistoryTransferNotReady",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 3,
+            "testIdentifierString": "NativeHistoryConsentScopeTests/sdkApprovalErrorIsPreserved()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryConsentScopeTests/sdkApprovalErrorIsPreserved()",
+            "testName": "sdkApprovalErrorIsPreserved()"
+          }
+        ]
+      }
+    },
+    "green-v1": {
+      "remote_prefix": "/Users/pj/project/build/results/ios-history-recipient-custody-green-v1",
+      "local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-history-recipient-custody-green-v1",
+      "result": {
+        "source_base": "217eccd584226c628c552b81fa013bfed66411d8",
+        "source_inputs": 847,
+        "input_manifest_sha256": "936b6481f0c75fc0786a3b0afbf50c766be91763166e399f0b3cc9e86d5199bd",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 101.92,
+        "log_sha256": "9a9966479d6d3496e5b2e25195f464db7d4c0fb21fecaee772233e872094158e",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Failed",
+          "totalTestCount": 13,
+          "passedTests": 12,
+          "failedTests": 1,
+          "skippedTests": 0
+        },
+        "test_failures": [
+          {
+            "failureText": "Expectation failed: expected error \".HistoryTransferNotReady\" of type MarmotKitError, but \".HistoryTransferRuntimeUnavailable\" of type MarmotKitError was thrown instead: MarmotKitError.HistoryTransferNotReady",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 13,
+            "testIdentifierString": "NativeHistoryConsentScopeTests/sdkMissingAccountRemainsTypedAndCreatesNoAccount()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/NativeHistoryConsentScopeTests/sdkMissingAccountRemainsTypedAndCreatesNoAccount()",
+            "testName": "sdkMissingAccountRemainsTypedAndCreatesNoAccount()"
+          }
+        ]
+      }
+    },
+    "green-v2": {
+      "remote_prefix": "/Users/pj/project/build/results/ios-history-recipient-custody-green-v2",
+      "local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-history-recipient-custody-green-v2",
+      "result": {
+        "source_base": "217eccd584226c628c552b81fa013bfed66411d8",
+        "source_inputs": 847,
+        "input_manifest_sha256": "24007ee5273e302475a9916b0ece3c8eb2b1ea19fa7eee1b375563f49c02c39c",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 0,
+        "seconds": 18.74,
+        "log_sha256": "147f413b60e11f2e9e58e136fd20364a999dc49b2a7367ef69a9b14e8317170e",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 13,
+          "passedTests": 13,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      }
+    },
+    "affected-v3": {
+      "remote_prefix": "/Users/pj/project/build/results/ios-history-recipient-custody-affected-v3",
+      "local_prefix": "/Users/pjaeckel/project/whitenoisechat-openclaw/build/results/ios-history-recipient-custody-affected-v3",
+      "result": {
+        "source_base": "217eccd584226c628c552b81fa013bfed66411d8",
+        "source_inputs": 847,
+        "input_manifest_sha256": "24007ee5273e302475a9916b0ece3c8eb2b1ea19fa7eee1b375563f49c02c39c",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 0,
+        "seconds": 8.1,
+        "log_sha256": "4ee0184f8baced4d25027275546e052de82f3fbffa84f8579f2b8597bddc8222",
+        "physical_phone_changed": false,
+        "scope": "Original history recipient custody and account/runtime lifetime; no UI or native import acceptance",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 92,
+          "passedTests": 92,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      }
+    }
+  },
+  "checks": {
+    "canonical_scoped_swift_format": 0,
+    "strict_scoped_swiftlint_0_63_2": 0,
+    "git_diff_check": 0
+  },
+  "interpretation": [
+    "RED v1-v3 zero-test compile failures are exact stale FFI PCM cohorts; only diagnosed idle modules retired, no broad cache clean.",
+    "RED v4 is missing-host-composition default-deny semantic 0/5. Initial GREEN 12/13 retained: missing-account fixture expected NotReady but actual existing SDK error is RuntimeUnavailable. Only this expectation corrected.",
+    "Final GREEN 13/13 and affected92/92 use identical847 inputs. Parameterized destructive exit test exercises signOut/wipe/explicit close; XCResult reports the parameterized test as one.",
+    "Initial reports inherited an obsolete reader scope text from the runner template; actual command/test identifiers are history recipient custody. Affected report label corrected.",
+    "Original snapshot review cannot recreate SDK authority. Native UUID identifies held rows only. Immutable group/source/recipient/cutoff/count/bytes/fragments checked; displayed revision is passed only to exact original approve.",
+    "Original SDK cancel is synchronous nonthrowing. Late ignored factory is retained negative custody and returns NotReady until exact late originals cancelled. Destructive account exit refuses; scene terminal suspension releases runtime and never adopts late originals.",
+    "Repeated listing reuses held nonempty batch; empty or fully cancelled batch may reacquire. New arrivals while an active nonempty batch is held remain a later liveness/explicit-refresh concern.",
+    "Tests use isolated protocol-original doubles for lifecycle, actual AppState/AccountStore/runtime routing and one actual missing-account SDK call; no genuine history import/approval/native UI/fullPR qualification is claimed."
+  ],
+  "limits": [
+    "Recipient pane/localization not yet implemented. Source-picker query awaits matched SDK.",
+    "No physical install, artifact rebuild, Core/Cargo work, production account access, publication or integration. Hosted tests may replace only the dedicated development simulator test host.",
+    "Only this proof is added after final source freeze; source/runtime/test bytes are unchanged."
+  ]
+}

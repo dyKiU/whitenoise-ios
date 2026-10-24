@@ -86,14 +86,14 @@ struct NotificationSettingsView: View {
                         } label: {
                             Label("Request APNS Token", systemImage: "antenna.radiowaves.left.and.right")
                         }
-                        .disabled(model.isSaving)
+                        .disabled(model.isSaving || !appState.notifications.remoteNotificationsAvailable)
                     } else {
                         Button {
                             Task { await model.refreshApnsToken(using: appState) }
                         } label: {
                             Label("Refresh APNS Token", systemImage: "arrow.clockwise.circle")
                         }
-                        .disabled(!model.canRefreshApnsToken)
+                        .disabled(!model.canRefreshApnsToken || !appState.notifications.remoteNotificationsAvailable)
 
                         Button {
                             Task { await model.syncNativeRegistration(using: appState) }

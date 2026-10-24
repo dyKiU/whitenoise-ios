@@ -1,8 +1,8 @@
-import SwiftUI
-import UIKit
-import MarmotKit
 import Contacts
 import CoreLocation
+import MarmotKit
+import SwiftUI
+import UIKit
 import UniformTypeIdentifiers
 
 enum TimelineBottom {
@@ -225,11 +225,12 @@ enum TimelineBottomScrollCoordinator {
         hasMoreAfter: Bool,
         isPaging: Bool
     ) -> UnitPoint? {
-        didFinishInitialPositioning && shouldExecute(
-            reason: .layoutChange, isUserScrolling: isUserScrolling,
-            userMovedAwayFromBottom: userMovedAwayFromBottom,
-            hasMoreAfter: hasMoreAfter, isPaging: isPaging
-        ) ? .bottom : nil
+        didFinishInitialPositioning
+            && shouldExecute(
+                reason: .layoutChange, isUserScrolling: isUserScrolling,
+                userMovedAwayFromBottom: userMovedAwayFromBottom,
+                hasMoreAfter: hasMoreAfter, isPaging: isPaging
+            ) ? .bottom : nil
     }
 
     static func shouldFollowLayoutChange(
@@ -284,7 +285,8 @@ enum ConversationSendPreparation {
         return ConversationSendPayload(viewModel: viewModel, text: text, attachments: attachments)
     }
 
-    static func removeOversizedAttachments(from mediaDrafts: inout [MediaDraftAttachment]) -> OutgoingSendSizeRejection? {
+    static func removeOversizedAttachments(from mediaDrafts: inout [MediaDraftAttachment]) -> OutgoingSendSizeRejection?
+    {
         let oversized = OutgoingSendSizePolicy.oversizedAttachmentIDs(in: mediaDrafts)
         guard !oversized.isEmpty else { return nil }
         mediaDrafts.removeAll { oversized.contains($0.id) }
@@ -419,8 +421,8 @@ enum TimelineUnreadDivider {
         firstUnreadMessageIdHex: String?
     ) -> Bool {
         guard let firstUnreadMessageIdHex,
-              !firstUnreadMessageIdHex.isEmpty,
-              case .message(let record, _) = item.kind
+            !firstUnreadMessageIdHex.isEmpty,
+            case .message(let record, _) = item.kind
         else { return false }
         return record.messageIdHex == firstUnreadMessageIdHex
     }
@@ -458,7 +460,8 @@ nonisolated struct ConversationChromePresentation: Equatable {
         initialTitle: String?,
         initialMemberCount: Int?
     ) -> ConversationChromePresentation {
-        let sanitizedName = ContentSanitizer.groupName(initialTitle)
+        let sanitizedName =
+            ContentSanitizer.groupName(initialTitle)
             ?? ContentSanitizer.groupName(chat.name)
         // A DM (unnamed 2-person) shows just the contact's name — no member
         // count — so don't flash one in the pre-roster initial chrome either.
@@ -551,7 +554,7 @@ enum ConversationInvitePresentation {
     /// preview so both resolve and name the inviter the same way.
     nonisolated static func normalizedInviterAccountId(_ value: String?) -> String? {
         guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
-              !value.isEmpty
+            !value.isEmpty
         else { return nil }
         return value
     }
@@ -586,6 +589,11 @@ struct ConversationView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ConversationViewModel?
     @State private var isConversationOnScreen = false
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private var automaticConversation: AccountConversationViewModel? {
+            appState.accountStore.automaticConversationModels[chat.groupIdHex]
+        }
+    #endif
     @State private var draft: String = ""
     @State private var didRestorePersistedDraft = false
     @State private var composerChangedBeforeDraftRestore = false
@@ -882,12 +890,21 @@ struct ConversationView: View {
                     onBegin: beginPopTransition,
                     onFinish: finishPopTransition
                 )
-                    .accessibilityHidden(true)
+                .accessibilityHidden(true)
             }
             .compatibleTopSafeAreaBar {
                 VStack(spacing: 0) {
                     if viewModel?.search.isActive != true {
                         conversationHeaderBar
+                        #if WN_EXPERIMENTAL_DEVICE_SYNC
+                            SynchronizedHistoryConversationEntry(
+                                makeModel: { try appState.makeSynchronizedHistoryModel(groupIdHex: chat.groupIdHex) },
+                                releaseModel: { appState.releaseSynchronizedHistoryModel($0, groupIdHex: chat.groupIdHex) }
+                            )
+                            .id(SynchronizedHistoryConversationOwner(
+                                accountEpoch: appState.accountStore.deviceLinkingOwnershipIdentity,
+                                runtimeGeneration: appState.runtimeGeneration, groupIdHex: chat.groupIdHex))
+                        #endif
                     }
                     searchBarInset
                     if let viewModel {
@@ -954,14 +971,24 @@ struct ConversationView: View {
                 MessageInfoSheet(record: target.record, status: target.status, conversation: viewModel)
                     .appAppearance()
             }
-            .alert("Draft changed", isPresented: Binding(
-                get: { draftAccountRef.map { appState.conversationDraftStore.conflictedKeys.contains(ConversationDraftKey(accountRef: $0, groupIdHex: chat.groupIdHex)) } ?? false },
-                set: { _ in }
-            )) {
+            .alert(
+                "Draft changed",
+                isPresented: Binding(
+                    get: {
+                        draftAccountRef.map {
+                            appState.conversationDraftStore.conflictedKeys.contains(
+                                ConversationDraftKey(accountRef: $0, groupIdHex: chat.groupIdHex))
+                        } ?? false
+                    },
+                    set: { _ in }
+                )
+            ) {
                 Button("Keep my draft") { resolveDraftConflict(keepLocal: true) }
                 Button("Use saved draft", role: .destructive) { resolveDraftConflict(keepLocal: false) }
             } message: {
-                Text("The saved draft changed while you were editing. Your text is preserved. Choose which version to keep.")
+                Text(
+                    "The saved draft changed while you were editing. Your text is preserved. Choose which version to keep."
+                )
             }
             .sheet(item: $reactionDetailsTarget) { target in
                 if let viewModel {
@@ -1005,7 +1032,7 @@ struct ConversationView: View {
                             return try await viewModel.forwardDestinations()
                         }
                     )
-                        .appAppearance()
+                    .appAppearance()
                 }
             }
             .sheet(item: $forwardSelectionTarget) { target in
@@ -1065,10 +1092,11 @@ struct ConversationView: View {
             }
             .sheet(item: $editHistoryTarget) { target in
                 if let viewModel {
-                    EditHistorySheet(rows: [], editCount: viewModel.editCount(for: target.record.messageIdHex)) { before in
+                    EditHistorySheet(rows: [], editCount: viewModel.editCount(for: target.record.messageIdHex)) {
+                        before in
                         try await viewModel.loadEditHistory(messageID: target.record.messageIdHex, before: before)
                     }
-                        .appAppearance()
+                    .appAppearance()
                 }
             }
             .confirmationDialog(
@@ -1099,13 +1127,14 @@ struct ConversationView: View {
                     messageDeleteSupportingText(for: target.record, viewModel: viewModel)
                 }
             }
-            .modifier(FailedSendDialogModifier(
-                target: $failedSendTarget,
-                canRetry: { viewModel?.canRetryFailedSend(rowId: $0) ?? false },
-                canDiscard: { viewModel?.canDiscardFailedSend(rowId: $0) ?? false },
-                onRetry: { rowId in Task { await viewModel?.retryFailedSend(rowId: rowId) } },
-                onDiscard: { viewModel?.discardFailedSend(rowId: $0) }
-            ))
+            .modifier(
+                FailedSendDialogModifier(
+                    target: $failedSendTarget,
+                    canRetry: { viewModel?.canRetryFailedSend(rowId: $0) ?? false },
+                    canDiscard: { viewModel?.canDiscardFailedSend(rowId: $0) ?? false },
+                    onRetry: { rowId in Task { await viewModel?.retryFailedSend(rowId: rowId) } },
+                    onDiscard: { viewModel?.discardFailedSend(rowId: $0) }
+                ))
     }
 
     private var conversationAttachmentSheets: some View {
@@ -1127,7 +1156,8 @@ struct ConversationView: View {
                     selectionLimit: remainingMediaDraftSlots,
                     onSelection: addPhotoLibrarySelections,
                     onError: { error in
-                        appState.present(UserFacingError.toast(title: L10n.string("Couldn't add attachment"), error: error))
+                        appState.present(
+                            UserFacingError.toast(title: L10n.string("Couldn't add attachment"), error: error))
                     },
                     onDismiss: {
                         showPhotoLibraryPicker = false
@@ -1204,11 +1234,13 @@ struct ConversationView: View {
             .task(id: viewModel?.composerLoadingTaskID) {
                 await viewModel?.waitForComposerLoadingGracePeriod()
             }
-            .task(id: ConversationRuntimeStartToken(
-                accountRef: appState.activeAccountRef,
-                runtimeGeneration: appState.runtimeGeneration,
-                isRuntimeWarmingUp: appState.isRuntimeWarmingUp
-            )) {
+            .task(
+                id: ConversationRuntimeStartToken(
+                    accountRef: appState.activeAccountRef,
+                    runtimeGeneration: appState.runtimeGeneration,
+                    isRuntimeWarmingUp: appState.isRuntimeWarmingUp
+                )
+            ) {
                 if viewModel == nil {
                     viewModel = ConversationViewModel(
                         appState: appState,
@@ -1220,7 +1252,8 @@ struct ConversationView: View {
                         onChatListRowUpdated: onChatListRowUpdated
                     )
                 }
-                viewModel?.openingMessageId = initialTargetMessageIdHex == initialUnreadMessageIdHex ? nil : initialTargetMessageIdHex
+                viewModel?.openingMessageId =
+                    initialTargetMessageIdHex == initialUnreadMessageIdHex ? nil : initialTargetMessageIdHex
                 let viewport = conversationViewport
                 viewModel?.windowWillChange = { [weak model = viewModel] snapshot in
                     guard let model, model.viewportIntent != .followingLatest else {
@@ -1241,20 +1274,24 @@ struct ConversationView: View {
                 // withheld from every conversation, not just a direct chat.
                 await blockedUsers.run(using: appState, target: blockedPeerTarget)
             }
-            .task(id: BlockedAuthorsToken(
-                accountIdHexes: blockedUsers.blockedAccountIds,
-                isViewModelReady: viewModel != nil
-            )) {
+            .task(
+                id: BlockedAuthorsToken(
+                    accountIdHexes: blockedUsers.blockedAccountIds,
+                    isViewModelReady: viewModel != nil
+                )
+            ) {
                 viewModel?.applyBlockedAuthors(blockedUsers.blockedAccountIds)
             }
-            .task(id: ConversationDraftLoadToken(
-                accountRef: draftAccountRef,
-                groupIdHex: chat.groupIdHex,
-                isViewModelReady: viewModel != nil,
-                runtimeGeneration: appState.runtimeGeneration,
-                isRuntimeReady: isRuntimeReadyForDraftLoad,
-                isEditingMessage: editSession != nil
-            )) {
+            .task(
+                id: ConversationDraftLoadToken(
+                    accountRef: draftAccountRef,
+                    groupIdHex: chat.groupIdHex,
+                    isViewModelReady: viewModel != nil,
+                    runtimeGeneration: appState.runtimeGeneration,
+                    isRuntimeReady: isRuntimeReadyForDraftLoad,
+                    isEditingMessage: editSession != nil
+                )
+            ) {
                 _ = await ConversationDraftLoadRetry.run { isFinalAttempt in
                     guard !didRestorePersistedDraft, isRuntimeReadyForDraftLoad, editSession == nil else { return nil }
                     return await restorePersistedDraft(surfacesTransientFailures: isFinalAttempt)
@@ -1262,7 +1299,8 @@ struct ConversationView: View {
             }
             .task(id: appState.groupRecoveryUpdate) {
                 guard let update = appState.groupRecoveryUpdate, update.groupID == chat.groupIdHex,
-                      update.accountID == appState.activeAccount?.accountIdHex else { return }
+                    update.accountID == appState.activeAccount?.accountIdHex
+                else { return }
                 await viewModel?.recovery.refresh(using: appState, groupID: chat.groupIdHex)
             }
             .task(id: appState.groupMembershipUpdate) {
@@ -1390,8 +1428,9 @@ struct ConversationView: View {
 
     private var blockedPeerNpub: String? {
         guard viewModel?.groupDisplay.isDirectMessage == true,
-              let peer = viewModel?.otherMember,
-              blockedUsers.isConfirmedBlocked(peer, accountRef: appState.activeAccountRef) else { return nil }
+            let peer = viewModel?.otherMember,
+            blockedUsers.isConfirmedBlocked(peer, accountRef: appState.activeAccountRef)
+        else { return nil }
         return IdentityPresentation.canonicalNpub(accountIdHex: peer)
     }
 
@@ -1505,8 +1544,10 @@ struct ConversationView: View {
         return HStack(spacing: 10) {
             if batchDeleteInFlight {
                 ProgressView()
-                    .frame(width: WNSecondaryButtonStyle.Metrics.circleDiameter,
-                           height: WNSecondaryButtonStyle.Metrics.circleDiameter)
+                    .frame(
+                        width: WNSecondaryButtonStyle.Metrics.circleDiameter,
+                        height: WNSecondaryButtonStyle.Metrics.circleDiameter
+                    )
                     .wnLiftedChrome(in: .circle)
             } else {
                 WNIconButton(title: "Delete selected messages", systemImage: "trash") {
@@ -1606,10 +1647,12 @@ struct ConversationView: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(L10n.string("Editing message"))
                     .font(.caption.weight(.semibold))
-                Text(ContentSanitizer.compactSingleLine(viewModel.displayBody(of: session.message), maxLength: 100) ?? "")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                Text(
+                    ContentSanitizer.compactSingleLine(viewModel.displayBody(of: session.message), maxLength: 100) ?? ""
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
             }
             Spacer(minLength: 8)
             Button(action: cancelEdit) {
@@ -1668,7 +1711,8 @@ struct ConversationView: View {
                     GroupAvatarBubble(
                         groupIdHex: viewModel.group.groupIdHex,
                         imageHashHex: viewModel.selectedImageHash,
-                        seed: viewModel.conversationWindow != nil ? viewModel.selectedAvatarSeed
+                        seed: viewModel.conversationWindow != nil
+                            ? viewModel.selectedAvatarSeed
                             : initialAvatarSeed ?? viewModel.selectedAvatarSeed,
                         title: chrome.title,
                         pictureURL: viewModel.selectedAvatarURL,
@@ -1719,10 +1763,11 @@ struct ConversationView: View {
             .foregroundStyle(.secondary)
             .lineLimit(1)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(L10n.formatted(
-                "Disappearing messages: %@",
-                GroupRetentionPresentation.label(seconds: seconds)
-            ))
+            .accessibilityLabel(
+                L10n.formatted(
+                    "Disappearing messages: %@",
+                    GroupRetentionPresentation.label(seconds: seconds)
+                ))
         case .subtitle(let value):
             // No placeholder line when there is no subtitle (direct messages):
             // reserving the space pushes the name off vertical center.
@@ -1759,6 +1804,105 @@ struct ConversationView: View {
 
     // MARK: - Timeline
 
+    private var hasAutomaticMessages: Bool {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            !AutomaticTranscriptPresentation.rows(
+                ordinary: [], paired: automaticConversation?.pairedMessages ?? [],
+                blockedAuthors: blockedUsers.blockedAccountIds,
+                now: UInt64(max(0, Date().timeIntervalSince1970))
+            ).isEmpty
+        #else
+            false
+        #endif
+    }
+
+    private func renderedTimelineTail(_ viewModel: ConversationViewModel) -> String? {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            automaticTimelineRows(viewModel).last?.id
+        #else
+            viewModel.timeline.last?.id
+        #endif
+    }
+
+    #if WN_EXPERIMENTAL_DEVICE_SYNC
+        private func automaticTimelineRows(_ viewModel: ConversationViewModel) -> [AutomaticTranscriptRow] {
+            AutomaticTranscriptPresentation.rows(
+                ordinary: viewModel.timeline, paired: automaticConversation?.pairedMessages ?? [],
+                blockedAuthors: blockedUsers.blockedAccountIds,
+                now: UInt64(max(0, Date().timeIntervalSince1970)))
+        }
+    #endif
+
+    @ViewBuilder
+    private func renderedTimelineRows(
+        viewModel: ConversationViewModel, showsSenderIdentity: Bool, dayHeaders: [String: TimelineDateHeading]
+    ) -> some View {
+        #if WN_EXPERIMENTAL_DEVICE_SYNC
+            ForEach(automaticTimelineRows(viewModel)) { entry in
+                switch entry {
+                case .ordinary(let item):
+                    ordinaryTimelineRow(
+                        item, viewModel: viewModel,
+                        showsSenderIdentity: showsSenderIdentity, dayHeaders: dayHeaders)
+                case .paired(let message):
+                    AutomaticPairedMessageRow(message: message)
+                }
+            }
+        #else
+            ForEach(viewModel.timeline) { item in
+                ordinaryTimelineRow(
+                    item, viewModel: viewModel,
+                    showsSenderIdentity: showsSenderIdentity, dayHeaders: dayHeaders)
+            }
+        #endif
+    }
+
+    @ViewBuilder
+    private func ordinaryTimelineRow(
+        _ item: TimelineItem, viewModel: ConversationViewModel,
+        showsSenderIdentity: Bool, dayHeaders: [String: TimelineDateHeading]
+    ) -> some View {
+        if let heading = dayHeaders[item.id] {
+            TimelineInlineDateHeader(heading: heading)
+        }
+        if TimelineUnreadDivider.shouldShow(
+            before: item,
+            firstUnreadMessageIdHex: suppressesInitialUnreadDivider
+                ? nil
+                : viewModel.initialWindowUnreadMessageId
+        ) {
+            UnreadMessagesDivider()
+                .id(unreadDividerID(for: viewModel.initialWindowUnreadMessageId ?? ""))
+        }
+        row(
+            for: item,
+            viewModel: viewModel,
+            showsSenderIdentity: showsSenderIdentity
+        )
+        .background {
+            searchMatchHighlight(for: item, viewModel: viewModel)
+            ChatListRowAnchor(
+                groupId: item.id,
+                sequence: viewModel.conversationWindow?.revision.sequence ?? 0,
+                viewport: conversationViewport)
+        }
+        .modifier(
+            TimelineRowVisibilityModifier(
+                rowKey: item.rowFrameKey,
+                store: timelineVisibility,
+                onBecameVisible: {
+                    markCurrentlyVisibleMessagesRead(viewModel: viewModel)
+                    clearPassedDownArrowStops(viewModel: viewModel)
+                },
+                onBecameHidden: {
+                    clearPassedDownArrowStops(viewModel: viewModel)
+                },
+                onVisibilityChange: { isVisible in
+                    viewModel.setTimestampRowVisible(item.rowFrameKey, isVisible: isVisible)
+                }
+            ))
+    }
+
     @ViewBuilder
     private var timeline: some View {
         if let viewModel {
@@ -1777,7 +1921,7 @@ struct ConversationView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(.rect)
                     .simultaneousGesture(TapGesture().onEnded { dismissKeyboard() })
-            } else if viewModel.timeline.isEmpty {
+            } else if viewModel.timeline.isEmpty && !hasAutomaticMessages {
                 let hasWindow = viewModel.conversationWindow != nil
                 let loading = viewModel.isLoading
                 emptyTimeline(viewModel: viewModel)
@@ -1794,9 +1938,10 @@ struct ConversationView: View {
                 let dateHeadings = viewModel.timelineDaySections().compactMap { section in
                     section.items.first.map { TimelineDateHeading(id: $0.id, day: section.day) }
                 }
-                let dayHeaders = Dictionary(dateHeadings.map { ($0.id, $0) },
-                                            uniquingKeysWith: { first, _ in first })
-                let renderedTailID = viewModel.timeline.last?.id
+                let dayHeaders = Dictionary(
+                    dateHeadings.map { ($0.id, $0) },
+                    uniquingKeysWith: { first, _ in first })
+                let renderedTailID = renderedTimelineTail(viewModel)
                 let hasWindow = viewModel.conversationWindow != nil
                 let loading = viewModel.isLoading
                 ScrollViewReader { proxy in
@@ -1805,45 +1950,10 @@ struct ConversationView: View {
                             VStack(spacing: 0) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     olderTimelineTrigger(viewModel: viewModel)
-                                    ForEach(viewModel.timeline) { item in
-                                        if let heading = dayHeaders[item.id] {
-                                            TimelineInlineDateHeader(heading: heading)
-                                        }
-                                        if TimelineUnreadDivider.shouldShow(
-                                            before: item,
-                                            firstUnreadMessageIdHex: suppressesInitialUnreadDivider
-                                                ? nil
-                                                : viewModel.initialWindowUnreadMessageId
-                                        ) {
-                                            UnreadMessagesDivider()
-                                                .id(unreadDividerID(for: viewModel.initialWindowUnreadMessageId ?? ""))
-                                        }
-                                        row(
-                                            for: item,
-                                            viewModel: viewModel,
-                                            showsSenderIdentity: showsSenderIdentity
-                                        )
-                                            .background {
-                                                searchMatchHighlight(for: item, viewModel: viewModel)
-                                                ChatListRowAnchor(groupId: item.id,
-                                                    sequence: viewModel.conversationWindow?.revision.sequence ?? 0,
-                                                    viewport: conversationViewport)
-                                            }
-                                            .modifier(TimelineRowVisibilityModifier(
-                                                rowKey: item.rowFrameKey,
-                                                store: timelineVisibility,
-                                                onBecameVisible: {
-                                                    markCurrentlyVisibleMessagesRead(viewModel: viewModel)
-                                                    clearPassedDownArrowStops(viewModel: viewModel)
-                                                },
-                                                onBecameHidden: {
-                                                    clearPassedDownArrowStops(viewModel: viewModel)
-                                                },
-                                                onVisibilityChange: { isVisible in
-                                                    viewModel.setTimestampRowVisible(item.rowFrameKey, isVisible: isVisible)
-                                                }
-                                            ))
-                                    }
+                                    renderedTimelineRows(
+                                        viewModel: viewModel, showsSenderIdentity: showsSenderIdentity,
+                                        dayHeaders: dayHeaders
+                                    )
                                     .padding(.bottom, 4)
                                     newerTimelineTrigger(viewModel: viewModel)
                                     // Keep spacing before the target so it ends at the actual content edge.
@@ -1881,17 +1991,19 @@ struct ConversationView: View {
                         // the bottom sentinel after row layout has completed.
                         .defaultScrollAnchor(.bottom, for: .initialOffset)
                         // Let native layout carry the tail with the keyboard's own transition.
-                        .defaultScrollAnchor(TimelineBottomScrollCoordinator.sizeChangeAnchor(
-                            didFinishInitialPositioning: isInitialTimelinePositionSettled,
-                            userMovedAwayFromBottom: userMovedAwayFromTimelineBottom,
-                            isUserScrolling: isUserScrollingTimeline,
-                            hasMoreAfter: viewModel.hasMoreAfter,
-                            isPaging: viewModel.isAwaitingPageCompletion
-                        ), for: .sizeChanges)
+                        .defaultScrollAnchor(
+                            TimelineBottomScrollCoordinator.sizeChangeAnchor(
+                                didFinishInitialPositioning: isInitialTimelinePositionSettled,
+                                userMovedAwayFromBottom: userMovedAwayFromTimelineBottom,
+                                isUserScrolling: isUserScrollingTimeline,
+                                hasMoreAfter: viewModel.hasMoreAfter,
+                                isPaging: viewModel.isAwaitingPageCompletion
+                            ), for: .sizeChanges
+                        )
                         .task(id: initialTimelinePositionRequestGeneration) {
                             await Task.yield()
                             guard !Task.isCancelled,
-                                  let target = pendingInitialPositionTarget
+                                let target = pendingInitialPositionTarget
                             else { return }
                             scrollToInitialTimelineTarget(target, proxy: proxy)
                             appliedInitialPositionGeneration = initialTimelinePositionRequestGeneration
@@ -1906,7 +2018,8 @@ struct ConversationView: View {
                                 loading: loading, empty: false,
                                 positionSettled: isInitialTimelinePositionSettled)
                         } action: { visible in
-                            openPerformance?.rendered(local: visible, composer: nil, recorder: appState.productAnalytics)
+                            openPerformance?.rendered(
+                                local: visible, composer: nil, recorder: appState.productAnalytics)
                         }
                         .compatibleBottomScrollEdgeEffectHidden()
                         .scrollDismissesKeyboard(.interactively)
@@ -1923,7 +2036,8 @@ struct ConversationView: View {
                                 cancelPendingBottomScroll()
                             }
                             if phase == .idle {
-                                viewModel.reportConversationViewport(atTail: isMeasuredConversationTail(viewModel),
+                                viewModel.reportConversationViewport(
+                                    atTail: isMeasuredConversationTail(viewModel),
                                     visibleRowID: conversationViewport.visibleAnchor())
                                 if isMeasuredConversationTail(viewModel) { userMovedAwayFromTimelineBottom = false }
                             }
@@ -1958,7 +2072,8 @@ struct ConversationView: View {
                             if atTail, isInitialTimelinePositionSettled {
                                 viewModel.markConversationReadThroughTail()
                                 if !isUserScrollingTimeline {
-                                    viewModel.reportConversationViewport(atTail: true,
+                                    viewModel.reportConversationViewport(
+                                        atTail: true,
                                         visibleRowID: conversationViewport.visibleAnchor())
                                 }
                             }
@@ -1976,14 +2091,15 @@ struct ConversationView: View {
                                 maintainInitialTimelinePosition(viewModel: viewModel)
                             }
                         }
-                        .onChange(of: viewModel.timeline.last?.id) { _, newId in
+                        .onChange(of: renderedTailID) { _, newId in
                             guard newId != nil else { return }
                             if performInitialScrollIfNeeded(viewModel: viewModel) {
                                 return
                             }
                             guard !isInitialTimelinePositioning else { return }
                             if !userMovedAwayFromTimelineBottom, !viewModel.hasMoreAfter,
-                               !viewModel.isAwaitingPageCompletion {
+                                !viewModel.isAwaitingPageCompletion
+                            {
                                 scheduleScrollToBottom(
                                     proxy: proxy,
                                     animated: true,
@@ -2142,11 +2258,13 @@ struct ConversationView: View {
         viewModel: ConversationViewModel,
         showsSenderIdentity: Bool
     ) -> some View {
-        let debugStyle = appState.streamingDebugEnabled
+        let debugStyle =
+            appState.streamingDebugEnabled
             ? MessageSemantics.debugStyle(for: record)
             : nil
         let allowsActions = debugStyle?.isUserVisibleBubble ?? true
-        let interactionsEnabled = !isSelectingMessages
+        let interactionsEnabled =
+            !isSelectingMessages
             && !viewModel.search.isActive
             && actionsTarget == nil
             && allowsActions
@@ -2211,10 +2329,11 @@ struct ConversationView: View {
         .id(item.id)
         .onLongPressGesture {
             guard !isSelectingMessages,
-                  !viewModel.search.isActive,
-                  allowsActions,
-                  !record.messageIdHex.isEmpty,
-                  !viewModel.isDeleted(record.messageIdHex) else { return }
+                !viewModel.search.isActive,
+                allowsActions,
+                !record.messageIdHex.isEmpty,
+                !viewModel.isDeleted(record.messageIdHex)
+            else { return }
             Haptics.tap()
             beginActionsPresentation(
                 for: record,
@@ -2257,7 +2376,8 @@ struct ConversationView: View {
         viewModel: ConversationViewModel,
         showsSenderIdentity: Bool
     ) -> some View {
-        let debugStyle = appState.streamingDebugEnabled
+        let debugStyle =
+            appState.streamingDebugEnabled
             ? MessageSemantics.debugStyle(for: record)
             : nil
         return MessageBubble(
@@ -2349,15 +2469,18 @@ struct ConversationView: View {
                 Spacer()
             }
             .frame(height: 28)
-            .modifier(TimelinePaginationVisibility(
-                isEnabled: isInitialTimelinePositionSettled && viewModel.hasMoreBefore && !viewModel.isLoadingOlder && !viewModel.isAwaitingPageCompletion,
-                retryToken: viewModel.paginationRetryToken
-            ) {
-                if let row = conversationViewport.visibleAnchor(), let id = viewModel.protocolID(forDisplayID: row) {
-                    viewModel.setVisibleConversationAnchor(id)
-                }
-                Task { await viewModel.loadOlderTimelinePage() }
-            })
+            .modifier(
+                TimelinePaginationVisibility(
+                    isEnabled: isInitialTimelinePositionSettled && viewModel.hasMoreBefore && !viewModel.isLoadingOlder
+                        && !viewModel.isAwaitingPageCompletion,
+                    retryToken: viewModel.paginationRetryToken
+                ) {
+                    if let row = conversationViewport.visibleAnchor(), let id = viewModel.protocolID(forDisplayID: row)
+                    {
+                        viewModel.setVisibleConversationAnchor(id)
+                    }
+                    Task { await viewModel.loadOlderTimelinePage() }
+                })
         }
     }
 
@@ -2373,15 +2496,18 @@ struct ConversationView: View {
             }
             .frame(height: viewModel.isLoadingNewer ? 28 : 1)
             .clipped()
-            .modifier(TimelinePaginationVisibility(
-                isEnabled: isInitialTimelinePositionSettled && viewModel.hasMoreAfter && !viewModel.isLoadingNewer && !viewModel.isAwaitingPageCompletion,
-                retryToken: viewModel.paginationRetryToken
-            ) {
-                if let row = conversationViewport.visibleAnchor(), let id = viewModel.protocolID(forDisplayID: row) {
-                    viewModel.setVisibleConversationAnchor(id)
-                }
-                Task { await viewModel.loadNewerTimelinePage() }
-            })
+            .modifier(
+                TimelinePaginationVisibility(
+                    isEnabled: isInitialTimelinePositionSettled && viewModel.hasMoreAfter && !viewModel.isLoadingNewer
+                        && !viewModel.isAwaitingPageCompletion,
+                    retryToken: viewModel.paginationRetryToken
+                ) {
+                    if let row = conversationViewport.visibleAnchor(), let id = viewModel.protocolID(forDisplayID: row)
+                    {
+                        viewModel.setVisibleConversationAnchor(id)
+                    }
+                    Task { await viewModel.loadNewerTimelinePage() }
+                })
         }
     }
 
@@ -2431,21 +2557,24 @@ struct ConversationView: View {
         ) {
             return
         }
-        guard TimelineBottomScrollCoordinator.shouldExecute(
-            reason: reason,
-            isUserScrolling: isUserScrollingTimeline,
-            userMovedAwayFromBottom: userMovedAwayFromTimelineBottom,
-            hasMoreAfter: viewModel?.hasMoreAfter ?? true,
-            isPaging: viewModel?.isAwaitingPageCompletion ?? true
-        ) else {
+        guard
+            TimelineBottomScrollCoordinator.shouldExecute(
+                reason: reason,
+                isUserScrolling: isUserScrollingTimeline,
+                userMovedAwayFromBottom: userMovedAwayFromTimelineBottom,
+                hasMoreAfter: viewModel?.hasMoreAfter ?? true,
+                isPaging: viewModel?.isAwaitingPageCompletion ?? true
+            )
+        else {
             return
         }
 
         if reason == .timelineChange,
-           TimelineBottomScrollCoordinator.shouldSkipTimelineChangeScroll(
-               lastAutomaticTargetID: lastAutomaticBottomScrollTargetID,
-               nextTargetID: targetID
-           ) {
+            TimelineBottomScrollCoordinator.shouldSkipTimelineChangeScroll(
+                lastAutomaticTargetID: lastAutomaticBottomScrollTargetID,
+                nextTargetID: targetID
+            )
+        {
             return
         }
 
@@ -2465,13 +2594,15 @@ struct ConversationView: View {
             guard let request = pendingBottomScrollRequest else { return }
             pendingBottomScrollRequest = nil
             pendingBottomScrollTask = nil
-            guard TimelineBottomScrollCoordinator.shouldExecute(
-                reason: request.reason,
-                isUserScrolling: isUserScrollingTimeline,
-                userMovedAwayFromBottom: userMovedAwayFromTimelineBottom,
-                hasMoreAfter: viewModel?.hasMoreAfter ?? true,
-                isPaging: viewModel?.isAwaitingPageCompletion ?? true
-            ) else { return }
+            guard
+                TimelineBottomScrollCoordinator.shouldExecute(
+                    reason: request.reason,
+                    isUserScrolling: isUserScrollingTimeline,
+                    userMovedAwayFromBottom: userMovedAwayFromTimelineBottom,
+                    hasMoreAfter: viewModel?.hasMoreAfter ?? true,
+                    isPaging: viewModel?.isAwaitingPageCompletion ?? true
+                )
+            else { return }
             scrollToBottom(proxy: proxy, animated: request.animated)
             lastAutomaticBottomScrollTargetID = request.targetID
         }
@@ -2490,7 +2621,8 @@ struct ConversationView: View {
         cancelPendingBottomScroll()
         Task {
             await viewModel?.returnConversationToLatest()
-            scheduleScrollToBottom(proxy: proxy, animated: true, reason: .buttonTap,
+            scheduleScrollToBottom(
+                proxy: proxy, animated: true, reason: .buttonTap,
                 targetID: viewModel?.timeline.last?.id)
         }
     }
@@ -2606,8 +2738,9 @@ struct ConversationView: View {
         }
         guard let snapshot = viewModel.conversationWindow else { return true }
         if let id = viewModel.windowAnchorMessageId,
-           let itemId = timelineItemId(forMessageIdHex: id, viewModel: viewModel),
-           snapshot.anchor.kind == .firstUnread || viewModel.openingMessageId != nil {
+            let itemId = timelineItemId(forMessageIdHex: id, viewModel: viewModel),
+            snapshot.anchor.kind == .firstUnread || viewModel.openingMessageId != nil
+        {
             requestInitialTimelinePosition(.item(id: itemId, anchor: .top), viewModel: viewModel)
         } else {
             requestInitialTimelinePosition(.latest(id: Self.timelineBottomID), viewModel: viewModel)
@@ -2689,11 +2822,13 @@ struct ConversationView: View {
     }
 
     private func settleInitialTimelinePositionIfTargetVisible(viewModel: ConversationViewModel) {
-        guard TimelineInitialTargetScrollPolicy.shouldSettle(
-            target: pendingInitialPositionTarget,
-            visibleTargetIDs: timelineTargetVisibility.visibleTargetIDs,
-            didApplyRequestedPosition: didApplyRequestedInitialPosition
-        ) else { return }
+        guard
+            TimelineInitialTargetScrollPolicy.shouldSettle(
+                target: pendingInitialPositionTarget,
+                visibleTargetIDs: timelineTargetVisibility.visibleTargetIDs,
+                didApplyRequestedPosition: didApplyRequestedInitialPosition
+            )
+        else { return }
         settleInitialTimelinePosition(viewModel: viewModel)
     }
 
@@ -2706,7 +2841,7 @@ struct ConversationView: View {
 
     private func initialTargetItemId(viewModel: ConversationViewModel) -> String? {
         guard let initialTargetMessageIdHex,
-              timelineItemId(forMessageIdHex: initialTargetMessageIdHex, viewModel: viewModel) != nil
+            timelineItemId(forMessageIdHex: initialTargetMessageIdHex, viewModel: viewModel) != nil
         else { return nil }
         if initialTargetMessageIdHex == initialUnreadMessageIdHex {
             return unreadDividerID(for: initialTargetMessageIdHex)
@@ -2744,11 +2879,13 @@ struct ConversationView: View {
     }
 
     private func reconcileTimelineTailVisibility(viewModel: ConversationViewModel) {
-        guard isMeasuredConversationTail(viewModel), TimelineTailVisibility.isTailOnScreen(
-            visibleTargetIDs: timelineTargetVisibility.visibleTargetIDs,
-            bottomSentinelID: Self.timelineBottomID,
-            hasMoreAfter: viewModel.hasMoreAfter
-        ) else { return }
+        guard isMeasuredConversationTail(viewModel),
+            TimelineTailVisibility.isTailOnScreen(
+                visibleTargetIDs: timelineTargetVisibility.visibleTargetIDs,
+                bottomSentinelID: Self.timelineBottomID,
+                hasMoreAfter: viewModel.hasMoreAfter
+            )
+        else { return }
         if !isAtTimelineBottom {
             isAtTimelineBottom = true
         }
@@ -2800,16 +2937,20 @@ struct ConversationView: View {
     }
 
     private func beginEdit(_ message: AppMessageRecordFfi, viewModel: ConversationViewModel) {
-        guard MessageEditingPolicy.canEdit(
-            message,
-            isDeleted: viewModel.isDeleted(message.messageIdHex),
-            canSendMessages: viewModel.canSendMessages
-        ) else { return }
+        guard
+            MessageEditingPolicy.canEdit(
+                message,
+                isDeleted: viewModel.isDeleted(message.messageIdHex),
+                canSendMessages: viewModel.canSendMessages
+            )
+        else { return }
         let preservedDraft = editSession?.preservedDraft ?? draft
         let preservedMediaDrafts = editSession?.preservedMediaDrafts ?? mediaDrafts
-        let preservedMentionState = editSession?.preservedMentionState
+        let preservedMentionState =
+            editSession?.preservedMentionState
             ?? viewModel.composerMentionDraftState(for: preservedDraft)
-        let preservedReplyTargetMessageIdHex = editSession?.preservedReplyTargetMessageIdHex
+        let preservedReplyTargetMessageIdHex =
+            editSession?.preservedReplyTargetMessageIdHex
             ?? viewModel.replyTargetMessageIdHex
         viewModel.replyingTo = nil
         mediaDrafts.removeAll()
@@ -2827,7 +2968,7 @@ struct ConversationView: View {
 
     private var editSubmissionEnabled: Bool {
         guard let editSession, let viewModel,
-              let outgoing = viewModel.preparedComposerText(draft)
+            let outgoing = viewModel.preparedComposerText(draft)
         else { return editSession == nil }
         return outgoing != editSession.message.plaintext
     }
@@ -2888,7 +3029,9 @@ struct ConversationView: View {
         let originalAttachments = mediaDrafts
         let originalReply = viewModel.replyTargetMessageIdHex
         let mentionState = viewModel.composerMentionDraftState(for: draft)
-        let saved = ConversationDraftSnapshot(canonicalText: ConversationViewModel.cappedOutgoingText(mentionState.canonicalText.trimmingCharacters(in: .whitespacesAndNewlines)),
+        let saved = ConversationDraftSnapshot(
+            canonicalText: ConversationViewModel.cappedOutgoingText(
+                mentionState.canonicalText.trimmingCharacters(in: .whitespacesAndNewlines)),
             replyToMessageIdHex: originalReply, mediaAttachments: originalAttachments)
         guard !saved.canonicalText.isEmpty || !originalAttachments.isEmpty else { return }
         if let outgoing = viewModel.preparedComposerText(draft).map({
@@ -2896,10 +3039,12 @@ struct ConversationView: View {
         }) {
             let customEmoji = viewModel.customEmojiUsed(in: outgoing)
             if !customEmoji.isEmpty {
-                let submitted = ConversationDraftSnapshot(canonicalText: mentionState.canonicalText,
-                                                          replyToMessageIdHex: originalReply, mediaAttachments: [])
-                sendWithCustomEmoji(outgoing, emoji: customEmoji, replyTargetId: originalReply,
-                                    submitted: submitted, viewModel: viewModel)
+                let submitted = ConversationDraftSnapshot(
+                    canonicalText: mentionState.canonicalText,
+                    replyToMessageIdHex: originalReply, mediaAttachments: [])
+                sendWithCustomEmoji(
+                    outgoing, emoji: customEmoji, replyTargetId: originalReply,
+                    submitted: submitted, viewModel: viewModel)
                 return
             }
         }
@@ -2915,12 +3060,15 @@ struct ConversationView: View {
             mediaDrafts: mediaDrafts,
             replyTargetMessageIdHex: originalReply
         )
-        guard let payload = ConversationSendPreparation.prepare(draft: &draft, mediaDrafts: &mediaDrafts, viewModel: viewModel),
-              let staged = viewModel.stagePreparedSend(
-                  text: payload.text,
-                  attachments: payload.attachments,
-                  replyTargetMessageIdHex: originalReply
-              ) else {
+        guard
+            let payload = ConversationSendPreparation.prepare(
+                draft: &draft, mediaDrafts: &mediaDrafts, viewModel: viewModel),
+            let staged = viewModel.stagePreparedSend(
+                text: payload.text,
+                attachments: payload.attachments,
+                replyTargetMessageIdHex: originalReply
+            )
+        else {
             // Nothing left the composer: put it back exactly as it was. This is
             // still the tap's own runloop turn, so no newer edit can be lost.
             viewModel.restoreComposerMentionDraftState(mentionState)
@@ -2949,7 +3097,8 @@ struct ConversationView: View {
                     await store.finishSend(accountRef: accountRef, groupIdHex: chat.groupIdHex, accepted: accepted)
                 }
                 if let rejection {
-                    recoverSizeRejectedSend(staged, rejection: rejection, tapped: tappedContents, mentionState: mentionState)
+                    recoverSizeRejectedSend(
+                        staged, rejection: rejection, tapped: tappedContents, mentionState: mentionState)
                 }
             } catch {
                 // The draft never reached a revision, so the submission was
@@ -2958,8 +3107,11 @@ struct ConversationView: View {
                 // or clobbering whatever the composer holds by now.
                 appState.productAnalytics.recordTiming(.sendDraftReady, since: tapped, outcome: .failure)
                 viewModel.failStagedSend(staged)
-                if let rejection = ConversationSendPreparation.draftRejection(for: error, attachments: staged.attachments) {
-                    recoverSizeRejectedSend(staged, rejection: rejection, tapped: tappedContents, mentionState: mentionState)
+                if let rejection = ConversationSendPreparation.draftRejection(
+                    for: error, attachments: staged.attachments)
+                {
+                    recoverSizeRejectedSend(
+                        staged, rejection: rejection, tapped: tappedContents, mentionState: mentionState)
                 } else {
                     appState.present(UserFacingError.toast(title: L10n.string("Send failed"), error: error))
                 }
@@ -2997,7 +3149,8 @@ struct ConversationView: View {
             return
         }
         Task {
-            await viewModel.sendCustomEmojiMessage(text: text, replyTargetId: replyTargetId, emoji: emoji, draft: submitted)
+            await viewModel.sendCustomEmojiMessage(
+                text: text, replyTargetId: replyTargetId, emoji: emoji, draft: submitted)
         }
     }
 
@@ -3007,13 +3160,14 @@ struct ConversationView: View {
     /// during the upload keeps the composer.
     private func reconcileAcceptedCustomEmojiSend() {
         guard let viewModel, let accepted = viewModel.acceptedCustomEmojiSend,
-              CustomEmojiComposerReconciliation.clears(
-                  submitted: accepted.submitted,
-                  canonicalText: viewModel.composerMentionDraftState(for: draft).canonicalText,
-                  replyTargetId: viewModel.replyTargetMessageIdHex,
-                  hasMediaDrafts: !mediaDrafts.isEmpty,
-                  isEditing: editSession != nil
-              ) else { return }
+            CustomEmojiComposerReconciliation.clears(
+                submitted: accepted.submitted,
+                canonicalText: viewModel.composerMentionDraftState(for: draft).canonicalText,
+                replyTargetId: viewModel.replyTargetMessageIdHex,
+                hasMediaDrafts: !mediaDrafts.isEmpty,
+                isEditing: editSession != nil
+            )
+        else { return }
         _ = viewModel.consumeComposerText(draft)
         if viewModel.replyTargetMessageIdHex != nil {
             viewModel.restoreReplyTarget(messageIdHex: nil)
@@ -3097,8 +3251,8 @@ struct ConversationView: View {
         didRestorePersistedDraft = true
         guard case .loaded(let loaded) = result, let snapshot = loaded else {
             guard draft == draftBeforeLoad,
-                  mediaDrafts.map(\.id) == mediaIDsBeforeLoad,
-                  viewModel.replyTargetMessageIdHex == replyBeforeLoad
+                mediaDrafts.map(\.id) == mediaIDsBeforeLoad,
+                viewModel.replyTargetMessageIdHex == replyBeforeLoad
             else { return result }
             draft = ""
             mediaDrafts.removeAll()
@@ -3106,9 +3260,9 @@ struct ConversationView: View {
             return result
         }
         guard !Task.isCancelled,
-              draft == draftBeforeLoad,
-              mediaDrafts.map(\.id) == mediaIDsBeforeLoad,
-              viewModel.replyTargetMessageIdHex == replyBeforeLoad
+            draft == draftBeforeLoad,
+            mediaDrafts.map(\.id) == mediaIDsBeforeLoad,
+            viewModel.replyTargetMessageIdHex == replyBeforeLoad
         else { return result }
         let mentionState = ComposerMentionDraftState(
             canonicalText: snapshot.canonicalText,
@@ -3125,7 +3279,8 @@ struct ConversationView: View {
         guard let accountRef = draftAccountRef else { return }
         Task {
             do {
-                try await appState.conversationDraftStore.resolveConflict(accountRef: accountRef, groupIdHex: chat.groupIdHex, keepLocal: keepLocal)
+                try await appState.conversationDraftStore.resolveConflict(
+                    accountRef: accountRef, groupIdHex: chat.groupIdHex, keepLocal: keepLocal)
                 if !keepLocal { await restorePersistedDraft() }
             } catch {
                 appState.present(UserFacingError.toast(title: L10n.string("Draft changed"), error: error))
@@ -3138,19 +3293,22 @@ struct ConversationView: View {
     }
 
     private func persistComposerChange(text: String? = nil) {
-        guard ConversationDraftHydrationGate.countsAsComposerChange(
-            isHydrated: didRestorePersistedDraft,
-            alreadyChanged: composerChangedBeforeDraftRestore,
-            composerIsEmpty: (text ?? draft).isEmpty && mediaDrafts.isEmpty
-                && viewModel?.replyTargetMessageIdHex == nil
-        ) else { return }
+        guard
+            ConversationDraftHydrationGate.countsAsComposerChange(
+                isHydrated: didRestorePersistedDraft,
+                alreadyChanged: composerChangedBeforeDraftRestore,
+                composerIsEmpty: (text ?? draft).isEmpty && mediaDrafts.isEmpty
+                    && viewModel?.replyTargetMessageIdHex == nil
+            )
+        else { return }
         if !didRestorePersistedDraft { composerChangedBeforeDraftRestore = true }
         persistCurrentDraft(text: text)
     }
 
     private func persistCurrentDraft(text: String? = nil) {
         let text = text ?? draft
-        let mentionState = viewModel?.composerMentionDraftState(for: text)
+        let mentionState =
+            viewModel?.composerMentionDraftState(for: text)
             ?? ComposerMentionDraftState(draft: text, selectedMentions: [])
         persistDraft(
             mentionState,
@@ -3521,7 +3679,10 @@ struct ConversationView: View {
     }
 
     private func presentMaxAttachmentWarning() {
-        appState.present(.warning(L10n.plural("You can send up to %lld attachments at once", Int64(MediaDraftProcessor.maxAttachmentCount))))
+        appState.present(
+            .warning(
+                L10n.plural(
+                    "You can send up to %lld attachments at once", Int64(MediaDraftProcessor.maxAttachmentCount))))
     }
 
     /// Opens a navigation epoch for the pop and dismisses input chrome once
@@ -3714,7 +3875,7 @@ struct ConversationView: View {
     private func selectedMessageRecords(viewModel: ConversationViewModel) -> [AppMessageRecordFfi] {
         viewModel.timeline.compactMap { item in
             guard case .message(let record, _) = item.kind,
-                  selectedMessageIds.contains(record.messageIdHex)
+                selectedMessageIds.contains(record.messageIdHex)
             else { return nil }
             return record
         }
@@ -3749,25 +3910,28 @@ struct ConversationView: View {
 
     private func pruneMessageSelection(viewModel: ConversationViewModel) {
         guard isSelectingMessages else { return }
-        let availableIds = Set(viewModel.timeline.compactMap { item -> String? in
-            guard case .message(let record, _) = item.kind else { return nil }
-            return record.messageIdHex
-        })
+        let availableIds = Set(
+            viewModel.timeline.compactMap { item -> String? in
+                guard case .message(let record, _) = item.kind else { return nil }
+                return record.messageIdHex
+            })
         selectedMessageIds.formIntersection(availableIds)
     }
 
     private func deleteSelectedMessages() {
         guard let viewModel, !batchDeleteInFlight else { return }
         let records = selectedMessageRecords(viewModel: viewModel)
-        guard MessageSelectionPolicy.canDelete(
-            selectedCount: records.count,
-            allDeletable: records.allSatisfy {
-                // Must stay in lockstep with the selection bar's gate — a
-                // divergence turns an enabled Delete into a silent no-op.
-                viewModel.deleteCapability(for: $0).canDeleteForEveryone
-                    && !viewModel.isDeleted($0.messageIdHex)
-            }
-        ) else { return }
+        guard
+            MessageSelectionPolicy.canDelete(
+                selectedCount: records.count,
+                allDeletable: records.allSatisfy {
+                    // Must stay in lockstep with the selection bar's gate — a
+                    // divergence turns an enabled Delete into a silent no-op.
+                    viewModel.deleteCapability(for: $0).canDeleteForEveryone
+                        && !viewModel.isDeleted($0.messageIdHex)
+                }
+            )
+        else { return }
 
         let operationID = UUID()
         batchDeleteOperationID = operationID
@@ -3832,7 +3996,7 @@ struct ConversationView: View {
 
     private func completePendingActionsPresentationIfMeasured() {
         guard let pending = pendingActionsPresentation,
-              let sourceFrame = rowFrames.frames[pending.rowFrameKey]
+            let sourceFrame = rowFrames.frames[pending.rowFrameKey]
         else { return }
         pendingActionFrameMeasurementClearTask?.cancel()
         pendingActionFrameMeasurementClearTask = nil
@@ -3862,10 +4026,11 @@ struct ConversationView: View {
     @ViewBuilder
     private var messageActionsOverlay: some View {
         if let viewModel,
-           let target = actionsTarget,
-           let rowId = target.rowId,
-           let sourceGlobalFrame = target.sourceFrame,
-           let item = viewModel.timeline.first(where: { $0.id == rowId }) {
+            let target = actionsTarget,
+            let rowId = target.rowId,
+            let sourceGlobalFrame = target.sourceFrame,
+            let item = viewModel.timeline.first(where: { $0.id == rowId })
+        {
             GeometryReader { proxy in
                 let containerGlobalFrame = proxy.frame(in: .global)
                 let sourceFrame = sourceGlobalFrame.offsetBy(
@@ -3891,9 +4056,10 @@ struct ConversationView: View {
                 let alignsTrailing = messageActionsAlignTrailing(record: target.record)
                 let selectedReaction = viewModel.reactions(for: target.record.messageIdHex)
                     .first(where: \.mine)?.emoji
-                let displayedReactionCount = appState.quickReactions.count
+                let displayedReactionCount =
+                    appState.quickReactions.count
                     + (selectedReaction.map { appState.quickReactions.contains($0) ? 0 : 1 } ?? 0)
-                    + 1 // More button.
+                    + 1  // More button.
                 let reactionWidth = MessageActionsPresentation.reactionWidth(
                     itemCount: displayedReactionCount,
                     maximumWidth: max(
@@ -3902,7 +4068,8 @@ struct ConversationView: View {
                     )
                 )
                 let surfaceWidth = max(MessageActionsPresentation.menuWidth, reactionWidth)
-                let menuCenterX = alignsTrailing
+                let menuCenterX =
+                    alignsTrailing
                     ? proxy.size.width
                         - MessageActionsPresentation.horizontalMargin
                         - surfaceWidth / 2
@@ -4363,3 +4530,11 @@ final class TimelineKeyboardDismissAttachmentView: UIView {
         return nil
     }
 }
+
+#if WN_EXPERIMENTAL_DEVICE_SYNC
+    private struct SynchronizedHistoryConversationOwner: Hashable {
+        let accountEpoch: UUID
+        let runtimeGeneration: Int
+        let groupIdHex: String
+    }
+#endif

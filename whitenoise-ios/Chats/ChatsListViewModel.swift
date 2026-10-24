@@ -1,7 +1,7 @@
 import Foundation
-import Observation
-import OSLog
 import MarmotKit
+import OSLog
+import Observation
 
 /// Session cache for the small piece of roster state a DM row needs to resolve
 /// through the already-cached profile directory. It is account-scoped because
@@ -28,7 +28,8 @@ struct ChatListDirectPeerCache {
         // any rows arrive. Keep the last useful mapping instead of replacing
         // it with an empty partial bind.
         guard !rowsByGroupId.isEmpty else { return }
-        let retained = peersByGroupId
+        let retained =
+            peersByGroupId
             .filter { groupId, peerId in
                 !peerId.isEmpty
                     && rowsByGroupId[groupId]?.conversationKind == .direct
@@ -123,13 +124,16 @@ final class ChatsListViewModel {
             now: Date = Date()
         ) {
             let previewExpired = ChatPreviewRetention.isExpired(row.lastMessage, at: now)
-            let previewText = isBlockedDirectPeer
+            let previewText =
+                isBlockedDirectPeer
                 ? L10n.string("You blocked this user")
-                : previewExpired ? nil : Self.sanitizedPreview(
-                    from: row.lastMessage,
-                    mentionDisplayName: mentionDisplayName,
-                    systemEventNaming: systemEventNaming
-                )
+                : previewExpired
+                    ? nil
+                    : Self.sanitizedPreview(
+                        from: row.lastMessage,
+                        mentionDisplayName: mentionDisplayName,
+                        systemEventNaming: systemEventNaming
+                    )
             self.row = row
             self.avatarURL = avatarURL
             self.selectedAvatar = selectedAvatar
@@ -143,7 +147,8 @@ final class ChatsListViewModel {
             self.isMuted = isMuted
             self.leaveRequestPending = leaveRequestPending
             self.previewText = previewText
-            self.previewSymbolName = isBlockedDirectPeer || previewExpired
+            self.previewSymbolName =
+                isBlockedDirectPeer || previewExpired
                 ? nil
                 : row.lastMessage.flatMap(ChatListAttachmentPresentation.systemImageName(for:))
             self.previewExpired = previewExpired
@@ -166,7 +171,8 @@ final class ChatsListViewModel {
                     self.draftPreview = nil
                 }
             } else {
-                self.draftPreview = ConversationDraftPreview.text(from: draftSummary, mentionDisplayName: mentionDisplayName)
+                self.draftPreview = ConversationDraftPreview.text(
+                    from: draftSummary, mentionDisplayName: mentionDisplayName)
             }
             self.pendingSendPreview = pendingSendPreview
             self.searchHaystack = Self.makeSearchHaystack(
@@ -348,9 +354,9 @@ final class ChatsListViewModel {
     private nonisolated static let inviterLookupFailureLimit = 3
 
     #if DEBUG
-    @ObservationIgnored var mentionDisplayNameForTesting: MarkdownMentionResolver?
-    @ObservationIgnored var presentedRowForTesting: ((String, String) async throws -> PresentedChatRowFfi?)?
-    @ObservationIgnored private(set) var publishedItemsMutationCountForTesting = 0
+        @ObservationIgnored var mentionDisplayNameForTesting: MarkdownMentionResolver?
+        @ObservationIgnored var presentedRowForTesting: ((String, String) async throws -> PresentedChatRowFfi?)?
+        @ObservationIgnored private(set) var publishedItemsMutationCountForTesting = 0
     #endif
 
     init(appState: AppState) {
@@ -434,9 +440,10 @@ final class ChatsListViewModel {
             }
             pendingChatListRowsByGroupId = [:]
             avatarURLByGroupId = [:]
-            directPeerAccountIdByGroupId = accountRef.map {
-                retainedDirectPeerCache.restore(accountRef: $0)
-            } ?? [:]
+            directPeerAccountIdByGroupId =
+                accountRef.map {
+                    retainedDirectPeerCache.restore(accountRef: $0)
+                } ?? [:]
             groupDetailsCache = [:]
             inviterAccountIdByGroupId = [:]
             inviterLookupCompletedGroupIds = []
@@ -484,10 +491,15 @@ final class ChatsListViewModel {
                     )
                     if case .window(let view) = self?.listMode {
                         let subscription = try await client.openChatListWindow(accountRef: accountRef, view: view)
-                        guard let initial = await Task.detached(priority: .utility, operation: {
-                            subscription.snapshot()
-                        }).value, !Task.isCancelled,
-                              self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true else { return }
+                        guard
+                            let initial = await Task.detached(
+                                priority: .utility,
+                                operation: {
+                                    subscription.snapshot()
+                                }
+                            ).value, !Task.isCancelled,
+                            self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
+                        else { return }
                         self?.windowSubscription = subscription
                         defer {
                             if self?.windowSubscription === subscription {
@@ -502,7 +514,8 @@ final class ChatsListViewModel {
                         finishLoad(.success)
                         while let update = try await subscription.nextCancellable() {
                             guard !Task.isCancelled,
-                                  self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true else { return }
+                                self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
+                            else { return }
                             guard self?.windowCursor?.generation == update.subscriptionGeneration else { break }
                             self?.acceptWindowSnapshot(update)
                             retryDelay = Self.liveSubscriptionInitialRetryDelayNanoseconds
@@ -518,14 +531,14 @@ final class ChatsListViewModel {
                         includeArchived: true
                     )
                     guard !Task.isCancelled,
-                          self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
+                        self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
                     else { return }
                     guard let snapshot = await client.presentedChatListSubscriptionSnapshot(chatListSub) else {
                         throw CancellationError()
                     }
                     guard !Task.isCancelled,
-                          appState.canUseRuntimeForForegroundWork,
-                          self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
+                        appState.canUseRuntimeForForegroundWork,
+                        self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
                     else { return }
                     self?.loadError = nil
                     self?.presentedCursor = PresentedChatListCursor(initial: snapshot)
@@ -535,8 +548,8 @@ final class ChatsListViewModel {
 
                     while let update = try await chatListSub.nextCancellable() {
                         guard !Task.isCancelled,
-                              appState.canUseRuntimeForForegroundWork,
-                              self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
+                            appState.canUseRuntimeForForegroundWork,
+                            self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
                         else { return }
                         retryDelay = Self.liveSubscriptionInitialRetryDelayNanoseconds
                         guard let self else { return }
@@ -549,8 +562,8 @@ final class ChatsListViewModel {
                 } catch {
                     finishLoad(.failure)
                     guard !Task.isCancelled,
-                          appState?.canUseRuntimeForForegroundWork == true,
-                          self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
+                        appState?.canUseRuntimeForForegroundWork == true,
+                        self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
                     else { return }
                     if self?.rowByGroupId.isEmpty == true {
                         self?.loadError = UserFacingError.message(for: error)
@@ -558,8 +571,8 @@ final class ChatsListViewModel {
                     self?.isLoading = false
                 }
                 guard !Task.isCancelled,
-                      appState?.canUseRuntimeForForegroundWork == true,
-                      self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
+                    appState?.canUseRuntimeForForegroundWork == true,
+                    self?.ownsChatListTask(taskID: taskID, accountRef: accountRef) == true
                 else { return }
                 do {
                     try await Task.sleep(nanoseconds: retryDelay)
@@ -580,7 +593,8 @@ final class ChatsListViewModel {
     }
 
     private func acceptWindowSnapshot(_ snapshot: ChatListWindowSnapshotFfi) {
-        guard windowCursor?.accept(generation: snapshot.subscriptionGeneration, sequence: snapshot.sequence) == true else { return }
+        guard windowCursor?.accept(generation: snapshot.subscriptionGeneration, sequence: snapshot.sequence) == true
+        else { return }
         installWindowSnapshot(snapshot)
     }
 
@@ -594,7 +608,8 @@ final class ChatsListViewModel {
 
     func pageWindow(_ direction: ChatListPageDirectionFfi) async {
         guard !isPaging, let snapshot = windowSnapshot,
-              direction == .forward ? snapshot.hasMoreAfter : snapshot.hasMoreBefore else { return }
+            direction == .forward ? snapshot.hasMoreAfter : snapshot.hasMoreBefore
+        else { return }
         isPaging = true
         let binding = bindID
         defer { if bindID == binding { isPaging = false } }
@@ -660,8 +675,8 @@ final class ChatsListViewModel {
     /// and list reappearance useful without doing an account-wide message scan.
     func refreshRows() async {
         guard let accountRef = currentAccount,
-              let appState,
-              appState.canUseRuntimeForForegroundWork
+            let appState,
+            appState.canUseRuntimeForForegroundWork
         else { return }
         if case .window = listMode {
             // Keep the current viewport when returning from a conversation.
@@ -688,10 +703,11 @@ final class ChatsListViewModel {
     func refreshRow(groupIdHex: String, retainAsDestination: Bool = true) async {
         guard let accountRef = currentAccount, let appState else { return }
         guard
-              appState.canUseRuntimeForLocalForegroundWork
+            appState.canUseRuntimeForLocalForegroundWork
         else { return }
         if rowByGroupId[groupIdHex] == nil,
-           let created = appState.createdChatListRow(accountRef: accountRef, groupIdHex: groupIdHex) {
+            let created = appState.createdChatListRow(accountRef: accountRef, groupIdHex: groupIdHex)
+        {
             applyChatListRow(created)
             if retainAsDestination { destinationItems[groupIdHex] = itemByGroupId[groupIdHex] }
         }
@@ -700,12 +716,13 @@ final class ChatsListViewModel {
             if retainAsDestination { destinationItems[groupIdHex] = previousItem }
             let taskID = chatListTaskID
             let generation = appState.runtimeGeneration
-            guard let row = try await readPresentedRow(
-                accountRef: accountRef,
-                groupIdHex: groupIdHex
-            ), !Task.isCancelled, currentAccount == accountRef, chatListTaskID == taskID,
-               item(groupIdHex: groupIdHex) == previousItem,
-               appState.runtimeGeneration == generation, appState.canUseRuntimeForLocalForegroundWork
+            guard
+                let row = try await readPresentedRow(
+                    accountRef: accountRef,
+                    groupIdHex: groupIdHex
+                ), !Task.isCancelled, currentAccount == accountRef, chatListTaskID == taskID,
+                item(groupIdHex: groupIdHex) == previousItem,
+                appState.runtimeGeneration == generation, appState.canUseRuntimeForLocalForegroundWork
             else { return }
             preparedRowsByGroupId[groupIdHex] = row
             selectedPresentationByGroupId[groupIdHex] = row.presentation
@@ -721,10 +738,11 @@ final class ChatsListViewModel {
 
     private func readPresentedRow(accountRef: String, groupIdHex: String) async throws -> PresentedChatRowFfi? {
         #if DEBUG
-        if let presentedRowForTesting { return try await presentedRowForTesting(accountRef, groupIdHex) }
+            if let presentedRowForTesting { return try await presentedRowForTesting(accountRef, groupIdHex) }
         #endif
         guard let appState else { return nil }
-        return try await appState.currentMarmotClient().presentedChatListRow(accountRef: accountRef, groupIdHex: groupIdHex)
+        return try await appState.currentMarmotClient().presentedChatListRow(
+            accountRef: accountRef, groupIdHex: groupIdHex)
     }
 
     /// O(1) lookup for a chat-list item by its group id, backed by the
@@ -741,16 +759,21 @@ final class ChatsListViewModel {
 
     /// Forwarding should use the same live, enriched projection as the chat
     /// list so newly-arrived rows and resolved direct-chat names are preserved.
-    func forwardDestinations(excludingGroupIdHex currentGroupIdHex: String) async throws -> [MessageForwardDestination] {
+    func forwardDestinations(excludingGroupIdHex currentGroupIdHex: String) async throws -> [MessageForwardDestination]
+    {
         guard let currentAccount, let appState else { return [] }
         let generation = appState.runtimeGeneration
         let snapshot = try await appState.currentMarmotClient().presentedChatList(
             accountRef: currentAccount, includeArchived: true
         )
-        guard self.currentAccount == currentAccount, generation == appState.runtimeGeneration else { throw CancellationError() }
+        guard self.currentAccount == currentAccount, generation == appState.runtimeGeneration else {
+            throw CancellationError()
+        }
         let muteLookup = currentMuteLookup()
         return MessageForwardDestinationPresentation.destinations(
-            from: snapshot.rows.map { makeItem(for: $0.row, muteLookup: muteLookup, selected: $0.presentation, prepared: $0) },
+            from: snapshot.rows.map {
+                makeItem(for: $0.row, muteLookup: muteLookup, selected: $0.presentation, prepared: $0)
+            },
             excludingGroupIdHex: currentGroupIdHex
         )
     }
@@ -767,10 +790,12 @@ final class ChatsListViewModel {
     }
 
     private func applyPresentedRows(_ rows: [PresentedChatRowFfi]) {
-        preparedRowsByGroupId = Dictionary(rows.map { ($0.row.groupIdHex, $0) }, uniquingKeysWith: { _, latest in latest })
-        avatarAssetsByGroupId = Dictionary(rows.compactMap { row in
-            row.avatarAsset.map { (row.row.groupIdHex, $0) }
-        }, uniquingKeysWith: { _, latest in latest })
+        preparedRowsByGroupId = Dictionary(
+            rows.map { ($0.row.groupIdHex, $0) }, uniquingKeysWith: { _, latest in latest })
+        avatarAssetsByGroupId = Dictionary(
+            rows.compactMap { row in
+                row.avatarAsset.map { (row.row.groupIdHex, $0) }
+            }, uniquingKeysWith: { _, latest in latest })
         selectedPresentationByGroupId = Dictionary(
             rows.map { ($0.row.groupIdHex, $0.presentation) }, uniquingKeysWith: { _, latest in latest }
         )
@@ -966,7 +991,8 @@ final class ChatsListViewModel {
             draftStore.removeDraft(accountRef: currentAccount, groupIdHex: groupIdHex)
         }
         row.leaveRequestPending = true
-        row.leaveRequestedAtMs = row.leaveRequestedAtMs
+        row.leaveRequestedAtMs =
+            row.leaveRequestedAtMs
             ?? UInt64(Date().timeIntervalSince1970 * 1_000)
         // Marmot's own `leaveGroup` records the voluntary departure locally the
         // moment the SelfRemove publishes, so mirror it here. Recording only the
@@ -1144,9 +1170,9 @@ final class ChatsListViewModel {
             },
             mentionDisplayName: { [weak appState] entity in
                 #if DEBUG
-                if let name = self.mentionDisplayNameForTesting?(entity) {
-                    return name
-                }
+                    if let name = self.mentionDisplayNameForTesting?(entity) {
+                        return name
+                    }
                 #endif
                 return appState?.mentionDisplayName(for: entity)
             },
@@ -1166,7 +1192,7 @@ final class ChatsListViewModel {
     /// account label; resolve through the account summaries.
     private var currentAccountIdHex: String? {
         guard let appState,
-              let accountRef = currentAccount ?? appState.activeAccountRef
+            let accountRef = currentAccount ?? appState.activeAccountRef
         else { return nil }
         return appState.accounts.first { $0.label == accountRef }?.accountIdHex
     }
@@ -1208,8 +1234,9 @@ final class ChatsListViewModel {
     ) -> Display {
         if let selected = selected ?? selectedPresentationByGroupId[row.groupIdHex] {
             // Nicknames are local-only; keep the rest of MDK's selection intact.
-            let nickname = row.conversationKind == .direct
-                && (currentAccount == nil || currentAccount == appState?.activeAccountRef)
+            let nickname =
+                row.conversationKind == .direct
+                    && (currentAccount == nil || currentAccount == appState?.activeAccountRef)
                 ? selected.peerId.flatMap { appState?.contactNickname(forAccountIdHex: $0) }
                 : nil
             return SelectedChatPresentation.display(selected, row: row, nickname: nickname)
@@ -1248,9 +1275,10 @@ final class ChatsListViewModel {
         cachedDirectPeerAccountId: String? = nil
     ) -> Display {
         if details == nil,
-           let appState,
-           row.conversationKind != .group,
-           ContentSanitizer.groupName(row.groupName) == nil {
+            let appState,
+            row.conversationKind != .group,
+            ContentSanitizer.groupName(row.groupName) == nil
+        {
             if let cachedDirectPeerAccountId {
                 return Display(
                     title: IdentityPresentation.text(
@@ -1432,19 +1460,23 @@ final class ChatsListViewModel {
         archivedItems = nextArchivedItems
         visibleRowsRevision &+= 1
         #if DEBUG
-        publishedItemsMutationCountForTesting += 1
+            publishedItemsMutationCountForTesting += 1
         #endif
         return true
     }
 
     func refreshExpiredPreviews() {
         let now = Date()
-        for (id, item) in itemByGroupId where !item.previewExpired
-            && ChatPreviewRetention.isExpired(item.row.lastMessage, at: now) {
+        for (id, item) in itemByGroupId
+        where !item.previewExpired
+            && ChatPreviewRetention.isExpired(item.row.lastMessage, at: now)
+        {
             itemByGroupId[id] = makeItem(for: item.row)
         }
-        for (id, item) in destinationItems where !item.previewExpired
-            && ChatPreviewRetention.isExpired(item.row.lastMessage, at: now) {
+        for (id, item) in destinationItems
+        where !item.previewExpired
+            && ChatPreviewRetention.isExpired(item.row.lastMessage, at: now)
+        {
             destinationItems[id] = makeItem(for: item.row)
         }
         publishItems()
@@ -1453,13 +1485,15 @@ final class ChatsListViewModel {
     private func scheduleMuteExpiry() {
         muteExpiryTask?.cancel()
         guard let accountIdHex = currentAccountIdHex,
-              let snapshot = ChatMuteStore.notifyModeSnapshot(),
-              let next = ChatMuteStore.nextMuteExpiry(accountIdHex: accountIdHex, in: snapshot)
-        else { muteExpiryTask = nil; return }
+            let snapshot = ChatMuteStore.notifyModeSnapshot(),
+            let next = ChatMuteStore.nextMuteExpiry(accountIdHex: accountIdHex, in: snapshot)
+        else {
+            muteExpiryTask = nil
+            return
+        }
         let delay = max(0.01, min(next.timeIntervalSinceNow, 86_400))
         muteExpiryTask = Task { @MainActor [weak self] in
-            do { try await Task.sleep(for: .seconds(delay)) }
-            catch { return }
+            do { try await Task.sleep(for: .seconds(delay)) } catch { return }
             self?.refreshDisplayProjections()
         }
     }
@@ -1471,8 +1505,7 @@ final class ChatsListViewModel {
             return
         }
         titleFallbackGraceTask = Task { @MainActor [weak self] in
-            do { try await Task.sleep(until: deadline, clock: .continuous) }
-            catch { return }
+            do { try await Task.sleep(until: deadline, clock: .continuous) } catch { return }
             self?.refreshDisplayProjections()
         }
     }
@@ -1481,19 +1514,21 @@ final class ChatsListViewModel {
         previewExpiryTask?.cancel()
         let pending = itemByGroupId.values.filter { !$0.previewExpired }
         guard let next = pending.compactMap({ ChatPreviewRetention.expiry($0.row.lastMessage) }).min()
-        else { previewExpiryTask = nil; return }
+        else {
+            previewExpiryTask = nil
+            return
+        }
         let delay = max(0.01, min(next.timeIntervalSinceNow, 86_400))
         previewExpiryTask = Task { @MainActor [weak self] in
-            do { try await Task.sleep(for: .seconds(delay)) }
-            catch { return }
+            do { try await Task.sleep(for: .seconds(delay)) } catch { return }
             self?.refreshExpiredPreviews()
         }
     }
 
     private func scheduleRowEnrichment(for rows: [ChatListRowFfi]) {
         guard let accountRef = currentAccount,
-              let appState,
-              let myAccountIdHex = appState.activeAccount?.accountIdHex
+            let appState,
+            let myAccountIdHex = appState.activeAccount?.accountIdHex
         else { return }
         let groupIds = rows.compactMap { row -> String? in
             guard rowNeedsDirectPeerEnrichment(row) || rowNeedsInviterEnrichment(row) else {
@@ -1511,8 +1546,9 @@ final class ChatsListViewModel {
             defer { self?.finishAvatarEnrichmentTask(taskID: taskID) }
             guard let self, let appState else { return }
             while !Task.isCancelled,
-                  appState.canUseRuntimeForForegroundWork,
-                  self.currentAccount == accountRef {
+                appState.canUseRuntimeForForegroundWork,
+                self.currentAccount == accountRef
+            {
                 let pendingGroupIds = self.pendingDirectPeerRefreshGroupIds
                 self.pendingDirectPeerRefreshGroupIds = []
                 let groupIds = Self.prioritizedEnrichmentGroupIds(
@@ -1555,7 +1591,7 @@ final class ChatsListViewModel {
                     )
                 }
                 guard appState.canUseRuntimeForForegroundWork,
-                      self.ownsAvatarEnrichmentTask(taskID: taskID, accountRef: accountRef)
+                    self.ownsAvatarEnrichmentTask(taskID: taskID, accountRef: accountRef)
                 else { return }
 
                 var peersByGroupId: [String: String] = [:]
@@ -1608,7 +1644,7 @@ final class ChatsListViewModel {
                     }
                 }
                 guard appState.canUseRuntimeForForegroundWork,
-                      self.ownsAvatarEnrichmentTask(taskID: taskID, accountRef: accountRef)
+                    self.ownsAvatarEnrichmentTask(taskID: taskID, accountRef: accountRef)
                 else { return }
 
                 for groupId in groupIds {
@@ -1616,7 +1652,8 @@ final class ChatsListViewModel {
                     if membership.memberIdsByGroupId[groupId] != nil {
                         self.directPeerLookupCompletedGroupIds.insert(groupId)
                         if let other = peersByGroupId[groupId],
-                           row.conversationKind != .group {
+                            row.conversationKind != .group
+                        {
                             self.directPeerAccountIdByGroupId[groupId] = other
                             appState.warmProfileProjection(
                                 forAccountIdHex: other,
@@ -1649,8 +1686,8 @@ final class ChatsListViewModel {
                     }
                 }
                 guard !Task.isCancelled,
-                      appState.canUseRuntimeForForegroundWork,
-                      self.ownsAvatarEnrichmentTask(taskID: taskID, accountRef: accountRef)
+                    appState.canUseRuntimeForForegroundWork,
+                    self.ownsAvatarEnrichmentTask(taskID: taskID, accountRef: accountRef)
                 else { break }
                 self.pendingDirectPeerRefreshGroupIds.formUnion(
                     unresolvedGroupIds.filter { self.rowByGroupId[$0] != nil }
@@ -1717,51 +1754,52 @@ final class ChatsListViewModel {
     }
 
     #if DEBUG
-    func groupDetailsCacheEntryForTesting(groupIdHex: String) -> GroupDetailsFfi? {
-        groupDetailsCache[groupIdHex]
-    }
-
-    func seedGroupDetailsCacheForTesting(_ details: GroupDetailsFfi) {
-        let groupId = details.group.groupIdHex
-        groupDetailsCache[groupId] = details
-        directPeerLookupCompletedGroupIds.insert(groupId)
-        if let avatarUrl = details.group.avatarUrl {
-            avatarURLByGroupId[groupId] = avatarUrl
+        func groupDetailsCacheEntryForTesting(groupIdHex: String) -> GroupDetailsFfi? {
+            groupDetailsCache[groupIdHex]
         }
-        if let row = rowByGroupId[groupId] {
-            let item = makeItem(for: row)
-            if itemByGroupId[groupId] != item {
-                itemByGroupId[groupId] = item
-                publishItems()
+
+        func seedGroupDetailsCacheForTesting(_ details: GroupDetailsFfi) {
+            let groupId = details.group.groupIdHex
+            groupDetailsCache[groupId] = details
+            directPeerLookupCompletedGroupIds.insert(groupId)
+            if let avatarUrl = details.group.avatarUrl {
+                avatarURLByGroupId[groupId] = avatarUrl
+            }
+            if let row = rowByGroupId[groupId] {
+                let item = makeItem(for: row)
+                if itemByGroupId[groupId] != item {
+                    itemByGroupId[groupId] = item
+                    publishItems()
+                }
             }
         }
-    }
 
-    func attachWindowForTesting(_ snapshot: ChatListWindowSnapshotFfi) {
-        listMode = .window(snapshot.view)
-        windowCursor = ProjectionSequenceCursor(generation: snapshot.subscriptionGeneration, sequence: snapshot.sequence)
-        installWindowSnapshot(snapshot)
-    }
+        func attachWindowForTesting(_ snapshot: ChatListWindowSnapshotFfi) {
+            listMode = .window(snapshot.view)
+            windowCursor = ProjectionSequenceCursor(
+                generation: snapshot.subscriptionGeneration, sequence: snapshot.sequence)
+            installWindowSnapshot(snapshot)
+        }
 
-    func receiveWindowForTesting(_ snapshot: ChatListWindowSnapshotFfi) {
-        acceptWindowSnapshot(snapshot)
-    }
+        func receiveWindowForTesting(_ snapshot: ChatListWindowSnapshotFfi) {
+            acceptWindowSnapshot(snapshot)
+        }
 
-    func setLoadErrorForTesting(_ error: String?) {
-        loadError = error
-    }
+        func setLoadErrorForTesting(_ error: String?) {
+            loadError = error
+        }
 
-    var avatarEnrichmentTaskIDForTesting: UUID? { avatarEnrichmentTaskID }
+        var avatarEnrichmentTaskIDForTesting: UUID? { avatarEnrichmentTaskID }
 
-    func installAvatarEnrichmentTaskForTesting(taskID: UUID) {
-        avatarURLTask?.cancel()
-        avatarURLTask = Task {}
-        avatarEnrichmentTaskID = taskID
-    }
+        func installAvatarEnrichmentTaskForTesting(taskID: UUID) {
+            avatarURLTask?.cancel()
+            avatarURLTask = Task {}
+            avatarEnrichmentTaskID = taskID
+        }
 
-    func finishAvatarEnrichmentTaskForTesting(taskID: UUID) {
-        finishAvatarEnrichmentTask(taskID: taskID)
-    }
+        func finishAvatarEnrichmentTaskForTesting(taskID: UUID) {
+            finishAvatarEnrichmentTask(taskID: taskID)
+        }
     #endif
 
     /// Match Marmot's durable chat-list ordering: manually ordered pinned rows

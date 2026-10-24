@@ -1,0 +1,100 @@
+{
+  "base": "49dfd1fa37b6a967faff78dd31e686dc57e8113d",
+  "sdk_source": "3fab3184d8cc089c7a3d24988443ff2d38ee93a5",
+  "red_stash": "7612a41e90c6ef537243b43a6b206ff42a20d8e4",
+  "green_stash": "22d2bc88f87a2ff719d24ed99e2e868fca9f7513",
+  "sdk4_remote_stash": "978b8352e855f193e27c18857311667b099f6281",
+  "phases": [
+    {
+      "source_base": "49dfd1fa37b6a967faff78dd31e686dc57e8113d",
+      "source_inputs": 824,
+      "input_manifest_sha256": "424ab71d44c84f4c696dfe55a5c9266f81d47ff7004153fb86a0fd35b2b2110c",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 65,
+      "seconds": 26.55,
+      "log_sha256": "339eba282542d9f194e57a19df78a4d9ab87544e1ccaebbdb781c4b178306519",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Failed",
+        "totalTestCount": 2,
+        "passedTests": 0,
+        "failedTests": 2,
+        "skippedTests": 0
+      },
+      "test_failures": [
+        {
+          "failureText": "Caught error: .SelectedChatCopyBusy",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 2,
+          "testIdentifierString": "SelectedChatPresentationTests/explicitConsentResetRequiresOriginalCleanupAndNeverApproves()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatPresentationTests/explicitConsentResetRequiresOriginalCleanupAndNeverApproves()",
+          "testName": "explicitConsentResetRequiresOriginalCleanupAndNeverApproves()"
+        },
+        {
+          "failureText": "Caught error: .SelectedChatCopyBusy",
+          "targetName": "whitenoise-iosTests",
+          "testIdentifier": 1,
+          "testIdentifierString": "SelectedChatPresentationTests/explicitCopyResetRequiresOriginalCleanupAndNeverStartsAnotherFactory()",
+          "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SelectedChatPresentationTests/explicitCopyResetRequiresOriginalCleanupAndNeverStartsAnotherFactory()",
+          "testName": "explicitCopyResetRequiresOriginalCleanupAndNeverStartsAnotherFactory()"
+        }
+      ],
+      "prefix": "ios-selected-chat-reset-red-v1"
+    },
+    {
+      "source_base": "49dfd1fa37b6a967faff78dd31e686dc57e8113d",
+      "source_inputs": 824,
+      "input_manifest_sha256": "e571b9392f9f15612f328b910e6e2be595ace570a4a397104c78cdfd319ba829",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 26.41,
+      "log_sha256": "fd9e3940bc055e742fceff811a4595a7366f05d24ff61e294b0c33fc9187e55e",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 21,
+        "passedTests": 21,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-reset-green-v1"
+    },
+    {
+      "source_base": "49dfd1fa37b6a967faff78dd31e686dc57e8113d",
+      "source_inputs": 824,
+      "input_manifest_sha256": "e571b9392f9f15612f328b910e6e2be595ace570a4a397104c78cdfd319ba829",
+      "profile": "local-3fab/experimentalflag1/Staging",
+      "installed_manifest_sha256": "f150577d4e49a05ed62eef82786922feee2fa491c2e5d89cf46a95e9b16109c1",
+      "exit_code": 0,
+      "seconds": 8.24,
+      "log_sha256": "97f206bb76fc03c0894bcd6cb70055bb4f53e8879c6aa8042a6cd658fa8047bb",
+      "physical_phone_changed": false,
+      "scope": "Original selected-chat injected UI and account lifetime; generated SDK controls, not native cryptographic acceptance",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 102,
+        "passedTests": 102,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": [],
+      "prefix": "ios-selected-chat-reset-affected-v1"
+    }
+  ],
+  "behavior": "Explicit presentation reset reveals the next entry only after the exact child is inactive and original cleanup succeeded. Active/failed cleanup refuses, owner retirement refuses, and no factory/export/approval runs as part of reset. Original account lifetime retains SDK custody independently.",
+  "tdd": "New reset operations default-denied before minimal implementation; two tests failed after successful original cleanup. They retain the active, failed cleanup and stale owner controls unchanged on GREEN.",
+  "checks": [
+    "canonical three-file strict swift-format",
+    "SwiftLint0.63.2 strict threefiles:zero violations",
+    "git diff --check"
+  ],
+  "limits": [
+    "Generated original-handle controls plus inherited account lifecycle tests; not real native cryptographic selected-chat acceptance.",
+    "No new strings, SDK/capability/UI approval inference/install/publication or full-PR claim."
+  ]
+}

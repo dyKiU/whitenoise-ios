@@ -1,0 +1,170 @@
+{
+  "base": "7e798bf1b643def2f60cd314173e0df09cf6e876",
+  "scope": "Actual hosted source pane and original AppState/model query: external XCUI only selects observed recipient and taps Request, Refresh and Continue. Unit observes actual same-held model/review, native recipient explicit approval, committed import and original retirement plus SDK storageIsClosed. Prior Request/Cancel and model-only transfer tests preserved.",
+  "source_sha256": {
+    "whitenoise-ios/Conversation/HistorySourcePickerView.swift": "e0c9638cef74ff665dcd65c4b5a7fe8800ddc61565a7e756bfb66232acd5556c",
+    "whitenoise-iosTests/GenuineHistorySourceTransferTests.swift": "d67e8089911c2d1d14468618eda35fbfaa74c3fd8d3dd19ff6059e6149339975",
+    "whitenoise-iosUITests/HostedHistorySourceTransferUITests.swift": "1f6e512e13db35f135d4534761f00fa1277cd64cf66eebc75c207eb2f2f456c9"
+  },
+  "preserved_sources": {
+    "local": "1afa49cf642b857a74fe67abaf0d150d6e2c31e7",
+    "m5": "8178c988c1cd1dd5f130304449f300c0b7be6142",
+    "m5_sdk_only": "f0d51b18444af2f28b1e7ff3c8fee8bf6a0ef5d9"
+  },
+  "qualification": {
+    "ios-genuine-history-source-continue-build-v1": {
+      "exit_code": 0,
+      "seconds": 21.89,
+      "source_inputs": 888,
+      "log_sha256": "6c0051d17867b735f1a47a11193e13460c4f5e4884433bb51c8d2ce8bda10d1f",
+      "scope": "Actual history approval fixture plus public UI driver build only; no runtime success implied"
+    },
+    "ios-genuine-history-source-continue-public-v1": {
+      "unit_exit_code": 0,
+      "driver_exit_code": 0,
+      "seconds": 78.77,
+      "source_inputs": 888,
+      "input_manifest_sha256": "05cf47de5d4b8a86b8efbc0d28d74d40462ecff924daf349ee30535c1aeb0a22",
+      "LOCAL_BUILD_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "framework_sha256": {
+        "Info.plist": "13b3e9d0136bfc10184edbbe0f4d21c53917ebabfc12885d2d247a4e7b34b0a5",
+        "ios-arm64-simulator/libmarmot_uniffi.a": "9e8ae53635e4c13eb3e81dbf98304305d0180d3e7b23bf30023bd7bd8398074e",
+        "ios-arm64/libmarmot_uniffi.a": "3b9473d0d4954bc6c7473ca1382d552f13e631000d310c023af8264601dc37c4",
+        "ios-arm64/Headers/marmot_uniffiFFI.h": "db774949553560b2b8070ca60f6b92a31e07ef800b11eb0242edfde30c114264",
+        "ios-arm64/Headers/module.modulemap": "f08ed742371741da4ba33db63af56b72cb8c6a64bec8cc8fb389626de04ed685",
+        "ios-arm64-simulator/Headers/marmot_uniffiFFI.h": "db774949553560b2b8070ca60f6b92a31e07ef800b11eb0242edfde30c114264",
+        "ios-arm64-simulator/Headers/module.modulemap": "f08ed742371741da4ba33db63af56b72cb8c6a64bec8cc8fb389626de04ed685"
+      },
+      "logs": {
+        "unit": "e8b7f6a4510152502179c2ec851c9d1b07917260ce7bef2e300741fb2d708033",
+        "driver": "37fea82b7d4394ac24a7722297c8f79f9828decda7bd229fca4c0b3a75024e82"
+      },
+      "completed": {
+        "runtime_closed": true,
+        "source_complete": true,
+        "original_retired": true
+      },
+      "unit": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "unit_failures": [],
+      "driver": {
+        "result": "Passed",
+        "totalTestCount": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "driver_failures": []
+    },
+    "ios-genuine-history-source-continue-affected-v1": {
+      "source_base": "7e798bf1b643def2f60cd314173e0df09cf6e876",
+      "source_inputs": 888,
+      "input_manifest_sha256": "05cf47de5d4b8a86b8efbc0d28d74d40462ecff924daf349ee30535c1aeb0a22",
+      "profile": "local-sdk987/experimentalflag1/Staging",
+      "installed_manifest_sha256": "9fd283362c595f3286bf26786be73671ba7691362cb06a4fda3a6797321c2884",
+      "exit_code": 0,
+      "seconds": 10.08,
+      "log_sha256": "0cbaa657d97228f80bd00b4547b30559da3182622f46e034a4e4b0e9244741ab",
+      "physical_phone_changed": false,
+      "scope": "Affected source model/pane/native query/recipient custody/constructor/account ownership controls; genuine source request executed separately, no continuation/consent/import or full PR claim",
+      "tests": {
+        "result": "Passed",
+        "totalTestCount": 44,
+        "passedTests": 44,
+        "failedTests": 0,
+        "skippedTests": 0
+      },
+      "test_failures": []
+    }
+  },
+  "static_checks": {
+    "swift_format": "strict scoped pass",
+    "swiftlint": "0.63.2 strict scoped pass",
+    "git_diff_check": "pass"
+  },
+  "limits": [
+    "Only product change is stable Refresh accessibility identifier; no authority or protocol behavior changes.",
+    "This fixture observed a revision advance after recipient approval; reading or refreshing does not generally promise a revision advance.",
+    "SDK987 unchanged; generated overrides excluded from Git.",
+    "Final published and experimental full integration suites pending after this focused commit.",
+    "No physical phone install, M1 ready mutation, live account access or whole installed navigation claim."
+  ],
+  "native_controller": {
+    "result_sha256": "970915690ceba5ca70348862e74c7730931a266607f36230142b9ba2c3f385e0",
+    "log_sha256": "6b39365aff8d9d1d72f289ab3235e3710898cd359deec49d6c6acd72830366d4",
+    "passed": 1,
+    "failed": 0,
+    "seconds": 62.01,
+    "history_counts": {
+      "native_three_device_phases": {
+        "coordinator": "enrollmentComplete",
+        "joining": "enrollmentComplete",
+        "sibling": "settled"
+      },
+      "native_three_device_transitions": [
+        {
+          "coordinator": {
+            "phase": "verificationCompleteEnrollmentPending",
+            "revision": 5
+          },
+          "joining": {
+            "phase": "verificationCompleteEnrollmentPending",
+            "revision": 6
+          },
+          "sibling": {
+            "phase": "awaitingSettlement",
+            "revision": 3
+          }
+        },
+        {
+          "coordinator": {
+            "phase": "verificationCompleteEnrollmentPending",
+            "revision": 5
+          },
+          "joining": {
+            "phase": "verificationCompleteEnrollmentPending",
+            "revision": 6
+          },
+          "sibling": {
+            "phase": "settled",
+            "revision": 4
+          }
+        },
+        {
+          "coordinator": {
+            "phase": "enrollmentComplete",
+            "revision": 6
+          },
+          "joining": {
+            "phase": "enrollmentComplete",
+            "revision": 7
+          },
+          "sibling": {
+            "phase": "settled",
+            "revision": 4
+          }
+        }
+      ],
+      "eligible_recipients": 2,
+      "query_created_requests": 0,
+      "source_records": 2,
+      "imported_records": 1,
+      "archive_page_records": 1,
+      "verified_prejoin_records": 1,
+      "postjoin_live_record_present": true,
+      "source_complete": true,
+      "recipient_complete": true,
+      "app_source_model_complete": true
+    },
+    "native_runtime_cleanup": {
+      "originals": 4,
+      "closed": 4,
+      "failed": 0
+    }
+  }
+}

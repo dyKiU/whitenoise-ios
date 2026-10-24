@@ -69,7 +69,9 @@ struct MessageLinkCopyTests {
         ])).isEmpty)
 
         let blockedByPolicy = try paragraph([
-            .link(dest: "\(DeepLink.scheme)://chat/abc", title: nil, children: [.text(content: "chat")], classification: .web),
+            .link(
+                dest: "\(DeepLink.canonicalScheme)://chat/abc", title: nil, children: [.text(content: "chat")],
+                classification: .web)
         ])
         #expect(blockedByPolicy.runs.first?.link != nil)
         #expect(MessageLinkSegment.segments(of: blockedByPolicy).allSatisfy { $0.target == nil })

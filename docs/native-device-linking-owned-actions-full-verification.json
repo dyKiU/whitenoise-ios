@@ -1,0 +1,135 @@
+{
+  "source_commit": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+  "full_gates": [
+    {
+      "source_commit": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+      "inputs": 783,
+      "verified_sources": {
+        "signed_c5afa4f": 779,
+        "preserved_M5_metadata": 2,
+        "preserved_e6_overrides": 2
+      },
+      "result": {
+        "source_base": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+        "source_inputs": 783,
+        "input_manifest_sha256": "756b3b1c07a7ed129285b234f68205c976942eafd11c7424daabf5920ae07a3f",
+        "profile": "local-e6/experimentalflag1/Staging",
+        "installed_manifest_sha256": "e859a5b228f87ffdd6902d9dd227615249baf5951dd0ff272dcff42a60b888a0",
+        "exit_code": 0,
+        "seconds": 187.99,
+        "log_sha256": "80afb4098272099899bafa3366c5e3573572584debb8d74f085990b04a58f521",
+        "physical_phone_changed": false,
+        "scope": "Full experimental Staging regression for signed action slice; not fresh SDK pairing, enrollment or delivery acceptance",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 2728,
+          "passedTests": 2726,
+          "failedTests": 0,
+          "skippedTests": 2
+        },
+        "test_failures": []
+      },
+      "scope": "Full experimental Staging regression only; not fresh native pairing, enrollment or delivery"
+    },
+    {
+      "source_inputs": 783,
+      "verified_signed_inputs": 783,
+      "result": {
+        "source_base": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+        "source_inputs": 783,
+        "input_manifest_sha256": "afae04090a0f437989a15873379b49bdab7ae3b434eeab69c2d4b57bed42bffa",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 0,
+        "seconds": 279.72,
+        "log_sha256": "b5cf07dec854a0520c1e63429b44dababa909e31f656b0a3e2995e93c60d12c8",
+        "physical_phone_changed": false,
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 2704,
+          "passedTests": 2702,
+          "failedTests": 0,
+          "skippedTests": 2
+        },
+        "test_failures": []
+      }
+    }
+  ],
+  "compile_only_attempts": [
+    {
+      "source_inputs": 783,
+      "verified_signed_inputs": 783,
+      "result": {
+        "source_base": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+        "source_inputs": 783,
+        "input_manifest_sha256": "afae04090a0f437989a15873379b49bdab7ae3b434eeab69c2d4b57bed42bffa",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 65,
+        "seconds": 6.49,
+        "log_sha256": "f9f1215d84edaa0c96856f768ab91dc78c247c37f2b572ed2af8b94b02fd08b4",
+        "physical_phone_changed": false,
+        "scope": "Compile-only stale FFI PCM header mismatch; zero tests",
+        "retirement": [
+          {
+            "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-J4ASDWKBSTQ2LQN32U4754KB.pcm",
+            "bytes": 529976,
+            "sha256": "585dd58a343d9c2ab8b482f512718be2285235481def85dad1250c646a681ea2",
+            "cause": "Exact diagnosed header/PCM mismatch; zero tests; owned Xcode target idle"
+          }
+        ]
+      }
+    },
+    {
+      "source_inputs": 783,
+      "verified_signed_inputs": 783,
+      "result": {
+        "source_base": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+        "source_inputs": 783,
+        "input_manifest_sha256": "afae04090a0f437989a15873379b49bdab7ae3b434eeab69c2d4b57bed42bffa",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 65,
+        "seconds": 9.15,
+        "log_sha256": "d81ff8329fe4e3374d637726b4b189799d5d2b3e115fe03698fa23cbf819049a",
+        "physical_phone_changed": false,
+        "scope": "Compile-only stale FFI PCM header mismatch; zero tests",
+        "retirement": [
+          {
+            "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-3FQ34PVTW6D4WJAGV5QRT2MD.pcm",
+            "bytes": 529928,
+            "sha256": "185b55f7a7866b8464afa18b7165c964e806148a62856f0ba99eed71c2cfbdcc",
+            "cause": "Exact diagnosed header/PCM mismatch; zero tests; owned Xcode target idle"
+          }
+        ]
+      }
+    },
+    {
+      "source_inputs": 783,
+      "verified_signed_inputs": 783,
+      "result": {
+        "source_base": "c5afa4f83803827a690ef71788c1ed4a396cd826",
+        "source_inputs": 783,
+        "input_manifest_sha256": "afae04090a0f437989a15873379b49bdab7ae3b434eeab69c2d4b57bed42bffa",
+        "profile": "published-0.12.0/experimentalflag0/Staging",
+        "exit_code": 65,
+        "seconds": 12.74,
+        "log_sha256": "37801df052272f23e8966e8d57edaf5263aaf6513d322ca1f219d6f6ff049268",
+        "physical_phone_changed": false,
+        "scope": "Compile-only stale FFI PCM header mismatch; zero tests",
+        "retirement": [
+          {
+            "path": "/Users/pj/project/whitenoise-sync-ios-build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/marmot_uniffiFFI-9148O2XZODL89SK09LRC06AF6.pcm",
+            "bytes": 529928,
+            "sha256": "4c2cb0bbaea99c5cef483773e986224b7723c02c0f5b07fc20bd3b8416bf4428",
+            "cause": "Exact diagnosed header/PCM mismatch; zero tests; owned Xcode target idle"
+          }
+        ]
+      }
+    }
+  ],
+  "binding_restoration": {
+    "restored_from": "1a6afd75e04301a765d26992054a6d9ff4d50d0b",
+    "all_previous_experimental_inputs_unchanged": 783,
+    "four_overrides_restored_byte_exact": true,
+    "physical_phone_changed": false
+  },
+  "scope": "Both full app regression cohorts qualify signed c5afa4f; fresh pairing, native UI, enrollment and delivery remain separate"
+}

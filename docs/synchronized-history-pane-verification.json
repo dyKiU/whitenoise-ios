@@ -1,0 +1,248 @@
+{
+  "base": "23e6558c56734f9a2f75dc4ed760b31648f3b7dc",
+  "sdk_source": "84113c20771a0092cb0e52ca094836375f9dd406",
+  "scope": "Conversation entry and bounded read-only pane; source-attested records separate from authenticated live timeline. No transfer/consent grants or attachment downloads.",
+  "red_local_stash": "03e31513a52992a68f1aceaf070bfab2f3aa88d1",
+  "initial_green_local_stash": "0b8583326f03c2cf52d2f28934e2c3f0e9baf1ca",
+  "final_local_stash": "ef37cc4376a4331c7216ded9c4b066b77eb6fe9a",
+  "final_remote_stash": "fca2a2f72c4ba44f6e6091c60f5990a17b64f03f",
+  "gates": {
+    "presentation-red-v1": {
+      "result": {
+        "source_base": "23e6558c56734f9a2f75dc4ed760b31648f3b7dc",
+        "source_inputs": 837,
+        "input_manifest_sha256": "57a0d496edef4d951dbcccc8ef1d4281ecd50b4658707b5db0da1f3292098a34",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 65,
+        "seconds": 82.74,
+        "log_sha256": "ed87af638317e75ae797c49afac7b5ba0dd19df5a46cd242b4766d084ac7379b",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Failed",
+          "totalTestCount": 3,
+          "passedTests": 1,
+          "failedTests": 2,
+          "skippedTests": 0
+        },
+        "test_failures": [
+          {
+            "failureText": "Expectation failed: SynchronizedHistoryPresentation.contentState(value, referenceDate: Date(timeIntervalSince1970: 10)) == .expired\nSynchronizedHistoryPresentation.contentState(value, referenceDate: Date(timeIntervalSince1970: 10)) \u2192 .visible",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 3,
+            "testIdentifierString": "SynchronizedHistoryPresentationTests/cachedRecordIsMaskedAtOriginalExpiryWithoutAnotherRead()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SynchronizedHistoryPresentationTests/cachedRecordIsMaskedAtOriginalExpiryWithoutAnotherRead()",
+            "testName": "cachedRecordIsMaskedAtOriginalExpiryWithoutAnotherRead()"
+          },
+          {
+            "failureText": "Expectation failed: SynchronizedHistoryPresentation.contentState(record(deleted: true), referenceDate: .distantPast) == .deleted\nSynchronizedHistoryPresentation.contentState(record(deleted: true), referenceDate: .distantPast) \u2192 .visible",
+            "targetName": "whitenoise-iosTests",
+            "testIdentifier": 1,
+            "testIdentifierString": "SynchronizedHistoryPresentationTests/deletedRecordNeverDisplaysRetainedContent()",
+            "testIdentifierURL": "test://com.apple.xcode/whitenoise-ios/whitenoise-iosTests/SynchronizedHistoryPresentationTests/deletedRecordNeverDisplaysRetainedContent()",
+            "testName": "deletedRecordNeverDisplaysRetainedContent()"
+          }
+        ]
+      },
+      "manifest": "build/results/ios-history-presentation-red-v1-input.json",
+      "log": "build/results/ios-history-presentation-red-v1.log"
+    },
+    "presentation-green-v1": {
+      "result": {
+        "source_base": "23e6558c56734f9a2f75dc4ed760b31648f3b7dc",
+        "source_inputs": 838,
+        "input_manifest_sha256": "12fd7062997346f1d5ecbf1b59a9e78dfc3844f163d2fdee7a97cd386371b527",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 0,
+        "seconds": 83.26,
+        "log_sha256": "df61c47a562487ace7ed8d044d3d5e3a54a1c2c67e8362ab7a179b5bfcadb7e0",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 3,
+          "passedTests": 3,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      },
+      "manifest": "build/results/ios-history-presentation-green-v1-input.json",
+      "log": "build/results/ios-history-presentation-green-v1.log"
+    },
+    "pane-affected-v1": {
+      "result": {
+        "source_base": "23e6558c56734f9a2f75dc4ed760b31648f3b7dc",
+        "source_inputs": 839,
+        "input_manifest_sha256": "0fcd96547e0af2fb052fd2aca18773ca0e2a193e83296e08d0cce35f4efdcf6e",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 0,
+        "seconds": 32.48,
+        "log_sha256": "6ceaccc77bf771f12f5df01cd2d7bd7569a62cf21dbe37dd84c2909fd1896f93",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 66,
+          "passedTests": 66,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      },
+      "manifest": "build/results/ios-history-pane-affected-v1-input.json",
+      "log": "build/results/ios-history-pane-affected-v1.log"
+    },
+    "pane-affected-v2": {
+      "result": {
+        "source_base": "23e6558c56734f9a2f75dc4ed760b31648f3b7dc",
+        "source_inputs": 839,
+        "input_manifest_sha256": "4edd97aef78a6836b169a384acdd73031c2a4db90a305da8b0e61554df4a44ac",
+        "profile": "local-84113/experimentalflag1/Staging",
+        "installed_manifest_sha256": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4",
+        "exit_code": 0,
+        "seconds": 37.68,
+        "log_sha256": "d0b5453722aa4b25e364919a277e19b66994d6321e707fd5bfdd2e21385b119e",
+        "physical_phone_changed": false,
+        "scope": "Bounded read-only source-attested history reader; no grant or live projection",
+        "tests": {
+          "result": "Passed",
+          "totalTestCount": 66,
+          "passedTests": 66,
+          "failedTests": 0,
+          "skippedTests": 0
+        },
+        "test_failures": []
+      },
+      "manifest": "build/results/ios-history-pane-affected-v2-input.json",
+      "log": "build/results/ios-history-pane-affected-v2.log"
+    }
+  },
+  "red_diagnostics": "After actual three-test RED, script diagnostic collection also reported simctl unavailable; distinct from behavioral 1pass/2fail.",
+  "catalog": {
+    "tool_changed_prior_entries_restored": [
+      "%lld groups in common",
+      "%lld images",
+      "%lld media files",
+      "%lld members",
+      "%lld more messages",
+      "%lld new messages",
+      "%lld notifications",
+      "%lld person group",
+      "%lld selected",
+      "%lld videos",
+      "%llu unread messages",
+      "\ud83d\udcce %lld attachments",
+      "Couldn't leave %lld chats. Try again.",
+      "Group \u00b7 %lld members",
+      "Invited %lld members",
+      "Leave %lld chats",
+      "Leave %lld chats?",
+      "Leave %lld chats\u2026",
+      "Published %lld updates.",
+      "See all %lld members",
+      "You can send up to %lld photos at once",
+      "Your kind:0 metadata is live on %lld relays."
+    ],
+    "raw_import_sha256": "041f43e02067acca5b63a0a929b8e5c48c78b85a6eed73ccfe02c731bea960a5",
+    "prior_order_unchanged": true,
+    "imports": [
+      {
+        "language": "de",
+        "exit_code": 0,
+        "xliff_sha256": "9dfcdc914c147ece878b0c8cac183edb1fdf1daf99c7140cea78dc3d40c5d787",
+        "log_sha256": "cebcdff861572eb34f5b6b8913bdb515c843f024ea9ce9a631796e8d6f923fa8"
+      },
+      {
+        "language": "es",
+        "exit_code": 0,
+        "xliff_sha256": "688e52cb59aafcac14a3818db8c6863d65a761ec5b4ca65ecedfcc20e5c4e8c2",
+        "log_sha256": "deeb0941f9a31adcdfcb42e0690f86d239a22d311742cd9f520876e5c0ef0da4"
+      },
+      {
+        "language": "fr",
+        "exit_code": 0,
+        "xliff_sha256": "8cb608b4886475437209ceac712e67bcf38111ffc92c64ac07fcc3d5dd2eee9d",
+        "log_sha256": "39138b35c8831666855b1f2e6fd9f5e09c4b5c81ab0386618b569a9ff51fd054"
+      },
+      {
+        "language": "it",
+        "exit_code": 0,
+        "xliff_sha256": "89332ebaa92d7e7924ffa13115e34e74545054a7c1898ef59b79b536468c1445",
+        "log_sha256": "9df1aa18a382f3ad846d3b6969e160ea668828d4b02ece35fb95c43fa3080468"
+      },
+      {
+        "language": "pt",
+        "exit_code": 0,
+        "xliff_sha256": "73b664a4f9fd4a7a9662fa3fc06ede23409951be91e0429bd2f83a3e950eacf0",
+        "log_sha256": "b32992ede6350b9a6285069cd3df4eb00ce1d1f8978b452a91a999e4e795d8d7"
+      },
+      {
+        "language": "ru",
+        "exit_code": 0,
+        "xliff_sha256": "7dcb172b129b9a69b5752e7c492d39121fd8aaa1c1047a25c428e0a86416deb0",
+        "log_sha256": "3372c30f0a260d85f089f8d69fd95304be7df99ee780b91860ae89ba37d041a3"
+      },
+      {
+        "language": "tr",
+        "exit_code": 0,
+        "xliff_sha256": "9805982bffb1bc04415d33c7a809fd6d64d3243931336f04cc74a87107f23808",
+        "log_sha256": "5e4a95f7b1d0884a78f2f026be761a5c9bb329fb2ad02e66f46fff6c563921e1"
+      },
+      {
+        "language": "zh-Hans",
+        "exit_code": 0,
+        "xliff_sha256": "fab6a281d00972a1c51ec67d690c8642ff46625f47aef6e7698057842787a77d",
+        "log_sha256": "2c7f3555ea57ddf55b900e43f61029a3f662fb8e6d4e07758e09c3210b135402"
+      },
+      {
+        "language": "zh-Hant",
+        "exit_code": 0,
+        "xliff_sha256": "1dced1c49fa987b0d3e922494d3926be8aa7d6dfc4022c532b59ce9fb88d8542",
+        "log_sha256": "56e4fcb1c0964d17fd9b978f07eee80440f564fdc135fb98f74261fb020b26aa"
+      }
+    ],
+    "original_count": 1976,
+    "new_count": 1985,
+    "added": [
+      "Attachment availability has not been verified on this device.",
+      "Attachment unavailable",
+      "Could not load synchronized history.",
+      "History transfer",
+      "Manifest digest",
+      "No messages",
+      "Source provenance",
+      "Synchronized history",
+      "These records are attested by the source device and are separate from live authenticated messages."
+    ],
+    "original_entries_unchanged": true,
+    "sdk_unchanged": {
+      "Packages/MarmotKit/MARMOT_VERSION": "bc26500dd12a74d981c8c4340e33c02c097846fa8bb9b964661e377e4bc4216d",
+      "Packages/MarmotKit/Package.swift": "4c379ba9d572adb649c9692466ebbc80204af9ca0bf5acd63256ff6e0fa29b50",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKit.swift": "ee50aae01fff2d451f3957181eb6643ceda9503e84899a89538684259348e36a",
+      "Packages/MarmotKit/Sources/MarmotKit/MarmotKitVersion.swift": "c2a560f7841709d13d560c6bb6a85bd8489df2ddb96683706dc7996826542843",
+      "Packages/MarmotKit/LOCAL_BUILD.json": "8509be6729e73521095ef81449b3d5f6f7d8790329a675c1b48cc2d303ca75b4"
+    },
+    "catalog_sha256": "95a046f1aa37551bfbeaaedc251244e035cc52e09adc9b03523cf6aefbee8e2b",
+    "workflow": "Compiler SynchronizedHistoryView.stringsdata \u2192 xcstringstool sync \u2192 Xcode export \u2192 nine XLIFF imports; actual prior values/order restored around tool-imported additions.",
+    "preserved_tooling_failures": [
+      "v1 import exit64 used default flag with expanded SDK; exhaustive enum compile failure, no product change.",
+      "v2 nine imports completed but prior-value/order preservation assertion rejected Xcode plural normalization. Raw imported catalog retained; v3 imports all exit0 and prior22 entries restored exactly."
+    ],
+    "serialization": "Final automated merge preserves original catalog raw formatting and appends only the9 Apple-imported keys (+522lines versus base). Exact final66 controls rerun after formatting-only correction."
+  },
+  "visual": {
+    "path": "build/results/ios-history-pane-affected-v1-visuals/7A77491D-4476-4763-99B4-C0F090730115.png",
+    "sha256": "2ba72f0367fdce6a26ce9c02fea106f25823b4d842e0548629a12e0fee6b04ac",
+    "inspection": "Hosted isolated injected-page pane fits390\u00d7844; source notice/identity/content/media rejection/provenance/pagination visible. User visual acceptance remains separate."
+  },
+  "limits": [
+    "Full Staging PR pending.",
+    "Hosted isolated injected page render; real native imported-history acceptance recorded separately in parent tools.",
+    "No manual install, physical phone change, transfer consent UI or automatic media acquisition."
+  ],
+  "preserved_initial_signed_ui": "8a88c192af7a58ad1994ae8d7ae895398a6dd0bc (refs/checkpoints/ios-history-pane-initial-serialization); unpublished first serialization before final raw-format preservation."
+}

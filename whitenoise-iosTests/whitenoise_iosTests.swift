@@ -678,6 +678,7 @@ struct AppStateBootstrapTests {
 
     @Test func createIdentityDefaultsNotificationsOnWhenPermissionIsGranted() async throws {
         try await notificationDefaultsTestGate.withLock {
+            let nativePushAvailable = Bundle.main.bundleIdentifier != "dev.ipf.whitenoise.ios.staging.personal"
             var authorizationRequestCount = 0
             var remoteRegistrationRequestCount = 0
             let notifications = grantedNotifications(
@@ -686,7 +687,8 @@ struct AppStateBootstrapTests {
                 },
                 remoteNotificationRegistrar: {
                     remoteRegistrationRequestCount += 1
-                }
+                },
+                remoteNotificationsAvailable: nativePushAvailable
             )
             let appState = try testAppState(notifications: notifications)
             await appState.bootstrap()
@@ -697,9 +699,13 @@ struct AppStateBootstrapTests {
             let maybeSettings = await appState.notificationSettings(for: account.label)
             let settings = try #require(maybeSettings)
             #expect(settings.localNotificationsEnabled)
-            #expect(settings.nativePushEnabled)
+            #expect(settings.nativePushEnabled == nativePushAvailable)
             #expect(authorizationRequestCount == 1)
-            #expect(remoteRegistrationRequestCount >= 1)
+            if nativePushAvailable {
+                #expect(remoteRegistrationRequestCount >= 1)
+            } else {
+                #expect(remoteRegistrationRequestCount == 0)
+            }
 
             let marmot = try #require(appState.client?.marmot)
             _ = try? marmot.setLocalNotificationsEnabled(accountRef: account.label, enabled: false)
@@ -1932,6 +1938,36 @@ struct AppStateBootstrapTests {
         await stopReadyRuntime(appState)
     }
 
+    @Test func pendingInvitationDeliveryWarnsOnlyForCurrentAccountAndRuntime() async throws {
+        let seeded = try await readyAppStateWithCreatedIdentities()
+        let appState = seeded.appState
+        let account = try #require(appState.activeAccount)
+        let generation = try #require(appState.runtimeEventsGeneration)
+        let event = MarmotEventFfi.welcomeDeliveryPending(
+            accountIdHex: account.accountIdHex, accountLabel: "private profile",
+            groupIdHex: "private group", messageIdHex: "private message", recipientHex: "private recipient"
+        )
+        appState.dismissToast()
+        appState.handleRuntimeEvent(event, generation: generation - 1)
+        #expect(appState.activeToast == nil)
+        appState.handleRuntimeEvent(.welcomeDeliveryPending(
+            accountIdHex: "other-account", accountLabel: "private profile",
+            groupIdHex: "private group", messageIdHex: "private message", recipientHex: "private recipient"
+        ), generation: generation)
+        #expect(appState.activeToast == nil)
+        appState.handleRuntimeEvent(event, generation: generation)
+        let toast = try #require(appState.activeToast)
+        #expect(toast.style == .warning)
+        #expect(toast.title == L10n.string("Invitation delivery pending"))
+        #expect(toast.message == L10n.string("The chat was created, but invitation delivery is not confirmed. The recipient may not see a chat request yet."))
+        #expect(toast.diagnostic == nil)
+        appState.dismissToast()
+        await appState.startRuntimeSuspension().value
+        appState.handleRuntimeEvent(event, generation: generation)
+        #expect(appState.activeToast == nil)
+        await stopReadyRuntime(appState)
+    }
+
     @Test func groupRecoveryNoticesRespectAccountAndRuntimeOwnership() async throws {
         let seeded = try await readyAppStateWithCreatedIdentities()
         let appState = seeded.appState
@@ -2403,7 +2439,8 @@ struct AppStateBootstrapTests {
 
     private func grantedNotifications(
         onAuthorizationRequest: @escaping () -> Void = {},
-        remoteNotificationRegistrar: @escaping () -> Void = {}
+        remoteNotificationRegistrar: @escaping () -> Void = {},
+        remoteNotificationsAvailable: Bool = true
     ) -> AppNotifications {
         AppNotifications(
             requestAuthorizationHandler: {
@@ -2411,7 +2448,8 @@ struct AppStateBootstrapTests {
                 return true
             },
             authorizationStatusProvider: { .authorized },
-            remoteNotificationRegistrar: remoteNotificationRegistrar
+            remoteNotificationRegistrar: remoteNotificationRegistrar,
+            remoteNotificationsAvailable: remoteNotificationsAvailable
         )
     }
 
@@ -3409,6 +3447,10 @@ struct AppContainerConfigTests {
     }
 
     @Test func pushServerConfigMatchesBuildFlavor() throws {
+        if Bundle.main.bundleIdentifier == "dev.ipf.whitenoise.ios.staging.personal" {
+            #expect(NativePushServerConfig.current() == nil)
+            return
+        }
         // The push server pubkey is flavor-specific (`WHITENOISE_PUSH_SERVER_PUBKEY_HEX`),
         // so assert against the value for the flavor this test bundle was built
         // with rather than hardcoding production; the test runs under Staging in CI.
@@ -3957,7 +3999,7 @@ struct LocalizationCatalogTests {
 
         let english = try localizedValue("NSCameraUsageDescription", locale: "en", in: strings)
         #expect(english != "NSCameraUsageDescription")
-        #expect(english == "White Noise uses the camera to scan profile QR codes and take photos and videos for encrypted chats.")
+        #expect(english == "White Noise uses the camera to scan profile and device pairing QR codes and take photos and videos for encrypted chats.")
         #expect(localizations["fr"] != nil)
         #expect(localizations["zh-Hant"] != nil)
     }
@@ -15563,11 +15605,17 @@ extension MarmotClient {
     /// Builds a MarmotClient pointed at a unique temp directory so unit tests
     /// stay hermetic. Falls back to the production root only if the temp dir
     /// can't be created (which would itself be a test environment problem).
-    static func testClient(relayUrls: [String] = unreachableTestRelays) throws -> MarmotClient {
+    static func testClient(
+        relayUrls: [String] = unreachableTestRelays,
+        relayPolicy: RelayPolicyFfi? = nil
+    ) throws -> MarmotClient {
         let tmp = FileManager.default.temporaryDirectory
             .appendingPathComponent("MarmotTests-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
-        return try MarmotClient(rootPath: tmp.path, relayUrls: relayUrls)
+        return try MarmotClient(
+            rootPath: tmp.path, relayUrls: relayUrls, cursorPersistence: .advance,
+            telemetryConfig: .current(), relayPolicy: relayPolicy
+        )
     }
 }
 

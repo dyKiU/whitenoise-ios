@@ -8,7 +8,6 @@ import SwiftUI
 /// faithful styling, render-side link gating, and budget/sanitization safety.
 @MainActor
 struct MarkdownMessageBuilderTests {
-
     private func doc(_ blocks: [MarkdownBlockFfi]) -> MarkdownDocumentFfi {
         MarkdownDocumentFfi(blocks: blocks, truncated: false)
     }

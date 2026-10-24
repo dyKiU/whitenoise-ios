@@ -93,6 +93,7 @@ struct GroupDetailsView: View {
                 membersSection
                 relaysSection
             }
+
             if viewModel.canModerateReports {
                 Section {
                     NavigationLink {
