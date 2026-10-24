@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 import UIKit
 import Vision
@@ -208,5 +209,19 @@ struct ContinuousQRScannerTests {
         )
         scanner.receiveFrame(["previous-profile", profile])
         #expect(accepted == [profile])
+    }
+}
+
+@MainActor
+struct QRScannerRevisionTests {
+    @Test func simulatorFallbackUsesEarliestAdvertisedRevision() throws {
+        let supported = IndexSet([9, 3, 6])
+        #expect(try QRScannerFrameDetector.earliestSupportedBarcodeRevision(supported) == 3)
+    }
+
+    @Test func missingSupportedRevisionRefusesDefaultInference() {
+        #expect(throws: QRScannerFrameDetector.BarcodeRevisionFailure.noSupportedRevisions) {
+            try QRScannerFrameDetector.earliestSupportedBarcodeRevision(IndexSet())
+        }
     }
 }
