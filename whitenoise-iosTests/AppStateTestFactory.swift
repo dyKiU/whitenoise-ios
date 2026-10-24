@@ -2,7 +2,7 @@ import Foundation
 @testable import whitenoise_ios
 
 extension AppState {
-    static func test(
+    @MainActor static func test(
         client: MarmotClient? = nil,
         notifications: AppNotifications? = nil,
         conversationDraftStore: ConversationDraftStore? = nil,

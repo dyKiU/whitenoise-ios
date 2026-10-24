@@ -27,7 +27,7 @@ struct ComposerMentionQueryTests {
         #expect(session?.query == "al")
     }
 
-    @Test func filterMatchesDisplayNameAndNpub() {
+    @MainActor @Test func filterMatchesDisplayNameAndNpub() {
         let candidates = [
             mentionCandidate(name: "Jeff", npub: jeffNpub, hex: "111"),
             mentionCandidate(name: "Alice", npub: aliceNpub, hex: "222"),
@@ -77,7 +77,7 @@ struct ComposerMentionQueryTests {
         #expect(ComposerMentionQuery.filter([candidate], matching: "best").map(\.npub) == [aliceNpub])
     }
 
-    @Test func filterMatchesMemberIdHexCaseInsensitively() {
+    @MainActor @Test func filterMatchesMemberIdHexCaseInsensitively() {
         // Regression for #300: filter matches against precomputed lowercased
         // fields. Verify the memberIdHex match path and case-insensitivity
         // survive the precompute (an uppercase query must still match the
@@ -104,7 +104,7 @@ struct ComposerMentionQueryTests {
         #expect(updated == "ping @Jeff ")
     }
 
-    @Test func canonicalizeDisplayNameMentionForSend() {
+    @MainActor @Test func canonicalizeDisplayNameMentionForSend() {
         let candidates = [
             mentionCandidate(name: "Jeff", npub: jeffNpub, hex: "111")
         ]
@@ -115,7 +115,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping @\(jeffNpub) ")
     }
 
-    @Test func canonicalizeRefusesAmbiguousNamesWithoutASelection() {
+    @MainActor @Test func canonicalizeRefusesAmbiguousNamesWithoutASelection() {
         // Two members share the display name: without an explicit tap, the
         // mention stays literal text — a peer cloning a name cannot capture
         // an unselected mention through match ordering.
@@ -130,7 +130,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping @Jeff ")
     }
 
-    @Test func canonicalizeResolvesAmbiguousNamesThroughTheTappedIdentity() {
+    @MainActor @Test func canonicalizeResolvesAmbiguousNamesThroughTheTappedIdentity() {
         let candidates = [
             mentionCandidate(name: "Jeff", npub: jeffNpub, hex: "111"),
             mentionCandidate(name: "Jeff", npub: aliceNpub, hex: "222"),
@@ -148,7 +148,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping @\(aliceNpub) ")
     }
 
-    @Test func editProjectionRendersNamesAndPreservesAmbiguousIdentities() throws {
+    @MainActor @Test func editProjectionRendersNamesAndPreservesAmbiguousIdentities() throws {
         let firstNpub = try #require(NostrProfileReference.npub(
             fromAccountIdHex: String(repeating: "11", count: 32)
         ))
@@ -195,7 +195,7 @@ struct ComposerMentionQueryTests {
         #expect(projection.selectedMentions.isEmpty)
     }
 
-    @Test func boundedCanonicalizationNeverSplitsExpandedMention() {
+    @MainActor @Test func boundedCanonicalizationNeverSplitsExpandedMention() {
         let candidate = mentionCandidate(name: "Alex", npub: aliceNpub, hex: "111")
         let prefix = String(repeating: "x", count: ContentSanitizer.maxMessageLength - 6)
         let text = "\(prefix) @Alex"
@@ -210,7 +210,7 @@ struct ComposerMentionQueryTests {
         #expect(!outgoing.contains("@npub"))
     }
 
-    @Test func boundedCanonicalizationKeepsMentionWholeWhenItFitsExactly() {
+    @MainActor @Test func boundedCanonicalizationKeepsMentionWholeWhenItFitsExactly() {
         let candidate = mentionCandidate(name: "Alex", npub: aliceNpub, hex: "111")
         let canonicalMention = "@\(aliceNpub)"
         let prefix = String(
@@ -228,7 +228,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing.hasSuffix(canonicalMention))
     }
 
-    @Test func ambiguousSelectionsStayBoundToTheirOwnOccurrences() {
+    @MainActor @Test func ambiguousSelectionsStayBoundToTheirOwnOccurrences() {
         let candidates = [
             mentionCandidate(name: "Jeff", npub: jeffNpub, hex: "111"),
             mentionCandidate(name: "Jeff", npub: aliceNpub, hex: "222"),
@@ -256,7 +256,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "@\(jeffNpub) and @\(aliceNpub)")
     }
 
-    @Test func deletedSelectionDoesNotBindRetypedAmbiguousText() {
+    @MainActor @Test func deletedSelectionDoesNotBindRetypedAmbiguousText() {
         let original = "ping @Jeff "
         var selections = [ComposerMentionSelection(
             utf16Location: "ping ".utf16.count,
@@ -280,7 +280,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == original)
     }
 
-    @Test func deletingOneOfTwoIdenticalMentionsDropsAmbiguousBindings() {
+    @MainActor @Test func deletingOneOfTwoIdenticalMentionsDropsAmbiguousBindings() {
         let original = "@Jeff x @Jeff"
         let selections = [
             ComposerMentionSelection(
@@ -315,7 +315,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "@Jeff")
     }
 
-    @Test func canonicalizeIgnoresSelectionsPointingOutsideTheRoster() {
+    @MainActor @Test func canonicalizeIgnoresSelectionsPointingOutsideTheRoster() {
         // A stale selection whose npub no longer belongs to any member with
         // that name must not resolve the mention.
         let candidates = [
@@ -335,7 +335,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping @Jeff ")
     }
 
-    @Test func selectedMentionDoesNotRetargetToAReplacementNamesake() {
+    @MainActor @Test func selectedMentionDoesNotRetargetToAReplacementNamesake() {
         let outgoing = ComposerMentionCanonicalizer.canonicalize(
             "ping @Jeff ",
             candidates: [
@@ -352,7 +352,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping @Jeff ")
     }
 
-    @Test func selectedMentionSurvivesProfileRename() {
+    @MainActor @Test func selectedMentionSurvivesProfileRename() {
         let outgoing = ComposerMentionCanonicalizer.canonicalize(
             "ping @Jeff ",
             candidates: [
@@ -419,7 +419,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping @Jeff ")
     }
 
-    @Test func canonicalizeDisplayNameMentionWithSpacesAndPunctuation() {
+    @MainActor @Test func canonicalizeDisplayNameMentionWithSpacesAndPunctuation() {
         let candidates = [
             mentionCandidate(name: "Jeff Smith", npub: jeffNpub, hex: "111")
         ]
@@ -430,7 +430,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping (@\(jeffNpub)), are you around?")
     }
 
-    @Test func canonicalizePrefersLongestDisplayName() {
+    @MainActor @Test func canonicalizePrefersLongestDisplayName() {
         let candidates = [
             mentionCandidate(name: "Jeff", npub: jeffNpub, hex: "111"),
             mentionCandidate(name: "Jeff Smith", npub: aliceNpub, hex: "222"),
@@ -442,7 +442,7 @@ struct ComposerMentionQueryTests {
         #expect(outgoing == "ping @\(aliceNpub) ")
     }
 
-    @Test func canonicalizeKeepsNonMentionAtSignsAndLongerWords() {
+    @MainActor @Test func canonicalizeKeepsNonMentionAtSignsAndLongerWords() {
         let candidates = [
             mentionCandidate(name: "Jeff", npub: jeffNpub, hex: "111")
         ]
@@ -502,7 +502,7 @@ struct ComposerMentionQueryTests {
         )
     }
 
-    @Test func fallbackMemberCandidateEncodesNpubWithoutMarmotClient() throws {
+    @MainActor @Test func fallbackMemberCandidateEncodesNpubWithoutMarmotClient() throws {
         let npub = "npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg"
         let accountIdHex = try #require(NostrProfileReference.pubkeyHex(fromBech32: npub))
         let member = AppGroupMemberRecordFfi(
@@ -517,7 +517,7 @@ struct ComposerMentionQueryTests {
         #expect(candidate.displayName == IdentityFormatter.short(npub))
     }
 
-    @Test func fallbackMemberCandidateRejectsInvalidAccountHex() {
+    @MainActor @Test func fallbackMemberCandidateRejectsInvalidAccountHex() {
         let member = AppGroupMemberRecordFfi(
             memberIdHex: "mls-member-id",
             account: "account-label",
@@ -554,7 +554,7 @@ struct ComposerMentionQueryTests {
     }
 }
 
-private func mentionCandidate(name: String, npub: String, hex: String) -> ComposerMentionCandidate {
+@MainActor private func mentionCandidate(name: String, npub: String, hex: String) -> ComposerMentionCandidate {
     ComposerMentionCandidate(
         details: GroupMemberDetailsFfi(
             memberIdHex: hex,
