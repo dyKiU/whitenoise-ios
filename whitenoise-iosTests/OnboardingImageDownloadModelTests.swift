@@ -30,7 +30,7 @@ struct OnboardingImageDownloadModelTests {
         // A valid image may carry trailing data; downloading still counts every byte.
         bytes.append(Data(repeating: 0, count: 3 * 1024 * 1024))
         var fetchCount = 0
-        let fetch: (URL, Int) async throws -> Data = { _, maximumBytes in
+        let fetch: @MainActor (URL, Int) async throws -> Data = { _, maximumBytes in
             fetchCount += 1
             guard bytes.count <= maximumBytes else { throw URLError(.dataLengthExceedsMaximum) }
             return bytes

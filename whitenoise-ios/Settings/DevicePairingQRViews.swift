@@ -55,13 +55,13 @@
     struct DevicePairingQRImportButton: View {
         @Environment(\.scenePhase) private var scenePhase
         let title: LocalizedStringKey
-        let isCurrent: @MainActor () -> Bool
+        let isCurrent: @MainActor @Sendable () -> Bool
         let onScan: (String) -> Void
         private let onStart: () -> Void
         @State private var transport: DevicePairingQRImport?
         @State private var scanning = false
 
-        init(title: LocalizedStringKey = "Scan pairing QR", isCurrent: @escaping @MainActor () -> Bool,
+        init(title: LocalizedStringKey = "Scan pairing QR", isCurrent: @escaping @MainActor @Sendable () -> Bool,
              onStart: @escaping () -> Void = {}, onScan: @escaping (String) -> Void) {
             self.title = title
             self.isCurrent = isCurrent
