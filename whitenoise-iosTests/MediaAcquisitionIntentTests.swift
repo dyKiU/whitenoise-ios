@@ -161,6 +161,19 @@ struct MediaAcquisitionIntentTests {
         #expect(requester.calls == [.init(kind: .downloadAgain, accountRef: "account-a", groupID: "group-a", target: target)])
     }
 
+    #if WN_CURRENT_SDK_API
+    @Test func settingsCleanupRequiresDeliberateDownloadAgain() async throws {
+        let requester = RecordingAttachmentDemandRequester(reference: "job", automaticState: .cleanedBySetting)
+        #expect(try await !AttachmentDemand.automatic.record(accountRef: "account-a", groupID: "group-a",
+            target: target, with: requester))
+        #expect(requester.calls.map(\.kind) == [.automatic])
+
+        #expect(try await AttachmentDemand.retry.record(accountRef: "account-a", groupID: "group-a",
+            target: target, with: requester))
+        #expect(requester.calls.map(\.kind) == [.automatic, .downloadAgain])
+    }
+    #endif
+
     @Test func automaticDemandAwaitsOnlyLiveTransfers() async throws {
         let live = RecordingAttachmentDemandRequester(reference: "job", automaticState: .downloading)
         #expect(try await AttachmentDemand.automatic.record(accountRef: "account-a", groupID: "group-a",

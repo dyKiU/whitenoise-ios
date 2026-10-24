@@ -175,17 +175,17 @@ struct AccountSetupTests {
     @Test func profileOptionalityFollowsTheOfferedActions() {
         var step = snapshot().steps[0]
         step.step = .profile
-        step.findings = [.init(issue: .missing, endpoint: nil)]
+        step.findings = [onboardingTestFinding(issue: .missing, endpoint: nil)]
         step.actions = [.editProfile, .continueWithout]
         #expect(AccountSetupPresentation.checkState(step) == .optionalReview)
 
         step.status = .retryableFailure
-        step.findings = [.init(issue: .timedOut, endpoint: nil)]
+        step.findings = [onboardingTestFinding(issue: .timedOut, endpoint: nil)]
         step.actions = [.retry, .continueWithout]
         #expect(AccountSetupPresentation.checkState(step) == .optionalReview)
 
         // An interrupted profile publication cannot promise a skip that MDK does not offer.
-        step.findings = [.init(issue: .publicationFailed, endpoint: nil)]
+        step.findings = [onboardingTestFinding(issue: .publicationFailed, endpoint: nil)]
         step.actions = [.retry]
         #expect(AccountSetupPresentation.checkState(step) == .requiredFix)
     }
@@ -342,9 +342,26 @@ struct AccountSetupTests {
         }
     }
 
+    #if WN_CURRENT_SDK_API
+    @Test func completedInspectionUsesTheExistingDoneLabel() {
+        #expect(AccountSetupPresentation.issue(.inspectionCompleted) == L10n.string("Done"))
+    }
+
+    @Test func completedInspectionDoesNotAcknowledgeOrFinishSetup() {
+        var unfinished = snapshot()
+        unfinished.steps[0].findings = [onboardingTestFinding(issue: .inspectionCompleted, endpoint: nil)]
+
+        #expect(!unfinished.ready)
+        #expect(AccountSetupPresentation.findingMessages(unfinished.steps[0].findings) == [L10n.string("Done")])
+        #expect(AccountSetupPresentation.checkState(unfinished.steps[0]) == .acknowledgment)
+        #expect(AccountSetupPresentation.stepToReview(unfinished, isBusy: false, isConnected: true) == .singleDevice)
+        #expect(AccountSetupPolicy.automaticAction(unfinished) == nil)
+    }
+    #endif
+
     @Test func relayFindingsNameTheAffectedAddressWithoutDuplicates() {
-        let retired = OnboardingFindingFfi(issue: .retiredRelay, endpoint: "wss://relay.damus.io")
-        let unreachable = OnboardingFindingFfi(issue: .unreachable, endpoint: "wss://example.com")
+        let retired = onboardingTestFinding(issue: .retiredRelay, endpoint: "wss://relay.damus.io")
+        let unreachable = onboardingTestFinding(issue: .unreachable, endpoint: "wss://example.com")
         #expect(AccountSetupPresentation.findingMessages([retired, retired, unreachable]) == [
             AccountSetupPresentation.issue(.retiredRelay) + "\nwss://relay.damus.io",
             AccountSetupPresentation.issue(.unreachable) + "\nwss://example.com"
@@ -352,7 +369,7 @@ struct AccountSetupTests {
     }
 
     @Test func relayFindingAddressesAreBoundedAndStripInvisibleFormatting() {
-        let findings = [OnboardingFindingFfi(issue: .invalidRelay,
+        let findings = [onboardingTestFinding(issue: .invalidRelay,
                                            endpoint: "\u{202e}wss://example.com\n" + String(repeating: "a", count: 1_000))]
         let messages = AccountSetupPresentation.findingMessages(findings)
         #expect(messages.count == 1)
@@ -561,7 +578,7 @@ struct AccountSetupTests {
         var result = initial
         result.revision += 1
         result.steps[0].status = lookupFailed ? .retryableFailure : .needsInput
-        result.steps[0].findings = [OnboardingFindingFfi(
+        result.steps[0].findings = [onboardingTestFinding(
             issue: lookupFailed ? .unreachable : .missing, endpoint: nil
         )]
         result.steps[0].actions = [.retry, .editDiscoveryRelays]
@@ -616,7 +633,7 @@ struct AccountSetupTests {
     func missingRelaysRequireConsent(_ step: OnboardingStepFfi) {
         var value = snapshot()
         value.steps[0].step = step
-        value.steps[0].findings = [OnboardingFindingFfi(issue: .missing, endpoint: nil)]
+        value.steps[0].findings = [onboardingTestFinding(issue: .missing, endpoint: nil)]
         value.steps[0].actions = [.useRecommendedRelays]
         #expect(AccountSetupPolicy.automaticAction(value) == nil)
     }

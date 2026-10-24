@@ -122,6 +122,9 @@ nonisolated enum AttachmentTransferPresentation {
         #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
         case .storageBlocked: L10n.string("Waiting to retry")
         #endif
+        #if WN_CURRENT_SDK_API
+        case .cleanedBySetting: L10n.string("Removed") + " · " + L10n.string("Settings")
+        #endif
         case .failed: L10n.string("Download failed")
         case .cancelled: L10n.string("Cancelled")
         case .paused: L10n.string("Paused")

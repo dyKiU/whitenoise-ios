@@ -192,6 +192,9 @@ nonisolated enum AttachmentAcquisitionPresentation {
         #if WN_CURRENT_SDK_API || WN_EXPERIMENTAL_DEVICE_SYNC
         case .storageBlocked: false
         #endif
+        #if WN_CURRENT_SDK_API
+        case .cleanedBySetting: false
+        #endif
         case .queued, .downloading, .verifyingCiphertext, .decrypting, .verifyingPlaintext,
              .ready, .retryScheduled: true
         case .unavailable, .notRequested, .paused, .failed, .policyBlocked, .cancelled, .removed,

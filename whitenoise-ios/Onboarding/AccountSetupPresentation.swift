@@ -154,6 +154,9 @@ nonisolated enum AccountSetupPresentation {
         case .multiDeviceUnsupported: L10n.string("Conversations do not sync across devices yet.")
         case .otherInstallationPossible: L10n.string("Another installation may exist.")
         case .discoveryIncomplete: L10n.string("Some discovery sources could not be checked.")
+        #if WN_CURRENT_SDK_API
+        case .inspectionCompleted: L10n.string("Done")
+        #endif
         }
     }
 }

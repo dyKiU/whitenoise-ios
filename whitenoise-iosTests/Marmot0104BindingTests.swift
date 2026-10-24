@@ -225,6 +225,11 @@ struct Marmot0104BindingTests {
         #expect(!AttachmentAcquisitionPresentation.canAwait(.storageBlocked))
         #expect(AttachmentTransferPresentation.label(.storageBlocked) == L10n.string("Waiting to retry"))
         #endif
+        #if WN_CURRENT_SDK_API
+        #expect(!AttachmentAcquisitionPresentation.canAwait(.cleanedBySetting))
+        #expect(AttachmentTransferPresentation.label(.cleanedBySetting)
+            == L10n.string("Removed") + " · " + L10n.string("Settings"))
+        #endif
         for state in [
             AttachmentTransferStateFfi.previouslyAcquiredUnavailable, .completedUnretained,
             .retryExhausted, .removed, .cancelled, .failed, .policyBlocked, .paused, .unavailable,
