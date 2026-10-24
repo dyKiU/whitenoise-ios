@@ -407,7 +407,7 @@ import UIKit
             try await consent.cancel()
         }
         @Test func failedTargetReadNeverFallsBackToPreviousSelection() async throws {
-            var readFails = false
+            let readFails = MainActorTestFlag(false)
             var invoked = false
             let selector = Data([32])
             let transfer = SelectedChatTransferViewModel(
@@ -417,11 +417,11 @@ import UIKit
                 },
                 receive: { _ in throw MarmotKitError.SelectedChatCopyUnsupported },
                 targets: {
-                    if readFails { throw MarmotKitError.SelectedChatCopyBusy }
+                    if readFails.value { throw MarmotKitError.SelectedChatCopyBusy }
                     return [.init(selector: selector, deviceCount: 2)]
                 }, isCurrent: { true })
             try await transfer.loadTargets()
-            readFails = true
+            readFails.value = true
             await #expect(throws: MarmotKitError.SelectedChatCopyBusy) { try await transfer.loadTargets() }
             #expect(transfer.targets.isEmpty)
             await #expect(throws: MarmotKitError.SelectedChatCopyNotReady) {

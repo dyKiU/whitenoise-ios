@@ -209,18 +209,18 @@ import Testing
         }
 
         @Test func inactiveListObserverCannotBeReusedAfterForegroundReturns() async {
-            var current = true
+            let current = MainActorTestFlag(true)
             let original = PagingList(page(sequence: 1, start: 0, cursor: nil))
             let model = AccountChatListViewModel(
                 accountRef: "synthetic-account", runtime: PagingFactory(original: original),
-                isPresentationCurrent: { true }, isCurrent: { current })
+                isPresentationCurrent: { true }, isCurrent: { current.value })
             model.start()
             defer { model.invalidate() }
             #expect(await waitFor { original.hasUpdateWaiter })
-            current = false
+            current.value = false
             original.cancel()
             #expect(await waitFor { model.retired })
-            current = true
+            current.value = true
             #expect(!model.isCurrentOwner)
             #expect(model.pairedRows.count == 64)
         }

@@ -106,14 +106,14 @@ import Testing
         }
 
         @Test func expiredRuntimeTicketCannotAdoptALateWindow() async {
-            var current = true
+            let current = MainActorTestFlag(true)
             let factory = DelayedAccountChatFactory()
             let model = AccountChatListViewModel(
                 accountRef: "synthetic-account", runtime: factory,
-                isCurrent: { current })
+                isCurrent: { current.value })
             model.start()
             #expect(await waitFor { factory.isWaiting })
-            current = false
+            current.value = false
             let original = HeldAccountChatList()
             factory.finish(original)
             #expect(await waitFor { original.cancelCount == 1 })

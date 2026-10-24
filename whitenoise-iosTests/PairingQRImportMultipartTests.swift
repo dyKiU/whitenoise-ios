@@ -24,14 +24,14 @@
         }
 
         @Test func changedAccountOrOriginalRefusesLateFrameAndClearsPartialBytes() throws {
-            var current = true
-            let transport = DevicePairingQRImport(isCurrent: { current })
+            let current = MainActorTestFlag(true)
+            let transport = DevicePairingQRImport(isCurrent: { current.value })
             let pages = try frames()
             _ = try transport.receive(pages[0])
-            current = false
+            current.value = false
             #expect(throws: DevicePairingQRCode.MultipartFailure.self) { try transport.receive(pages[1]) }
             #expect(transport.terminal && transport.receivedFrames == 0)
-            current = true
+            current.value = true
             #expect(throws: DevicePairingQRCode.MultipartFailure.self) { try transport.receive(pages[0]) }
         }
 

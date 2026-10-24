@@ -317,23 +317,23 @@ import Testing
         }
 
         @Test func inactiveObservationRetiresWithoutClearingAcceptedSendOrDraft() async throws {
-            var current = true
+            let current = MainActorTestFlag(true)
             let state = PendingSendState()
             let sender = PendingSender(state: state)
             let original = PendingConversation(snapshot(sequence: 1))
             let model = AccountConversationViewModel(
                 accountRef: "synthetic-account", groupIdHex: group, runtime: sender,
                 observations: PendingFactory(original: original), isPresentationCurrent: { true },
-                isCurrent: { current })
+                isCurrent: { current.value })
             model.start()
             defer { model.invalidate() }
             #expect(await waitFor { model.snapshot != nil })
             let accepted = try await model.sendText("Synthetic pending message")
             model.continuity.draft = "Unsent draft"
-            current = false
+            current.value = false
             original.cancel()
             #expect(await waitFor { model.retired })
-            current = true
+            current.value = true
             #expect(!model.isCurrentOwner)
             #expect(model.pairedHeader != nil)
             #expect(model.continuity.draft == "Unsent draft")
