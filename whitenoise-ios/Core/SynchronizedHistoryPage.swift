@@ -28,7 +28,7 @@ nonisolated struct SynchronizedHistoryPage: Sendable {
 
 #if WN_EXPERIMENTAL_DEVICE_SYNC
     extension SynchronizedHistoryPage {
-        init(_ page: ArchivedHistoryPageFfi) {
+        nonisolated init(_ page: ArchivedHistoryPageFfi) {
             records = page.records.map { record in
                 SynchronizedHistoryRecord(
                     id: record.messageIdHex, authorPubkey: record.authorPubkey, createdAt: record.createdAt,

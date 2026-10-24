@@ -14,10 +14,9 @@ struct WNIdentityPaletteTests {
 
     @Test(arguments: [UIUserInterfaceStyle.light, .dark], [UIAccessibilityContrast.normal, .high])
     func everyNameColorMeetsContrast(style: UIUserInterfaceStyle, contrast: UIAccessibilityContrast) {
-        let traits = UITraitCollection(traitsFrom: [
-            UITraitCollection(userInterfaceStyle: style),
-            UITraitCollection(accessibilityContrast: contrast),
-        ])
+        let traits = UITraitCollection(userInterfaceStyle: style).modifyingTraits {
+            $0.accessibilityContrast = contrast
+        }
         var checkedBuckets = Set<Int>()
         for value in 0..<256 {
             let key = String(format: "%064x", value)

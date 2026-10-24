@@ -34,10 +34,9 @@ struct WNPhotoMenuActionTests {
     @MainActor
     @Test func destructiveSymbolUsesTheCurrentContrastVariant() throws {
         for style in [UIUserInterfaceStyle.light, .dark] {
-            let traits = UITraitCollection(traitsFrom: [
-                UITraitCollection(userInterfaceStyle: style),
-                UITraitCollection(accessibilityContrast: .high)
-            ])
+            let traits = UITraitCollection(userInterfaceStyle: style).modifyingTraits {
+                $0.accessibilityContrast = .high
+            }
             let expected = try #require(UIImage(systemName: "trash"))
                 .withTintColor(UIColor.systemRed.resolvedColor(with: traits), renderingMode: .alwaysOriginal)
             traits.performAsCurrent {

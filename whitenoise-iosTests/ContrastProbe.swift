@@ -18,9 +18,9 @@ enum ContrastProbe {
     }
 
     static func channels(_ color: Color, style: UIUserInterfaceStyle, contrast: UIAccessibilityContrast = .normal) -> Channels {
-        let traits = UITraitCollection(traitsFrom: [
-            UITraitCollection(userInterfaceStyle: style), UITraitCollection(accessibilityContrast: contrast),
-        ])
+        let traits = UITraitCollection(userInterfaceStyle: style).modifyingTraits {
+            $0.accessibilityContrast = contrast
+        }
         let resolved = UIColor(color).resolvedColor(with: traits)
         var red: CGFloat = 0
         var green: CGFloat = 0

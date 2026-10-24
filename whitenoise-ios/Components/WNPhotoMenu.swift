@@ -38,10 +38,9 @@ nonisolated enum WNPhotoMenuAction: Hashable, CaseIterable {
     }
 
     func symbol(for colorScheme: ColorScheme, contrast: ColorSchemeContrast = .standard) -> UIImage {
-        let traits = UITraitCollection(traitsFrom: [
-            UITraitCollection(userInterfaceStyle: colorScheme == .dark ? .dark : .light),
-            UITraitCollection(accessibilityContrast: contrast == .increased ? .high : .normal)
-        ])
+        let traits = UITraitCollection(userInterfaceStyle: colorScheme == .dark ? .dark : .light).modifyingTraits {
+            $0.accessibilityContrast = contrast == .increased ? .high : .normal
+        }
         let color = (isDestructive ? UIColor.systemRed : .label).resolvedColor(with: traits)
         return UIImage(systemName: systemImage)?.withTintColor(color, renderingMode: .alwaysOriginal) ?? UIImage()
     }
