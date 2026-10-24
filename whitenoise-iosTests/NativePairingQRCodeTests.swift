@@ -147,7 +147,7 @@
       try FileManager.default.createDirectory(
         at: root, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
       let relay = "ws://127.0.0.1:18181"
-      let stores = [try IsolatedQRSecretStore(), try IsolatedQRSecretStore(), try IsolatedQRSecretStore()]
+      let stores = [IsolatedQRSecretStore(), IsolatedQRSecretStore(), IsolatedQRSecretStore()]
       var runtimes: [Marmot] = []
       var originals: [DeviceLinkingSession] = []
       var approvals: [DeviceLinkingApproval] = []

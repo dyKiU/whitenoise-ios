@@ -29,8 +29,14 @@ struct ChatListViewportTests {
         ids: [String],
         viewport: ChatListViewport,
         sequence: UInt64 = 0,
-        scroll: UIScrollView = UIScrollView()
+        scroll suppliedScroll: UIScrollView? = nil
     ) throws -> (window: UIWindow, scroll: UIScrollView) {
+        let scroll: UIScrollView
+        if let suppliedScroll {
+            scroll = suppliedScroll
+        } else {
+            scroll = UIScrollView()
+        }
         let scene = try #require(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
         let window = UIWindow(windowScene: scene)
         window.frame = CGRect(x: 0, y: 0, width: 390, height: viewportHeight)
