@@ -104,7 +104,13 @@ if [ -n "$udid" ]; then
   boot_pid=$!
 fi
 
-phase "build-for-testing" run build-for-testing "${xcodebuild_args[@]}" "${build_settings[@]}"
+# Optional, separate CI build evidence. Keep the test result bundle independent.
+# Xcode requires a fresh path; do not remove an existing caller-owned bundle.
+build_result_args=()
+if [ -n "${WN_TEST_BUILD_RESULT_BUNDLE:-}" ]; then
+  build_result_args+=(-resultBundlePath "$WN_TEST_BUILD_RESULT_BUNDLE")
+fi
+phase "build-for-testing" run build-for-testing "${xcodebuild_args[@]}" "${build_settings[@]}" ${build_result_args[@]+"${build_result_args[@]}"}
 
 if [ -n "$boot_pid" ]; then
   wait "$boot_pid" || true
